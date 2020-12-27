@@ -1,0 +1,751 @@
+//! All responses that can be received from the API.
+
+use serde::Deserialize;
+
+use crate::common::{Bounds, Crop, Position, Scale, SceneItem, SceneItemTransform};
+
+mod de;
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct Response<T> {
+    pub message_id: String,
+    pub status: Status,
+    pub error: Option<String>,
+    #[serde(flatten)]
+    pub details: T,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) enum Status {
+    Ok,
+    Error,
+}
+
+/// Response value for [`get_version`](crate::client::General::get_version).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct Version {
+    /// OBSRemote compatible API version. Fixed to 1.1 for retrocompatibility.
+    pub version: f64,
+    /// obs-websocket plugin version.
+    pub obs_websocket_version: String,
+    /// OBS Studio program version.
+    pub obs_studio_version: String,
+    /// List of available request types, formatted as a comma-separated list string (e.g. :
+    /// "Method1,Method2,Method3").
+    pub available_requests: String,
+    /// List of supported formats for features that use image export (like the
+    /// [`TakeSourceScreenshot`](crate::requests::RequestType::TakeSourceScreenshot) request type)
+    /// formatted as a comma-separated list string.
+    pub supported_image_export_formats: String,
+}
+
+/// Response value for [`get_auth_required`](crate::client::General::get_auth_required).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AuthRequired {
+    /// Indicates whether authentication is required.
+    pub auth_required: bool,
+    /// A random string that will be used to generate the auth response.
+    pub challenge: Option<String>,
+    /// Applied to the password when generating the auth response.
+    pub salt: Option<String>,
+}
+
+/// Response value for [`get_filename_formatting`](crate::client::General::get_filename_formatting).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct FilenameFormatting {
+    /// Current filename formatting string.
+    pub filename_formatting: String,
+}
+
+/// Response value for [`get_stats`](crate::client::General::get_stats).
+#[derive(Debug, Deserialize)]
+pub(crate) struct Stats {
+    /// See [`ObsStats`].
+    pub stats: ObsStats,
+}
+
+/// Response value for [`get_video_info`](crate::client::General::get_video_info).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VideoInfo {
+    /// Base (canvas) width.
+    pub base_width: u64,
+    /// Base (canvas) height.
+    pub base_height: u64,
+    /// Output width.
+    pub output_width: u64,
+    /// Output height.
+    pub output_height: u64,
+    /// Scaling method used if output size differs from base size.
+    pub scale_type: String,
+    /// Frames rendered per second.
+    pub fps: f64,
+    /// Video color format.
+    pub video_format: String,
+    /// Color space for YUV.
+    pub color_space: String,
+    /// Color range (full or partial).
+    pub color_range: String,
+}
+
+/// Response value for [`get_sources_list`](crate::client::Sources::get_sources_list).
+#[derive(Debug, Deserialize)]
+pub(crate) struct SourcesList {
+    /// Array of sources.
+    pub sources: Vec<SourceListItem>,
+}
+
+/// Response value for [`get_sources_types_list`](crate::client::Sources::get_sources_types_list).
+#[derive(Debug, Deserialize)]
+pub(crate) struct SourceTypesList {
+    /// Array of source types.
+    pub types: Vec<SourceTypeItem>,
+}
+
+/// Response value for [`get_volume`](crate::client::Sources::get_volume).
+#[derive(Debug, Deserialize)]
+pub struct Volume {
+    /// Source name.
+    pub name: String,
+    /// Volume of the source. Between `0.0` and `20.0` if using mul, under `26.0` if using dB.
+    pub volume: f64,
+    /// Indicates whether the source is muted.
+    pub muted: bool,
+}
+
+/// Response value for [`get_mute`](crate::client::Sources::get_mute).
+#[derive(Debug, Deserialize)]
+pub struct Mute {
+    /// Source name.
+    pub name: String,
+    /// Mute status of the source.
+    pub muted: bool,
+}
+
+/// Response value for [`get_audio_active`](crate::client::Sources::get_audio_active).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AudioActive {
+    /// Audio active status of the source.
+    pub audio_active: bool,
+}
+
+/// Response value for [`get_sync_offset`](crate::client::Sources::get_sync_offset).
+#[derive(Debug, Deserialize)]
+pub struct SyncOffset {
+    /// Source name.
+    pub name: String,
+    /// The audio sync offset (in nanoseconds).
+    pub offset: i64,
+}
+
+/// Response value for [`get_source_settings`](crate::client::Sources::get_source_settings) and
+/// [`set_source_settings`](crate::client::Sources::set_source_settings).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceSettings<T> {
+    /// Source name.
+    pub source_name: String,
+    /// Type of the specified source.
+    pub source_type: String,
+    /// Source settings (varies between source types, may require some probing around).
+    pub source_settings: T,
+}
+
+/// Response value for
+/// [`get_text_gdi_plus_properties`](crate::client::Sources::get_text_gdi_plus_properties).
+#[derive(Debug, Deserialize)]
+pub struct TextGdiPlusProperties {
+    /// Source name.
+    pub source: String,
+    /// Text Alignment ("left", "center", "right").
+    pub align: String,
+    /// Background color.
+    pub bk_color: u32,
+    /// Background opacity (0-100).
+    pub bk_opacity: u8,
+    /// Chat log.
+    pub chatlog: bool,
+    /// Chat log lines.
+    pub chatlog_lines: u64,
+    /// Text color.
+    pub color: u32,
+    /// Extents wrap.
+    pub extents: bool,
+    /// Extents cx.
+    pub extents_cx: i64,
+    /// Extents cy.
+    pub extents_cy: i64,
+    /// File path name.
+    pub file: String,
+    /// Read text from the specified file.
+    pub read_from_file: bool,
+    /// Holds data for the font. Ex:
+    /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
+    pub font: Font,
+    /// Gradient enabled.
+    pub gradient: bool,
+    /// Gradient color.
+    pub gradient_color: u32,
+    /// Gradient direction.
+    pub gradient_dir: f32,
+    /// Gradient opacity (0-100).
+    pub gradient_opacity: u8,
+    /// Outline.
+    pub outline: bool,
+    /// Outline color.
+    pub outline_color: u32,
+    /// Outline size.
+    pub outline_size: u64,
+    /// Outline opacity (0-100).
+    pub outline_opacity: u8,
+    /// Text content to be displayed.
+    pub text: String,
+    /// Text vertical alignment ("top", "center", "bottom").
+    pub valign: String,
+    /// Vertical text enabled.
+    pub vertical: bool,
+}
+
+/// Response value for
+/// [`get_text_freetype2_properties`](crate::client::Sources::get_text_freetype2_properties).
+#[derive(Debug, Deserialize)]
+pub struct TextFreetype2Properties {
+    /// Source name.
+    pub source: String,
+    /// Gradient top color.
+    pub color1: u32,
+    /// Gradient bottom color.
+    pub color2: u32,
+    /// Custom width (0 to disable).
+    pub custom_width: u32,
+    /// Drop shadow.
+    pub drop_shadow: bool,
+    /// Holds data for the font. Ex:
+    /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
+    pub font: Font,
+    /// Read text from the specified file.
+    pub from_file: bool,
+    /// Chat log.
+    pub log_mode: bool,
+    /// Outline.
+    pub outline: bool,
+    /// Text content to be displayed.
+    pub text: String,
+    /// File path.
+    pub text_file: String,
+    /// Word wrap.
+    pub word_wrap: bool,
+}
+
+/// Response value for [`get_special_sources`](crate::client::Sources::get_special_sources).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct SpecialSources {
+    /// Name of the first Desktop Audio capture source.
+    pub desktop_1: Option<String>,
+    /// Name of the second Desktop Audio capture source.
+    pub desktop_2: Option<String>,
+    /// Name of the first Mic/Aux input source.
+    pub mic_1: Option<String>,
+    /// Name of the second Mic/Aux input source.
+    pub mic_2: Option<String>,
+    /// Name of the third Mic/Aux input source.
+    pub mic_3: Option<String>,
+}
+
+/// Response value for [`get_source_filters`](crate::client::Sources::get_source_filters).
+#[derive(Debug, Deserialize)]
+pub(crate) struct SourceFilters {
+    /// List of filters for the specified source.
+    pub filters: Vec<SourceFilter>,
+}
+
+/// Response value for [`get_source_filter_info`](crate::client::Sources::get_source_filter_info).
+#[derive(Debug, Deserialize)]
+pub struct SourceFilterInfo<T> {
+    /// Filter status (enabled or not).
+    pub enabled: bool,
+    /// Filter type.
+    #[serde(rename = "type")]
+    pub ty: String,
+    /// Filter name.
+    pub name: String,
+    /// Filter settings.
+    pub settings: T,
+}
+
+/// Response value for [`get_audio_monitor_type`](crate::client::Sources::get_audio_monitor_type).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AudioMonitorType {
+    /// The monitor type in use. Options: `none`, `monitorOnly`, `monitorAndOutput`.
+    pub monitor_type: String,
+}
+
+/// Response value for [`take_source_screenshot`](crate::client::Sources::take_source_screenshot).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceScreenshot {
+    /// Source name.
+    pub source_name: String,
+    /// Image Data URI (if
+    /// [`embed_picture_format`](crate::requests::SourceScreenshot::embed_picture_format) was
+    /// specified in the request).
+    pub img: Option<String>,
+    /// Absolute path to the saved image file (if
+    /// [`save_to_file_path`](crate::requests::SourceScreenshot::save_to_file_path) was specified in
+    /// the request).
+    pub image_file: Option<String>,
+}
+
+/// Response value for [`list_outputs`](crate::client::Outputs::list_outputs).
+#[derive(Debug, Deserialize)]
+pub(crate) struct Outputs {
+    /// Outputs list.
+    pub outputs: Vec<Output>,
+}
+
+/// Response value for [`get_output_info`](crate::client::Outputs::get_output_info).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct OutputInfo {
+    /// Output info.
+    pub output_info: Output,
+}
+
+/// Response value for [`get_current_profile`](crate::client::Profiles::get_current_profile).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct CurrentProfile {
+    /// Name of the currently active profile.
+    pub profile_name: String,
+}
+
+/// Response value for [`list_profiles`](crate::client::Profiles::list_profiles).
+#[derive(Debug, Deserialize)]
+pub(crate) struct Profiles {
+    /// List of available profiles.
+    pub profiles: Vec<Profile>,
+}
+
+/// Response value for [`get_recording_folder`](crate::client::Recording::get_recording_folder).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct RecordingFolder {
+    /// Path of the recording folder.
+    pub rec_folder: String,
+}
+
+/// Response value for
+/// [`get_current_scene_collection`](crate::client::SceneCollections::get_current_scene_collection).
+#[serde(rename_all = "kebab-case")]
+#[derive(Debug, Deserialize)]
+pub(crate) struct CurrentSceneCollection {
+    /// Name of the currently active scene collection.
+    pub sc_name: String,
+}
+
+/// Response value for
+/// [`list_scene_collections`](crate::client::SceneCollections::list_scene_collections).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct SceneCollections {
+    /// Scene collections list.
+    pub scene_collections: Vec<SceneCollection>,
+}
+
+/// Response value for
+/// [`get_scene_item_properties`](crate::client::SceneItems::get_scene_item_properties).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItemProperties {
+    /// Scene Item name.
+    pub name: String,
+    /// Scene Item ID.
+    pub item_id: i64,
+    /// Position of the source.
+    pub position: Position,
+    /// The clockwise rotation of the item in degrees around the point of alignment.
+    pub rotation: f64,
+    /// Scaling factor of the source.
+    pub scale: Scale,
+    /// Pixel cropping of the source before scaling.
+    pub crop: Crop,
+    /// If the source is visible.
+    pub visible: bool,
+    /// If the source is muted.
+    pub muted: bool,
+    /// If the source's transform is locked.
+    pub locked: bool,
+    /// Bounding box of the source.
+    pub bounds: Bounds,
+    /// Base width (without scaling) of the source.
+    pub source_width: u32,
+    /// Base source (without scaling) of the source.
+    pub source_height: u32,
+    /// Scene item width (base source width multiplied by the horizontal scaling factor).
+    pub width: f64,
+    /// Scene item height (base source height multiplied by the vertical scaling factor).
+    pub height: f64,
+    // pub alignment: u8,
+    /// Name of the item's parent (if this item belongs to a group).
+    pub parent_group_name: Option<String>,
+    /// List of children (if this item is a group).
+    #[serde(default)]
+    pub group_children: Vec<SceneItemTransform>,
+}
+
+/// Response value for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AddSceneItem {
+    /// Numerical ID of the created scene item.
+    pub item_id: i64,
+}
+
+/// Response value for [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
+#[derive(Debug, Deserialize)]
+pub struct DuplicateSceneItem {
+    /// Name of the scene where the new item was created.
+    pub scene: String,
+    /// New item info.
+    pub item: SceneItemSpecification,
+}
+
+/// Response value for [`get_current_scene`](crate::client::Scenes::get_current_scene).
+#[derive(Debug, Deserialize)]
+pub struct CurrentScene {
+    /// Name of the currently active scene.
+    pub name: String,
+    /// Ordered list of the current scene's source items.
+    pub sources: Vec<SceneItem>,
+}
+
+/// Response value for [`get_scene_list`](crate::client::Scenes::get_scene_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct SceneList {
+    /// Name of the currently active scene.
+    pub current_scene: String,
+    /// Ordered list of the current profile's scenes.
+    pub scenes: Vec<Scene>,
+}
+
+/// Response value for
+/// [`get_scene_transition_override`](crate::client::Scenes::get_scene_transition_override).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneTransitionOverride {
+    /// Name of the current overriding transition. Empty string if no override is set.
+    pub transition_name: String,
+    /// Transition duration. `-1` if no override is set.
+    pub transition_duration: i64,
+}
+
+/// Response value for [`get_streaming_status`](crate::client::Streaming::get_streaming_status).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct StreamingStatus {
+    /// Current streaming status.
+    pub streaming: bool,
+    /// Current recording status.
+    pub recording: bool,
+    /// Time elapsed since streaming started (only present if currently streaming).
+    pub stream_timecode: Option<String>,
+    /// Time elapsed since recording started (only present if currently recording).
+    pub rec_timecode: Option<String>,
+    /// Always false. Retrocompatibility with OBSRemote.
+    #[serde(default)]
+    pub preview_only: bool,
+}
+
+/// Response value for [`get_stream_settings`](crate::client::Streaming::get_stream_settings).
+#[derive(Debug, Deserialize)]
+pub struct GetStreamSettings {
+    /// The type of streaming service configuration. Possible values: `rtmp_custom` or
+    /// `rtmp_common`.
+    #[serde(rename = "type")]
+    pub ty: String,
+    /// Stream settings object.
+    pub settings: StreamSettings,
+}
+
+/// Response value for
+/// [`get_studio_mode_status`](crate::client::StudioMode::get_studio_mode_status).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct StudioModeStatus {
+    /// Indicates if Studio Mode is enabled.
+    pub studio_mode: bool,
+}
+
+/// Response value for [`get_preview_scene`](crate::client::StudioMode::get_preview_scene).
+#[derive(Debug, Deserialize)]
+pub struct PreviewScene {
+    /// The name of the active preview scene.
+    pub name: String,
+    /// Array of scene items of the active preview scene.
+    pub sources: Vec<SceneItem>,
+}
+
+/// Response value for [`get_transition_list`](crate::client::Transitions::get_transition_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct TransitionList {
+    /// Name of the currently active transition.
+    pub current_transition: String,
+    /// List of transitions.
+    pub transitions: Vec<Transition>,
+}
+
+/// Response value for
+/// [`get_current_transition`](crate::client::Transitions::get_current_transition).
+#[derive(Debug, Deserialize)]
+pub struct CurrentTransition {
+    /// Name of the selected transition.
+    pub name: String,
+    /// Transition duration (in milliseconds) if supported by the transition.
+    pub duration: Option<u64>,
+}
+
+/// Response value for
+/// [`get_transition_duration`](crate::client::Transitions::get_transition_duration).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub(crate) struct TransitionDuration {
+    /// Duration of the current transition (in milliseconds).
+    pub transition_duration: u64,
+}
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/// Response value for [`get_stats`](crate::client::General::get_stats).
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct ObsStats {
+    /// Current framerate.
+    pub fps: f64,
+    /// Number of frames rendered.
+    pub render_total_frames: u64,
+    /// Number of frames missed due to rendering lag.
+    pub render_missed_frames: u64,
+    /// Number of frames outputted.
+    pub output_total_frames: u64,
+    /// Number of frames skipped due to encoding lag.
+    pub output_skipped_frames: u64,
+    /// Average frame render time (in milliseconds).
+    pub average_frame_time: f64,
+    /// Current CPU usage (percentage).
+    pub cpu_usage: f64,
+    /// Current RAM usage (in megabytes).
+    pub memory_usage: f64,
+    /// Free recording disk space (in megabytes)
+    pub free_disk_space: f64,
+}
+
+/// Response value for [`get_sources_list`](crate::client::Sources::get_sources_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceListItem {
+    /// Unique source name.
+    pub name: String,
+    /// Non-unique source internal type (a.k.a kind).
+    pub type_id: String,
+    /// Source type. Value is one of the following: "input", "filter", "transition", "scene" or
+    /// "unknown".
+    #[serde(rename = "type")]
+    pub ty: String,
+}
+
+/// Response value for [`get_sources_types_list`](crate::client::Sources::get_sources_types_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceTypeItem {
+    /// Non-unique internal source type ID.
+    pub type_id: String,
+    /// Display name of the source type.
+    pub display_name: String,
+    /// Type. Value is one of the following: "input", "filter", "transition" or "other".
+    #[serde(rename = "type")]
+    pub ty: String,
+    /// Default settings of this source type.
+    pub default_settings: serde_json::Value,
+    /// Source type capabilities.
+    pub caps: Caps,
+}
+
+/// Response value for [`get_sources_types_list`](crate::client::Sources::get_sources_types_list) as
+/// part of [`SourceTypeItem`].
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Caps {
+    /// True if source of this type provide frames asynchronously.
+    pub is_async: bool,
+    /// True if sources of this type provide video.
+    pub has_video: bool,
+    /// True if sources of this type provide audio.
+    pub has_audio: bool,
+    /// True if interaction with this sources of this type is possible.
+    pub can_interact: bool,
+    /// True if sources of this type composite one or more sub-sources.
+    pub is_composite: bool,
+    /// True if sources of this type should not be fully duplicated.
+    pub do_not_duplicate: bool,
+    /// True if sources of this type may cause a feedback loop if it's audio is monitored and
+    /// shouldn't be.
+    pub do_not_self_monitor: bool,
+}
+
+/// Response value for
+/// [`get_text_gdi_plus_properties`](crate::client::Sources::get_text_gdi_plus_properties) as part
+/// of [`TextGdiPlusProperties`] and
+/// [`get_text_freetype2_properties`](crate::client::Sources::get_text_freetype2_properties) as part
+/// of [`TextFreetype2Properties`].
+#[derive(Debug, Deserialize)]
+pub struct Font {
+    /// Font face.
+    pub face: String,
+    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
+    pub flags: u8,
+    /// Font text size.
+    pub size: u32,
+    /// Font Style (unknown function).
+    pub style: String,
+}
+
+/// Response value for [`get_source_filters`](crate::client::Sources::get_source_filters).
+#[derive(Debug, Deserialize)]
+pub struct SourceFilter {
+    /// Filter status (enabled or not).
+    pub enabled: bool,
+    /// Filter type.
+    #[serde(rename = "type")]
+    pub ty: String,
+    /// Filter name.
+    pub name: String,
+    /// Filter settings.
+    pub settings: serde_json::Value,
+}
+
+/// Response value for [`list_outputs`](crate::client::Outputs::list_outputs) and
+/// [`get_output_info`](crate::client::Outputs::get_output_info).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Output {
+    /// Output name.
+    pub name: String,
+    /// Output type/kind.
+    #[serde(rename = "type")]
+    pub ty: String,
+    /// Video output width.
+    pub width: u32,
+    /// Video output height.
+    pub height: u32,
+    /// Output flags.
+    pub flags: OutputFlags,
+    /// Output settings.
+    pub settings: serde_json::Value,
+    /// Output status (active or not).
+    pub active: bool,
+    /// Output reconnection status (reconnecting or not).
+    pub reconnecting: bool,
+    /// Output congestion.
+    pub congestion: f64,
+    /// Number of frames sent.
+    pub total_frames: u64,
+    /// Number of frames dropped.
+    pub dropped_frames: u64,
+    /// Total bytes sent.
+    pub total_bytes: u64,
+}
+
+/// Response value for [`list_outputs`](crate::client::Outputs::list_outputs) and
+/// [`get_output_info`](crate::client::Outputs::get_output_info) as part of [`Output`].
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OutputFlags {
+    /// Raw flags value.
+    pub raw_value: u64,
+    /// Output uses audio.
+    pub audio: bool,
+    /// Output uses video.
+    pub video: bool,
+    /// Output is encoded.
+    pub encoded: bool,
+    /// Output uses several audio tracks.
+    pub multi_track: bool,
+    /// Output uses a service.
+    pub service: bool,
+}
+
+/// Response value for [`list_profiles`](crate::client::Profiles::list_profiles).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct Profile {
+    /// Profile name.
+    pub profile_name: String,
+}
+
+/// Response value for
+/// [`list_scene_collections`](crate::client::SceneCollections::list_scene_collections).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub struct SceneCollection {
+    /// Scene collection name.
+    pub sc_name: String,
+}
+
+/// Response value for [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item) as
+/// part of [`DuplicateSceneItem`].
+#[derive(Debug, Deserialize)]
+pub struct SceneItemSpecification {
+    /// New item ID.
+    pub id: i64,
+    /// New item name.
+    pub name: String,
+}
+
+/// Response value for [`get_scene_list`](crate::client::Scenes::get_scene_list) as part of
+/// [`SceneList`].
+// TODO: actually the same as `CurrentScene`.
+#[derive(Clone, Debug, Deserialize)]
+pub struct Scene {
+    /// Name of the scene.
+    pub name: String,
+    /// Ordered list of the scene's source items.
+    pub sources: Vec<SceneItem>,
+}
+
+/// Response value for [`get_stream_settings`](crate::client::Streaming::get_stream_settings) as
+/// part of [`GetStreamSettings`].
+#[derive(Debug, Deserialize)]
+pub struct StreamSettings {
+    /// The publish URL.
+    pub server: String,
+    /// The publish key of the stream.
+    pub key: String,
+    /// Indicates whether authentication should be used when connecting to the streaming server.
+    pub use_auth: bool,
+    /// The username to use when accessing the streaming server. Only present if
+    /// [`use_auth`](Self::use_auth) is `true`.
+    pub username: Option<String>,
+    /// The password to use when accessing the streaming server. Only present if
+    /// [`use_auth`](Self::use_auth) is `true`.
+    pub password: Option<String>,
+}
+
+/// Response value for [`get_transition_list`](crate::client::Transitions::get_transition_list) as
+/// part of [`TransitionList`].
+#[derive(Debug, Deserialize)]
+pub struct Transition {
+    /// Name of the transition.
+    pub name: String,
+}
