@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::Duration;
 
 use super::Client;
 use crate::requests::RequestType;
@@ -36,14 +37,14 @@ impl<'a> Transitions<'a> {
     /// Set the duration of the currently selected transition if supported.
     ///
     /// - `duration`: Desired duration of the transition (in milliseconds).
-    pub async fn set_transition_duration(&self, duration: u64) -> Result<()> {
+    pub async fn set_transition_duration(&self, duration: Duration) -> Result<()> {
         self.client
             .send_message(RequestType::SetTransitionDuration { duration })
             .await
     }
 
     /// Get the duration of the currently selected transition if supported.
-    pub async fn get_transition_duration(&self) -> Result<u64> {
+    pub async fn get_transition_duration(&self) -> Result<Duration> {
         self.client
             .send_message::<responses::TransitionDuration>(RequestType::GetTransitionDuration)
             .await

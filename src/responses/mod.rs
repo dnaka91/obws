@@ -1,8 +1,17 @@
 //! All responses that can be received from the API.
 
+use std::collections::HashSet;
+use std::path::PathBuf;
+
+use chrono::Duration;
 use serde::Deserialize;
 
-use crate::common::{Bounds, Crop, Position, Scale, SceneItem, SceneItemTransform};
+pub use semver::Version as SemVerVersion;
+
+use crate::common::{
+    Align, Bounds, Crop, FontFlags, MonitorType, Position, Scale, SceneItem, SceneItemTransform,
+    StreamType, Valign,
+};
 
 mod de;
 
@@ -30,16 +39,18 @@ pub struct Version {
     /// OBSRemote compatible API version. Fixed to 1.1 for retrocompatibility.
     pub version: f64,
     /// obs-websocket plugin version.
-    pub obs_websocket_version: String,
+    pub obs_websocket_version: SemVerVersion,
     /// OBS Studio program version.
-    pub obs_studio_version: String,
+    pub obs_studio_version: SemVerVersion,
     /// List of available request types, formatted as a comma-separated list string (e.g. :
     /// "Method1,Method2,Method3").
-    pub available_requests: String,
+    #[serde(deserialize_with = "de::string_comma_list")]
+    pub available_requests: HashSet<String>,
     /// List of supported formats for features that use image export (like the
     /// [`TakeSourceScreenshot`](crate::requests::RequestType::TakeSourceScreenshot) request type)
     /// formatted as a comma-separated list string.
-    pub supported_image_export_formats: String,
+    #[serde(deserialize_with = "de::string_comma_list")]
+    pub supported_image_export_formats: HashSet<String>,
 }
 
 /// Response value for [`get_auth_required`](crate::client::General::get_auth_required).
@@ -82,15 +93,86 @@ pub struct VideoInfo {
     /// Output height.
     pub output_height: u64,
     /// Scaling method used if output size differs from base size.
-    pub scale_type: String,
+    pub scale_type: ScaleType,
     /// Frames rendered per second.
     pub fps: f64,
     /// Video color format.
-    pub video_format: String,
+    pub video_format: VideoFormat,
     /// Color space for YUV.
-    pub color_space: String,
+    pub color_space: ColorSpace,
     /// Color range (full or partial).
-    pub color_range: String,
+    pub color_range: ColorRange,
+}
+
+/// Possible scaling types for the output.
+///
+/// Response value for [`get_video_info`](crate::client::General::get_video_info) as part of
+/// [`VideoInfo`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum ScaleType {
+    /// Fastest, but blurry scaling.
+    #[serde(rename = "VIDEO_SCALE_BILINEAR")]
+    Bilinear,
+    /// Weighted sum, 4/6/9 samples.
+    #[serde(rename = "VIDEO_SCALE_DEFAULT")]
+    Area,
+    /// Sharpened scaling, 16 samples.
+    #[serde(rename = "VIDEO_SCALE_FAST_BILINEAR")]
+    Bicubic,
+    /// Sharpened scaling, 36 samples.
+    #[serde(rename = "VIDEO_SCALE_BICUBIC")]
+    Lanczos,
+}
+
+/// Supported formats for video output.
+///
+/// Response value for [`get_video_info`](crate::client::General::get_video_info) as part of
+/// [`VideoInfo`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum VideoFormat {
+    /// NV12 format.
+    #[serde(rename = "VIDEO_FORMAT_NV12")]
+    Nv12,
+    /// I420 format.
+    #[serde(rename = "VIDEO_FORMAT_I420")]
+    I420,
+    /// I444 format.
+    #[serde(rename = "VIDEO_FORMAT_I444")]
+    I444,
+    /// RGB format.
+    #[serde(rename = "VIDEO_FORMAT_RGBA")]
+    RGB,
+}
+
+/// Supported color spaces for video output.
+///
+/// Response value for [`get_video_info`](crate::client::General::get_video_info) as part of
+/// [`VideoInfo`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum ColorSpace {
+    /// 709 color space.
+    #[serde(rename = "VIDEO_CS_709")]
+    Cs709,
+    /// 601 color space.
+    #[serde(rename = "VIDEO_CS_601")]
+    Cs601,
+    /// sRGB color space.
+    #[serde(rename = "VIDEO_CS_DEFAULT")]
+    CsSRgb,
+}
+
+/// Supported color ranges for video output.
+///
+/// Response value for [`get_video_info`](crate::client::General::get_video_info) as part of
+/// [`VideoInfo`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum ColorRange {
+    /// Partial color range.
+    #[serde(rename = "VIDEO_RANGE_PARTIAL")]
+    Partial,
+    /// Full range.
+    #[serde(rename = "VIDEO_RANGE_FULL")]
+    Full,
 }
 
 /// Response value for [`get_sources_list`](crate::client::Sources::get_sources_list).
@@ -141,7 +223,8 @@ pub struct SyncOffset {
     /// Source name.
     pub name: String,
     /// The audio sync offset (in nanoseconds).
-    pub offset: i64,
+    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    pub offset: Duration,
 }
 
 /// Response value for [`get_source_settings`](crate::client::Sources::get_source_settings) and
@@ -164,7 +247,7 @@ pub struct TextGdiPlusProperties {
     /// Source name.
     pub source: String,
     /// Text Alignment ("left", "center", "right").
-    pub align: String,
+    pub align: Align,
     /// Background color.
     pub bk_color: u32,
     /// Background opacity (0-100).
@@ -182,7 +265,7 @@ pub struct TextGdiPlusProperties {
     /// Extents cy.
     pub extents_cy: i64,
     /// File path name.
-    pub file: String,
+    pub file: PathBuf,
     /// Read text from the specified file.
     pub read_from_file: bool,
     /// Holds data for the font. Ex:
@@ -207,7 +290,7 @@ pub struct TextGdiPlusProperties {
     /// Text content to be displayed.
     pub text: String,
     /// Text vertical alignment ("top", "center", "bottom").
-    pub valign: String,
+    pub valign: Valign,
     /// Vertical text enabled.
     pub vertical: bool,
 }
@@ -219,27 +302,32 @@ pub struct TextFreetype2Properties {
     /// Source name.
     pub source: String,
     /// Gradient top color.
-    pub color1: u32,
+    pub color1: Option<u32>,
     /// Gradient bottom color.
-    pub color2: u32,
+    pub color2: Option<u32>,
     /// Custom width (0 to disable).
-    pub custom_width: u32,
+    pub custom_width: Option<u32>,
     /// Drop shadow.
+    #[serde(default)]
     pub drop_shadow: bool,
     /// Holds data for the font. Ex:
     /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
     pub font: Font,
     /// Read text from the specified file.
+    #[serde(default)]
     pub from_file: bool,
     /// Chat log.
+    #[serde(default)]
     pub log_mode: bool,
     /// Outline.
+    #[serde(default)]
     pub outline: bool,
     /// Text content to be displayed.
     pub text: String,
     /// File path.
-    pub text_file: String,
+    pub text_file: Option<PathBuf>,
     /// Word wrap.
+    #[serde(default)]
     pub word_wrap: bool,
 }
 
@@ -285,7 +373,7 @@ pub struct SourceFilterInfo<T> {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioMonitorType {
     /// The monitor type in use. Options: `none`, `monitorOnly`, `monitorAndOutput`.
-    pub monitor_type: String,
+    pub monitor_type: MonitorType,
 }
 
 /// Response value for [`take_source_screenshot`](crate::client::Sources::take_source_screenshot).
@@ -301,7 +389,7 @@ pub struct SourceScreenshot {
     /// Absolute path to the saved image file (if
     /// [`save_to_file_path`](crate::requests::SourceScreenshot::save_to_file_path) was specified in
     /// the request).
-    pub image_file: Option<String>,
+    pub image_file: Option<PathBuf>,
 }
 
 /// Response value for [`list_outputs`](crate::client::Outputs::list_outputs).
@@ -339,7 +427,7 @@ pub(crate) struct Profiles {
 #[serde(rename_all = "kebab-case")]
 pub(crate) struct RecordingFolder {
     /// Path of the recording folder.
-    pub rec_folder: String,
+    pub rec_folder: PathBuf,
 }
 
 /// Response value for
@@ -457,9 +545,11 @@ pub struct StreamingStatus {
     /// Current recording status.
     pub recording: bool,
     /// Time elapsed since streaming started (only present if currently streaming).
-    pub stream_timecode: Option<String>,
+    #[serde(deserialize_with = "crate::de::duration")]
+    pub stream_timecode: Option<Duration>,
     /// Time elapsed since recording started (only present if currently recording).
-    pub rec_timecode: Option<String>,
+    #[serde(deserialize_with = "crate::de::duration")]
+    pub rec_timecode: Option<Duration>,
     /// Always false. Retrocompatibility with OBSRemote.
     #[serde(default)]
     pub preview_only: bool,
@@ -471,7 +561,7 @@ pub struct GetStreamSettings {
     /// The type of streaming service configuration. Possible values: `rtmp_custom` or
     /// `rtmp_common`.
     #[serde(rename = "type")]
-    pub ty: String,
+    pub ty: StreamType,
     /// Stream settings object.
     pub settings: StreamSettings,
 }
@@ -511,7 +601,8 @@ pub struct CurrentTransition {
     /// Name of the selected transition.
     pub name: String,
     /// Transition duration (in milliseconds) if supported by the transition.
-    pub duration: Option<u64>,
+    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    pub duration: Option<Duration>,
 }
 
 /// Response value for
@@ -520,12 +611,9 @@ pub struct CurrentTransition {
 #[serde(rename_all = "kebab-case")]
 pub(crate) struct TransitionDuration {
     /// Duration of the current transition (in milliseconds).
-    pub transition_duration: u64,
+    #[serde(deserialize_with = "crate::de::duration_millis")]
+    pub transition_duration: Duration,
 }
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 /// Response value for [`get_stats`](crate::client::General::get_stats).
 #[derive(Clone, Debug, Deserialize)]
@@ -559,8 +647,7 @@ pub struct SourceListItem {
     pub name: String,
     /// Non-unique source internal type (a.k.a kind).
     pub type_id: String,
-    /// Source type. Value is one of the following: "input", "filter", "transition", "scene" or
-    /// "unknown".
+    /// Source type.
     #[serde(rename = "type")]
     pub ty: String,
 }
@@ -575,11 +662,25 @@ pub struct SourceTypeItem {
     pub display_name: String,
     /// Type. Value is one of the following: "input", "filter", "transition" or "other".
     #[serde(rename = "type")]
-    pub ty: String,
+    pub ty: SourceType,
     /// Default settings of this source type.
     pub default_settings: serde_json::Value,
     /// Source type capabilities.
     pub caps: Caps,
+}
+
+/// Source type as part of [`SourceTypeItem`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceType {
+    /// Input source from outside of OBS.
+    Input,
+    /// Filter applied to other items.
+    Filter,
+    /// Transition when switching scenes.
+    Transition,
+    /// Other kinds of sources.
+    Other,
 }
 
 /// Response value for [`get_sources_types_list`](crate::client::Sources::get_sources_types_list) as
@@ -614,7 +715,8 @@ pub struct Font {
     /// Font face.
     pub face: String,
     /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
-    pub flags: u8,
+    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    pub flags: FontFlags,
     /// Font text size.
     pub size: u32,
     /// Font Style (unknown function).

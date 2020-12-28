@@ -1,5 +1,6 @@
 //! All events that can be received from the API.
 
+use chrono::Duration;
 use serde::Deserialize;
 
 use crate::common::{SceneItem, SceneItemTransform};
@@ -8,10 +9,12 @@ use crate::common::{SceneItem, SceneItemTransform};
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Event {
+    #[serde(default, deserialize_with = "crate::de::duration")]
     /// Time elapsed between now and stream start (only present if OBS Studio is streaming).
-    pub stream_timecode: Option<String>,
+    pub stream_timecode: Option<Duration>,
     /// Time elapsed between now and recording start (only present if OBS Studio is recording).
-    pub rec_timecode: Option<String>,
+    #[serde(default, deserialize_with = "crate::de::duration")]
+    pub rec_timecode: Option<Duration>,
     /// The type of event.
     #[serde(flatten)]
     pub ty: EventType,
@@ -63,7 +66,8 @@ pub enum EventType {
     #[serde(rename_all = "kebab-case")]
     TransitionDurationChanged {
         /// New transition duration.
-        new_duration: u64,
+        #[serde(deserialize_with = "crate::de::duration_millis")]
+        new_duration: Duration,
     },
     /// A transition (other than "cut") has begun.
     #[serde(rename_all = "kebab-case")]
@@ -75,7 +79,8 @@ pub enum EventType {
         ty: String,
         /// Transition duration (in milliseconds). Will be -1 for any transition with a fixed
         /// duration, such as a Stinger, due to limitations of the OBS API.
-        duration: u64,
+        #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+        duration: Option<Duration>,
         /// Source scene of the transition.
         from_scene: String,
         /// Destination scene of the transition.
@@ -91,7 +96,8 @@ pub enum EventType {
         #[serde(rename = "type")]
         ty: String,
         /// Transition duration (in milliseconds).
-        duration: u64,
+        #[serde(deserialize_with = "crate::de::duration_millis")]
+        duration: Duration,
         /// Destination scene of the transition.
         to_scene: String,
     },
@@ -104,7 +110,8 @@ pub enum EventType {
         #[serde(rename = "type")]
         ty: String,
         /// Transition duration (in milliseconds).
-        duration: u64,
+        #[serde(deserialize_with = "crate::de::duration_millis")]
+        duration: Duration,
         /// Source scene of the transition.
         from_scene: String,
         /// Destination scene of the transition.
@@ -188,23 +195,11 @@ pub enum EventType {
     /// available at the time this event is emitted.
     RecordingStarting,
     /// Recording started successfully.
-    #[serde(rename_all = "camelCase")]
-    RecordingStarted {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
+    RecordingStarted,
     /// A request to stop recording has been issued.
-    #[serde(rename_all = "camelCase")]
-    RecordingStopping {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
+    RecordingStopping,
     /// Recording stopped successfully.
-    #[serde(rename_all = "camelCase")]
-    RecordingStopped {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
+    RecordingStopped,
     /// Current recording paused.
     RecordingPaused,
     /// Current recording resumed.
@@ -244,7 +239,7 @@ pub enum EventType {
         /// Source name.
         source_name: String,
         /// Source type. Can be "input", "scene", "transition" or "filter".
-        source_type: String,
+        source_type: SourceType,
         /// Source kind.
         source_kind: String,
         /// Source settings.
@@ -256,7 +251,7 @@ pub enum EventType {
         /// Source name.
         source_name: String,
         /// Source type. Can be "input", "scene", "transition" or "filter".
-        source_type: String,
+        source_type: SourceType,
         /// Source kind.
         source_kind: String,
     },
@@ -294,7 +289,8 @@ pub enum EventType {
         /// Source name.
         source_name: String,
         /// Audio sync offset of the source (in nanoseconds).
-        sync_offset: i64,
+        #[serde(deserialize_with = "crate::de::duration_nanos")]
+        sync_offset: Duration,
     },
     /// Audio mixer routing changed on a source.
     #[serde(rename_all = "camelCase")]
@@ -314,7 +310,7 @@ pub enum EventType {
         /// New source name.
         new_name: String,
         /// Type of source (input, scene, filter, transition).
-        source_type: String,
+        source_type: SourceType,
     },
     /// A filter was added to a source.
     #[serde(rename_all = "camelCase")]
@@ -508,4 +504,19 @@ pub struct SourceOrderSceneItem {
     pub source_name: String,
     /// Scene item unique ID.
     pub item_id: i64,
+}
+
+/// Part of [`EventType::SourceCreated`], [`EventType::SourceDestroyed`] and
+/// [`EventType::SourceRenamed`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceType {
+    /// An input source.
+    Input,
+    /// A scene.
+    Scene,
+    /// Transition between scenes.
+    Transition,
+    /// Filter for scene items.
+    Filter,
 }

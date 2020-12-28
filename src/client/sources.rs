@@ -1,7 +1,9 @@
 use anyhow::Result;
+use chrono::Duration;
 use serde::de::DeserializeOwned;
 
 use super::Client;
+use crate::common::MonitorType;
 use crate::requests::{
     AddFilter, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
     SourceFilterVisibility, SourceScreenshot, SourceSettings, TextFreetype2Properties,
@@ -112,7 +114,7 @@ impl<'a> Sources<'a> {
     ///
     /// - `source`: Source name.
     /// - `offset`: The desired audio sync offset (in nanoseconds).
-    pub async fn set_sync_offset(&self, source: String, offset: i64) -> Result<()> {
+    pub async fn set_sync_offset(&self, source: String, offset: Duration) -> Result<()> {
         self.client
             .send_message(RequestType::SetSyncOffset { source, offset })
             .await
@@ -304,7 +306,7 @@ impl<'a> Sources<'a> {
     /// Get the audio monitoring type of the specified source.
     ///
     /// - `source_name`: Source name.
-    pub async fn get_audio_monitor_type(&self, source_name: String) -> Result<String> {
+    pub async fn get_audio_monitor_type(&self, source_name: String) -> Result<MonitorType> {
         self.client
             .send_message::<responses::AudioMonitorType>(RequestType::GetAudioMonitorType {
                 source_name,
@@ -321,7 +323,7 @@ impl<'a> Sources<'a> {
     pub async fn set_audio_monitor_type(
         &self,
         source_name: String,
-        monitor_type: String,
+        monitor_type: MonitorType,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::SetAudioMonitorType {

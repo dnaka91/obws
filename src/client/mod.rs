@@ -95,7 +95,7 @@ impl Client {
                 .await;
 
                 if let Err(e) = temp {
-                    error!("{:?}", e);
+                    error!("failed handling message: {:?}", e);
                 }
             }
         });

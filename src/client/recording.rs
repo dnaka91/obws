@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use anyhow::Result;
 
 use super::Client;
@@ -43,14 +45,14 @@ impl<'a> Recording<'a> {
     /// immediately and will be effective on the next recording.
     ///
     /// - `rec_folder`: Path of the recording folder.
-    pub async fn set_recording_folder(&self, rec_folder: String) -> Result<()> {
+    pub async fn set_recording_folder(&self, rec_folder: PathBuf) -> Result<()> {
         self.client
             .send_message(RequestType::SetRecordingFolder { rec_folder })
             .await
     }
 
     /// Get the path of the current recording folder.
-    pub async fn get_recording_folder(&self) -> Result<String> {
+    pub async fn get_recording_folder(&self) -> Result<PathBuf> {
         self.client
             .send_message::<responses::RecordingFolder>(RequestType::GetRecordingFolder)
             .await

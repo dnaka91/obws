@@ -1,8 +1,15 @@
 //! All requests that can be send to the API.
 
+use std::path::PathBuf;
+
+use chrono::Duration;
 use either::Either;
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+
+use crate::common::{Align, Alignment, BoundsType, FontFlags, MonitorType, StreamType, Valign};
+
+mod ser;
 
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -82,7 +89,8 @@ pub(crate) enum RequestType {
         /// Source name.
         source: String,
         /// The desired audio sync offset (in nanoseconds).
-        offset: i64,
+        #[serde(serialize_with = "ser::duration_nanos")]
+        offset: Duration,
     },
     GetSyncOffset {
         /// Source name.
@@ -142,7 +150,7 @@ pub(crate) enum RequestType {
         /// Source name.
         source_name: String,
         /// The monitor type to use. Options: `none`, `monitorOnly`, `monitorAndOutput`.
-        monitor_type: String,
+        monitor_type: MonitorType,
     },
     TakeSourceScreenshot(SourceScreenshot),
     // --------------------------------
@@ -187,7 +195,7 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetRecordingFolder {
         /// Path of the recording folder.
-        rec_folder: String,
+        rec_folder: PathBuf,
     },
     GetRecordingFolder,
     // --------------------------------
@@ -315,7 +323,8 @@ pub(crate) enum RequestType {
     },
     SetTransitionDuration {
         /// Desired duration of the transition (in milliseconds).
-        duration: u64,
+        #[serde(serialize_with = "ser::duration_millis")]
+        duration: Duration,
     },
     GetTransitionDuration,
 }
@@ -327,7 +336,7 @@ pub struct Projector {
     /// Type of projector: `Preview` (default), `Source`, `Scene`, `StudioProgram`, or `Multiview`
     /// (case insensitive).
     #[serde(rename = "type")]
-    pub ty: Option<String>,
+    pub ty: Option<ProjectorType>,
     /// Monitor to open the projector on. If -1 or omitted, opens a window.
     pub monitor: Option<i64>,
     /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
@@ -336,6 +345,22 @@ pub struct Projector {
     pub geometry: Option<String>,
     /// Name of the source or scene to be displayed (ignored for other projector types).
     pub name: Option<String>,
+}
+
+/// Request information for [`open_projector`](crate::client::General::open_projector) as part of
+/// [`Projector`].
+#[derive(Clone, Copy, Debug, Serialize)]
+pub enum ProjectorType {
+    /// Open a projector of the preview area.
+    Preview,
+    /// Open a projector for a source.
+    Source,
+    /// Open a projector for a scene.
+    Scene,
+    /// Open a projector of the program pane in studio mode.
+    StudioProgram,
+    /// Open a projector in multiview.
+    Multiview,
 }
 
 /// Request information for [`set_volume`](crate::client::Sources::set_volume).
@@ -375,7 +400,7 @@ pub struct TextGdiPlusProperties {
     /// Name of the source.
     pub source: String,
     /// Text Alignment ("left", "center", "right").
-    pub align: Option<String>,
+    pub align: Option<Align>,
     /// Background color.
     pub bk_color: Option<u32>,
     /// Background opacity (0-100).
@@ -393,7 +418,7 @@ pub struct TextGdiPlusProperties {
     /// Extents cy.
     pub extents_cy: Option<i64>,
     /// File path name.
-    pub file: Option<String>,
+    pub file: Option<PathBuf>,
     /// Read text from the specified file.
     pub read_from_file: Option<bool>,
     /// Holds data for the font. Ex:
@@ -418,7 +443,7 @@ pub struct TextGdiPlusProperties {
     /// Text content to be displayed.
     pub text: Option<String>,
     /// Text vertical alignment ("top", "center", "bottom").
-    pub valign: Option<String>,
+    pub valign: Option<Valign>,
     /// Vertical text enabled.
     pub vertical: Option<bool>,
     /// Visibility of the scene item.
@@ -452,7 +477,7 @@ pub struct TextFreetype2Properties {
     /// Text content to be displayed.
     pub text: Option<String>,
     /// File path.
-    pub text_file: Option<String>,
+    pub text_file: Option<PathBuf>,
     /// Word wrap.
     pub word_wrap: Option<bool>,
 }
@@ -494,7 +519,22 @@ pub struct MoveFilter {
     pub filter_name: String,
     /// How to move the filter around in the source's filter chain. Either "up", "down", "top" or
     /// "bottom".
-    pub movement_type: String,
+    pub movement_type: MovementType,
+}
+
+/// Request information for [`move_source_filter`](crate::client::Sources::move_source_filter) as
+/// part of [`MoveFilter`].
+#[derive(Clone, Copy, Debug, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MovementType {
+    /// Move up by one position.
+    Up,
+    /// Move down by one position.
+    Down,
+    /// Move to the very top.
+    Top,
+    /// Move to the very bottom.
+    Bottom,
 }
 
 /// Request information for
@@ -538,7 +578,7 @@ pub struct SourceScreenshot {
     /// Full file path (file extension included) where the captured image is to be saved. Can be in
     /// a format different from [`embed_picture_format`](SourceScreenshot::embed_picture_format).
     /// Can be a relative path.
-    pub save_to_file_path: Option<String>,
+    pub save_to_file_path: Option<PathBuf>,
     /// Format to save the image file as (one of the values provided in the
     /// [`supported_image_export_formats`](crate::responses::Version::supported_image_export_formats)
     /// response field of [`get_version`](crate::client::General::get_version)). If not specified,
@@ -634,7 +674,8 @@ pub struct SceneTransitionOverride {
     /// Duration in milliseconds of the transition if transition is not fixed. Defaults to the
     /// current duration specified in the UI if there is no current override and this value is not
     /// given.
-    pub transition_duration: Option<i64>,
+    #[serde(serialize_with = "ser::duration_millis_opt")]
+    pub transition_duration: Option<Duration>,
 }
 
 /// Request information for [`set_stream_settings`](crate::client::Streaming::set_stream_settings).
@@ -642,16 +683,12 @@ pub struct SceneTransitionOverride {
 pub struct SetStreamSettings {
     /// The type of streaming service configuration, usually `rtmp_custom` or `rtmp_common`.
     #[serde(rename = "type")]
-    pub ty: String,
+    pub ty: StreamType,
     /// The actual settings of the stream.
     pub settings: StreamSettings,
     /// Persist the settings to disk.
     pub save: bool,
 }
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
 
 /// Request information for
 /// [`set_text_gdi_plus_properties`](crate::client::Sources::set_text_gdi_plus_properties) as part
@@ -664,7 +701,8 @@ pub struct Font {
     /// Font face.
     pub face: Option<String>,
     /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
-    pub flags: Option<u8>,
+    #[serde(serialize_with = "ser::bitflags_u8_opt")]
+    pub flags: Option<FontFlags>,
     /// Font text size.
     pub size: Option<u32>,
     /// Font Style (unknown function).
@@ -698,7 +736,8 @@ pub struct Position {
     /// The new y position of the source.
     pub y: Option<f64>,
     /// The new alignment of the source.
-    pub alignment: Option<u8>,
+    #[serde(serialize_with = "ser::bitflags_u8_opt")]
+    pub alignment: Option<Alignment>,
 }
 
 /// Request information for
@@ -739,9 +778,10 @@ pub struct Bounds {
     /// "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT",
     /// "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
     #[serde(rename = "type")]
-    pub ty: Option<String>,
+    pub ty: Option<BoundsType>,
     /// The new alignment of the bounding box. (0-2, 4-6, 8-10).
-    pub alignment: Option<u8>,
+    #[serde(serialize_with = "ser::bitflags_u8_opt")]
+    pub alignment: Option<Alignment>,
     /// The new width of the bounding box.
     pub x: Option<f64>,
     /// The new height of the bounding box.
@@ -769,7 +809,7 @@ pub struct Stream {
     /// type, all settings must be specified in the `settings` object or an error will occur when
     /// starting the stream.
     #[serde(rename = "type")]
-    ty: Option<String>,
+    ty: Option<StreamType>,
     /// Adds the given object parameters as encoded query string parameters to the 'key' of the RTMP
     /// stream. Used to pass data to the RTMP service about the streaming. May be any String,
     /// Numeric, or Boolean field.
@@ -806,5 +846,6 @@ pub struct Transition {
     /// Name of the transition.
     name: String,
     /// Transition duration (in milliseconds).
-    duration: Option<u64>,
+    #[serde(serialize_with = "ser::duration_millis_opt")]
+    duration: Option<Duration>,
 }

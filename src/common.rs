@@ -1,7 +1,11 @@
 //! Common data structures shared between [`requests`](crate::requests),
 //! [`responses`](crate::responses) and [`events`](crate::events).
 
-use serde::Deserialize;
+use std::convert::TryFrom;
+
+use anyhow::Context;
+use bitflags::bitflags;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`get_current_scene`](crate::client::Scenes::get_current_scene) as part of
 /// [`CurrentScene`](crate::responses::CurrentScene),
@@ -19,7 +23,8 @@ pub struct SceneItem {
     pub cx: f64,
     /// The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and
     /// 4=Top or 8=Bottom, or omit to center on that axis.
-    pub alignment: u8,
+    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    pub alignment: Alignment,
     /// The name of this Scene Item.
     pub name: String,
     /// Scene item ID.
@@ -32,8 +37,7 @@ pub struct SceneItem {
     pub locked: bool,
     pub source_cx: f64,
     pub source_cy: f64,
-    /// Source type. Value is one of the following: "input", "filter", "transition", "scene" or
-    /// "unknown".
+    /// Source type.
     #[serde(rename = "type")]
     pub ty: String,
     pub volume: f64,
@@ -95,7 +99,8 @@ pub struct Position {
     pub y: f64,
     /// The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and
     /// 4=Top or 8=Bottom, or omit to center on that axis.
-    pub alignment: u8,
+    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    pub alignment: Alignment,
 }
 
 /// Response value for
@@ -115,13 +120,13 @@ pub struct Scale {
 #[derive(Clone, Debug, Deserialize)]
 pub struct Crop {
     /// The number of pixels cropped off the top of the source before scaling.
-    pub top: i64,
+    pub top: u32,
     /// The number of pixels cropped off the right of the source before scaling.
-    pub right: i64,
+    pub right: u32,
     /// The number of pixels cropped off the bottom of the source before scaling.
-    pub bottom: i64,
+    pub bottom: u32,
     /// The number of pixels cropped off the left of the source before scaling.
-    pub left: i64,
+    pub left: u32,
 }
 
 /// Response value for
@@ -133,11 +138,146 @@ pub struct Bounds {
     /// "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT",
     /// "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
     #[serde(rename = "type")]
-    pub ty: String,
+    pub ty: BoundsType,
     /// Alignment of the bounding box.
-    pub alignment: u8,
+    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    pub alignment: Alignment,
     /// Width of the bounding box.
     pub x: f64,
     /// Height of the bounding box.
     pub y: f64,
+}
+
+/// Monitoring type for audio outputs.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum MonitorType {
+    /// No monitoring.
+    None,
+    /// Only monitor but don't output any sounds.
+    MonitorOnly,
+    /// Mintor the audio and output it at the same time.
+    MonitorAndOutput,
+}
+
+/// Text alignment used for GDI+ text properties.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Align {
+    /// Align to the left.
+    Left,
+    /// Center the text in the middle (horizontally).
+    Center,
+    /// Align to the right.
+    Right,
+}
+
+/// Vertical text alignment use for GDI+ text properties.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Valign {
+    /// Align to the top.
+    Top,
+    /// Center the text in the middle (vertically).
+    Center,
+    /// Align to the bottom.
+    Bottom,
+}
+
+/// The type of streaming for service configurations.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StreamType {
+    /// Customized RTMP streaming.
+    RtmpCustom,
+    /// Common RTMP configuration.
+    RtmpCommon,
+}
+
+bitflags! {
+    /// Different flags for font display that can be combined together.
+    pub struct FontFlags: u8 {
+        /// Make the text appear thicker.
+        const BOLD = 1;
+        /// Make the text appear cursive.
+        const ITALIC = 2;
+        /// Underline the text with a straight line.
+        const UNDERLINE = 5;
+        /// Strikeout the text.
+        const STRIKEOUT = 8;
+    }
+}
+
+impl TryFrom<u8> for FontFlags {
+    type Error = anyhow::Error;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        Self::from_bits(value).context("value contains unknown flags")
+    }
+}
+
+impl From<FontFlags> for u8 {
+    fn from(value: FontFlags) -> Self {
+        value.bits
+    }
+}
+
+bitflags! {
+    /// Alignment for different items on the scene that is described in two axis. The default is
+    /// center for both axis.
+    ///
+    /// For example, only using `LEFT` would arrange the target to the left horzontally and centered
+    /// vertically. To align to the top right, the alignments can be combined to `LEFT | TOP`.
+    /// Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
+    pub struct Alignment: u8 {
+        /// Align to the left side.
+        const LEFT = 1;
+        /// Align to the right side.
+        const RIGHT = 2;
+        /// Align to the top.
+        const TOP = 4;
+        /// Align to the bottom.
+        const BOTTOM = 8;
+    }
+}
+
+impl TryFrom<u8> for Alignment {
+    type Error = anyhow::Error;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        Self::from_bits(value).context("value contains unknown flags")
+    }
+}
+
+impl From<Alignment> for u8 {
+    fn from(value: Alignment) -> Self {
+        value.bits
+    }
+}
+
+/// Different kinds of bounds that can be applied to different items on the scene as part of the
+/// [`Bounds`] type.
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+pub enum BoundsType {
+    /// Stretch to bounds.
+    #[serde(rename = "OBS_BOUNDS_STRETCH")]
+    Stretch,
+    /// Scale to inner bounds.
+    #[serde(rename = "OBS_BOUNDS_SCALE_INNER")]
+    ScaleInner,
+    /// Scale to outer bounds.
+    #[serde(rename = "OBS_BOUNDS_SCALE_OUTER")]
+    ScaleOuter,
+    /// Scale to width of bounds.
+    #[serde(rename = "OBS_BOUNDS_SCALE_TO_WIDTH")]
+    ScaleToWidth,
+    /// Scale to height of bounds.
+    #[serde(rename = "OBS_BOUNDS_SCALE_TO_HEIGHT")]
+    ScaleToHeight,
+    /// Maximum size only.
+    #[serde(rename = "OBS_BOUNDS_MAX_ONLY")]
+    MaxOnly,
+    /// No bounds.
+    #[serde(rename = "OBS_BOUNDS_NONE")]
+    None,
 }
