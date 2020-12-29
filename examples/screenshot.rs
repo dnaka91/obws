@@ -1,9 +1,8 @@
 use std::env;
 
 use anyhow::Result;
+use obws::{requests::SourceScreenshot, Client};
 use tokio::fs;
-
-use obws::{client::Client, requests::SourceScreenshot};
 
 #[tokio::main]
 async fn main() -> Result<()> {

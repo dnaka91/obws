@@ -1,8 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-
-use obws::client::Client;
+use obws::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {

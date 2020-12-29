@@ -2,8 +2,7 @@ use std::env;
 
 use anyhow::Result;
 use futures_util::{pin_mut, StreamExt};
-
-use obws::client::Client;
+use obws::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {

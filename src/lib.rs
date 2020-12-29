@@ -1,4 +1,34 @@
 //! # OBSWS - The obws (obvious) remote control library for OBS
+//!
+//! Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
+//!
+//! [obs-websocket]: https://github.com/Palakis/obs-websocket
+//!
+//! ## Example
+//!
+//! ```no_run
+//! use anyhow::Result;
+//! use obws::Client;
+//!
+//! #[tokio::main]
+//! async fn main() -> Result<()> {
+//!     /// Connect to the OBS instance through obs-websocket.
+//!     let client = Client::connect("localhost", 4444).await?;
+//!
+//!     /// Get and print out version information of OBS and obs-websocket.
+//!     let version = client.general().get_version().await?;
+//!     println!("{:#?}", version);
+//!
+//!     /// Optionally log-in (if enabled in obs-websocket) to allow other APIs and receive events.
+//!     client.login(Some("password")).await?;
+//!
+//!     /// Get a list of available scenes and print them out.
+//!     let scene_list = client.scenes().get_scene_list().await?;
+//!     println!("{:#?}", scene_list);
+//!
+//!     Ok(())
+//! }
+//! ```
 
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
 
