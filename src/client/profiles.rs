@@ -12,7 +12,7 @@ impl<'a> Profiles<'a> {
     /// Set the currently active profile.
     ///
     /// - `profile_name`: Name of the desired profile.
-    pub async fn set_current_profile(&self, profile_name: String) -> Result<()> {
+    pub async fn set_current_profile(&self, profile_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetCurrentProfile { profile_name })
             .await

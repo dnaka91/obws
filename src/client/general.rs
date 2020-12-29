@@ -25,7 +25,7 @@ impl<'a> General<'a> {
     /// Attempt to authenticate the client to the server.
     ///
     /// - `auth`: Response to the auth challenge.
-    pub async fn authenticate(&self, auth: String) -> Result<()> {
+    pub async fn authenticate(&self, auth: &str) -> Result<()> {
         self.client
             .send_message(RequestType::Authenticate { auth })
             .await
@@ -34,7 +34,7 @@ impl<'a> General<'a> {
     /// Set the filename formatting string.
     ///
     /// - `filename_formatting`: Filename formatting string to set.
-    pub async fn set_filename_formatting(&self, filename_formatting: String) -> Result<()> {
+    pub async fn set_filename_formatting(&self, filename_formatting: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetFilenameFormatting {
                 filename_formatting,
@@ -62,14 +62,14 @@ impl<'a> General<'a> {
     ///
     /// - `realm`: Identifier to be choosen by the client.
     /// - `data`: User-defined data.
-    pub async fn broadcast_custom_message<T>(&self, realm: String, data: T) -> Result<()>
+    pub async fn broadcast_custom_message<T>(&self, realm: &str, data: &T) -> Result<()>
     where
         T: Serialize,
     {
         self.client
             .send_message(RequestType::BroadcastCustomMessage {
                 realm,
-                data: serde_json::to_value(&data).map_err(Error::SerializeCustomData)?,
+                data: &serde_json::to_value(data).map_err(Error::SerializeCustomData)?,
             })
             .await
     }
@@ -80,7 +80,7 @@ impl<'a> General<'a> {
     }
 
     /// Open a projector window or create a projector on a monitor. Requires OBS v24.0.4 or newer.
-    pub async fn open_projector(&self, projector: Projector) -> Result<()> {
+    pub async fn open_projector(&self, projector: Projector<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::OpenProjector(projector))
             .await

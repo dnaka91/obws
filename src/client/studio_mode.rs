@@ -26,7 +26,7 @@ impl<'a> StudioMode<'a> {
     /// Set the active preview scene. Will return an `error` if Studio Mode is not enabled.
     ///
     /// - `scene_name`: The name of the scene to preview.
-    pub async fn set_preview_scene(&self, scene_name: String) -> Result<()> {
+    pub async fn set_preview_scene(&self, scene_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetPreviewScene { scene_name })
             .await
@@ -37,7 +37,10 @@ impl<'a> StudioMode<'a> {
     ///
     /// - `with_transition`: Change the active transition before switching scenes. Defaults to the
     ///   active transition.
-    pub async fn transition_to_program(&self, with_transition: Option<Transition>) -> Result<()> {
+    pub async fn transition_to_program(
+        &self,
+        with_transition: Option<Transition<'_>>,
+    ) -> Result<()> {
         self.client
             .send_message(RequestType::TransitionToProgram { with_transition })
             .await

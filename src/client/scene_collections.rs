@@ -12,7 +12,7 @@ impl<'a> SceneCollections<'a> {
     /// Change the active scene collection.
     ///
     /// - `sc_name`: Name of the desired scene collection.
-    pub async fn set_current_scene_collection(&self, sc_name: String) -> Result<()> {
+    pub async fn set_current_scene_collection(&self, sc_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetCurrentSceneCollection { sc_name })
             .await

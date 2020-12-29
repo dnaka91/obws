@@ -19,8 +19,8 @@ async fn main() -> Result<()> {
     let screenshot = client
         .sources()
         .take_source_screenshot(SourceScreenshot {
-            source_name: Some("Start".to_owned()),
-            embed_picture_format: Some("png".to_owned()),
+            source_name: Some("Start"),
+            embed_picture_format: Some("png"),
             save_to_file_path: None,
             file_format: None,
             compress_quality: None,

@@ -18,10 +18,7 @@ async fn main() -> Result<()> {
     let scene_list = client.scenes().get_scene_list().await?;
 
     for scene in scene_list.scenes.iter().cycle() {
-        client
-            .scenes()
-            .set_current_scene(scene.name.clone())
-            .await?;
+        client.scenes().set_current_scene(&scene.name).await?;
         tokio::time::sleep(Duration::from_secs(1)).await;
     }
 

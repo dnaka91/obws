@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use super::Client;
 use crate::requests::RequestType;
@@ -44,7 +44,7 @@ impl<'a> Recording<'a> {
     /// immediately and will be effective on the next recording.
     ///
     /// - `rec_folder`: Path of the recording folder.
-    pub async fn set_recording_folder(&self, rec_folder: PathBuf) -> Result<()> {
+    pub async fn set_recording_folder(&self, rec_folder: &Path) -> Result<()> {
         self.client
             .send_message(RequestType::SetRecordingFolder { rec_folder })
             .await

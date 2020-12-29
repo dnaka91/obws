@@ -21,8 +21,8 @@ impl<'a> SceneItems<'a> {
     /// - `item`: Scene Item name (if this field is a string) or specification (if it is an object).
     pub async fn get_scene_item_properties(
         &self,
-        scene_name: Option<String>,
-        item: Either<String, SceneItemSpecification>,
+        scene_name: Option<&str>,
+        item: Either<&str, SceneItemSpecification<'_>>,
     ) -> Result<Vec<responses::SceneItemProperties>> {
         self.client
             .send_message(RequestType::GetSceneItemProperties { scene_name, item })
@@ -31,7 +31,10 @@ impl<'a> SceneItems<'a> {
 
     /// Sets the scene specific properties of a source. Unspecified properties will remain
     /// unchanged. Coordinates are relative to the item's parent (the scene or group it belongs to).
-    pub async fn set_scene_item_properties(&self, properties: SceneItemProperties) -> Result<()> {
+    pub async fn set_scene_item_properties(
+        &self,
+        properties: SceneItemProperties<'_>,
+    ) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemProperties(properties))
             .await
@@ -43,8 +46,8 @@ impl<'a> SceneItems<'a> {
     /// - `item`: Scene Item name (if this field is a string) or specification (if it is an object).
     pub async fn reset_scene_item(
         &self,
-        scene_name: Option<String>,
-        item: Either<String, SceneItemSpecification>,
+        scene_name: Option<&str>,
+        item: Either<&str, SceneItemSpecification<'_>>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::ResetSceneItem { scene_name, item })
@@ -52,7 +55,10 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Show or hide a specified source item in a specified scene.
-    pub async fn set_scene_item_render(&self, scene_item_render: SceneItemRender) -> Result<()> {
+    pub async fn set_scene_item_render(
+        &self,
+        scene_item_render: SceneItemRender<'_>,
+    ) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemRender(scene_item_render))
             .await
@@ -64,8 +70,8 @@ impl<'a> SceneItems<'a> {
     /// - `item`: Scene item to delete.
     pub async fn delete_scene_item(
         &self,
-        scene: Option<String>,
-        item: SceneItemSpecification,
+        scene: Option<&str>,
+        item: SceneItemSpecification<'_>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::DeleteSceneItem { scene, item })
@@ -73,7 +79,7 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Creates a scene item in a scene. In other words, this is how you add a source into a scene.
-    pub async fn add_scene_item(&self, scene_item: AddSceneItem) -> Result<i64> {
+    pub async fn add_scene_item(&self, scene_item: AddSceneItem<'_>) -> Result<i64> {
         self.client
             .send_message::<responses::AddSceneItem>(RequestType::AddSceneItem(scene_item))
             .await
@@ -83,7 +89,7 @@ impl<'a> SceneItems<'a> {
     /// Duplicates a scene item.
     pub async fn duplicate_scene_item(
         &self,
-        scene_item: DuplicateSceneItem,
+        scene_item: DuplicateSceneItem<'_>,
     ) -> Result<responses::DuplicateSceneItem> {
         self.client
             .send_message(RequestType::DuplicateSceneItem(scene_item))

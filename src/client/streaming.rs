@@ -27,7 +27,7 @@ impl<'a> Streaming<'a> {
     ///
     /// - `stream`: Special stream configuration. Please note: these won't be saved to OBS'
     ///   configuration.
-    pub async fn start_streaming(&self, stream: Option<Stream>) -> Result<()> {
+    pub async fn start_streaming(&self, stream: Option<Stream<'_>>) -> Result<()> {
         self.client
             .send_message(RequestType::StartStreaming { stream })
             .await
@@ -42,7 +42,7 @@ impl<'a> Streaming<'a> {
     /// will remain unchanged. Returns the updated settings in response. If 'type' is different than
     /// the current streaming service type, all settings are required. Returns the full settings of
     /// the stream (the same as GetStreamSettings).
-    pub async fn set_stream_settings(&self, settings: SetStreamSettings) -> Result<()> {
+    pub async fn set_stream_settings(&self, settings: SetStreamSettings<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetStreamSettings(settings))
             .await
@@ -65,7 +65,7 @@ impl<'a> Streaming<'a> {
     /// Send the provided text as embedded CEA-608 caption data.
     ///
     /// - `text`: Captions text.
-    pub async fn send_captions(&self, text: String) -> Result<()> {
+    pub async fn send_captions(&self, text: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SendCaptions { text })
             .await

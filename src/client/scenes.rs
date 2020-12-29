@@ -12,7 +12,7 @@ impl<'a> Scenes<'a> {
     /// Switch to the specified scene.
     ///
     /// - `scene_name`: Name of the scene to switch to.
-    pub async fn set_current_scene(&self, scene_name: String) -> Result<()> {
+    pub async fn set_current_scene(&self, scene_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetCurrentScene { scene_name })
             .await
@@ -31,7 +31,7 @@ impl<'a> Scenes<'a> {
     /// Create a new scene scene.
     ///
     /// - `scene_name`: Name of the scene to create.
-    pub async fn create_scene(&self, scene_name: String) -> Result<()> {
+    pub async fn create_scene(&self, scene_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::CreateScene { scene_name })
             .await
@@ -44,8 +44,8 @@ impl<'a> Scenes<'a> {
     ///   uniqueness per scene
     pub async fn reorder_scene_items(
         &self,
-        scene: Option<String>,
-        items: Vec<Scene>,
+        scene: Option<&str>,
+        items: &[Scene<'_>],
     ) -> Result<()> {
         self.client
             .send_message(RequestType::ReorderSceneItems { scene, items })
@@ -55,7 +55,7 @@ impl<'a> Scenes<'a> {
     /// Set a scene to use a specific transition override.
     pub async fn set_scene_transition_override(
         &self,
-        scene_transition: SceneTransitionOverride,
+        scene_transition: SceneTransitionOverride<'_>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneTransitionOverride(scene_transition))
@@ -65,7 +65,7 @@ impl<'a> Scenes<'a> {
     /// Remove any transition override on a scene.
     ///
     /// - `scene_name`: Name of the scene to remove the override from.
-    pub async fn remove_scene_transition_override(&self, scene_name: String) -> Result<()> {
+    pub async fn remove_scene_transition_override(&self, scene_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::RemoveSceneTransitionOverride { scene_name })
             .await
@@ -76,7 +76,7 @@ impl<'a> Scenes<'a> {
     /// - `scene_name`: Name of the scene to get the override for.
     pub async fn get_scene_transition_override(
         &self,
-        scene_name: String,
+        scene_name: &str,
     ) -> Result<responses::SceneTransitionOverride> {
         self.client
             .send_message(RequestType::GetSceneTransitionOverride { scene_name })

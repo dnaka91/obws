@@ -40,7 +40,7 @@ impl<'a> Sources<'a> {
     /// - `use_decibel`: Output volume in decibels of attenuation instead of amplitude/mul.
     pub async fn get_volume(
         &self,
-        source: String,
+        source: &str,
         use_decibel: Option<bool>,
     ) -> Result<responses::Volume> {
         self.client
@@ -53,7 +53,7 @@ impl<'a> Sources<'a> {
 
     /// Set the volume of the specified source. Default request format uses mul, NOT SLIDER
     /// PERCENTAGE.
-    pub async fn set_volume(&self, volume: Volume) -> Result<()> {
+    pub async fn set_volume(&self, volume: Volume<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetVolume(volume))
             .await
@@ -62,7 +62,7 @@ impl<'a> Sources<'a> {
     /// Get the mute status of a specified source.
     ///
     /// - `source`: Source name.
-    pub async fn get_mute(&self, source: String) -> Result<responses::Mute> {
+    pub async fn get_mute(&self, source: &str) -> Result<responses::Mute> {
         self.client
             .send_message(RequestType::GetMute { source })
             .await
@@ -72,7 +72,7 @@ impl<'a> Sources<'a> {
     ///
     /// - `source`: Source name.
     /// - `mute`: Desired mute status.
-    pub async fn set_mute(&self, source: String, mute: bool) -> Result<()> {
+    pub async fn set_mute(&self, source: &str, mute: bool) -> Result<()> {
         self.client
             .send_message(RequestType::SetMute { source, mute })
             .await
@@ -81,7 +81,7 @@ impl<'a> Sources<'a> {
     /// Inverts the mute status of a specified source.
     ///
     /// - `source`: Source name.
-    pub async fn toggle_mute(&self, source: String) -> Result<()> {
+    pub async fn toggle_mute(&self, source: &str) -> Result<()> {
         self.client
             .send_message(RequestType::ToggleMute { source })
             .await
@@ -90,7 +90,7 @@ impl<'a> Sources<'a> {
     /// Get the audio's active status of a specified source.
     ///
     /// - `source_name`: Source name.
-    pub async fn get_audio_active(&self, source_name: String) -> Result<bool> {
+    pub async fn get_audio_active(&self, source_name: &str) -> Result<bool> {
         self.client
             .send_message::<responses::AudioActive>(RequestType::GetAudioActive { source_name })
             .await
@@ -101,7 +101,7 @@ impl<'a> Sources<'a> {
     ///
     /// - `source_name`: Source name.
     /// - `new_name`: New source name.
-    pub async fn set_source_name(&self, source_name: String, new_name: String) -> Result<()> {
+    pub async fn set_source_name(&self, source_name: &str, new_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceName {
                 source_name,
@@ -114,7 +114,7 @@ impl<'a> Sources<'a> {
     ///
     /// - `source`: Source name.
     /// - `offset`: The desired audio sync offset (in nanoseconds).
-    pub async fn set_sync_offset(&self, source: String, offset: Duration) -> Result<()> {
+    pub async fn set_sync_offset(&self, source: &str, offset: Duration) -> Result<()> {
         self.client
             .send_message(RequestType::SetSyncOffset { source, offset })
             .await
@@ -123,7 +123,7 @@ impl<'a> Sources<'a> {
     /// Get the audio sync offset of a specified source.
     ///
     /// - `source`: Source name.
-    pub async fn get_sync_offset(&self, source: String) -> Result<responses::SyncOffset> {
+    pub async fn get_sync_offset(&self, source: &str) -> Result<responses::SyncOffset> {
         self.client
             .send_message(RequestType::GetSyncOffset { source })
             .await
@@ -136,8 +136,8 @@ impl<'a> Sources<'a> {
     ///   specific settings schema.
     pub async fn get_source_settings<T>(
         &self,
-        source_name: String,
-        source_type: Option<String>,
+        source_name: &str,
+        source_type: Option<&str>,
     ) -> Result<responses::SourceSettings<T>>
     where
         T: DeserializeOwned,
@@ -153,7 +153,7 @@ impl<'a> Sources<'a> {
     /// Set settings of the specified source.
     pub async fn set_source_settings<T>(
         &self,
-        source_settings: SourceSettings,
+        source_settings: SourceSettings<'_>,
     ) -> Result<responses::SourceSettings<T>>
     where
         T: DeserializeOwned,
@@ -168,7 +168,7 @@ impl<'a> Sources<'a> {
     /// - `source`: Source name.
     pub async fn get_text_gdi_plus_properties(
         &self,
-        source: String,
+        source: &str,
     ) -> Result<responses::TextGdiPlusProperties> {
         self.client
             .send_message(RequestType::GetTextGDIPlusProperties { source })
@@ -178,7 +178,7 @@ impl<'a> Sources<'a> {
     /// Set the current properties of a Text GDI Plus source.
     pub async fn set_text_gdi_plus_properties(
         &self,
-        properties: TextGdiPlusProperties,
+        properties: TextGdiPlusProperties<'_>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::SetTextGDIPlusProperties(Box::new(properties)))
@@ -190,7 +190,7 @@ impl<'a> Sources<'a> {
     /// - `source`: Source name.
     pub async fn get_text_freetype2_properties(
         &self,
-        source: String,
+        source: &str,
     ) -> Result<responses::TextFreetype2Properties> {
         self.client
             .send_message(RequestType::GetTextFreetype2Properties { source })
@@ -200,7 +200,7 @@ impl<'a> Sources<'a> {
     /// Set the current properties of a Text Freetype 2 source.
     pub async fn set_text_freetype2_properties(
         &self,
-        properties: TextFreetype2Properties,
+        properties: TextFreetype2Properties<'_>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::SetTextFreetype2Properties(properties))
@@ -219,7 +219,7 @@ impl<'a> Sources<'a> {
     /// - `source_name`: Source name.
     pub async fn get_source_filters(
         &self,
-        source_name: String,
+        source_name: &str,
     ) -> Result<Vec<responses::SourceFilter>> {
         self.client
             .send_message::<responses::SourceFilters>(RequestType::GetSourceFilters { source_name })
@@ -233,8 +233,8 @@ impl<'a> Sources<'a> {
     /// - `filter_name`: Source filter name.
     pub async fn get_source_filter_info<T>(
         &self,
-        source_name: String,
-        filter_name: String,
+        source_name: &str,
+        filter_name: &str,
     ) -> Result<responses::SourceFilterInfo<T>>
     where
         T: DeserializeOwned,
@@ -249,7 +249,7 @@ impl<'a> Sources<'a> {
 
     /// Add a new filter to a source. Available source types along with their settings properties
     /// are available from [`get_sources_types_list`](Self::get_sources_types_list).
-    pub async fn add_filter_to_source(&self, add_filter: AddFilter) -> Result<()> {
+    pub async fn add_filter_to_source(&self, add_filter: AddFilter<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::AddFilterToSource(add_filter))
             .await
@@ -261,8 +261,8 @@ impl<'a> Sources<'a> {
     /// - `filter_name`: Name of the filter to remove.
     pub async fn remove_filter_from_source(
         &self,
-        source_name: String,
-        filter_name: String,
+        source_name: &str,
+        filter_name: &str,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::RemoveFilterFromSource {
@@ -273,21 +273,24 @@ impl<'a> Sources<'a> {
     }
 
     /// Move a filter in the chain (absolute index positioning).
-    pub async fn reorder_source_filter(&self, reorder_filter: ReorderFilter) -> Result<()> {
+    pub async fn reorder_source_filter(&self, reorder_filter: ReorderFilter<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::ReorderSourceFilter(reorder_filter))
             .await
     }
 
     /// Move a filter in the chain (relative positioning).
-    pub async fn move_source_filter(&self, move_filter: MoveFilter) -> Result<()> {
+    pub async fn move_source_filter(&self, move_filter: MoveFilter<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::MoveSourceFilter(move_filter))
             .await
     }
 
     /// Update settings of a filter.
-    pub async fn set_source_filter_settings(&self, settings: SourceFilterSettings) -> Result<()> {
+    pub async fn set_source_filter_settings(
+        &self,
+        settings: SourceFilterSettings<'_>,
+    ) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceFilterSettings(settings))
             .await
@@ -296,7 +299,7 @@ impl<'a> Sources<'a> {
     /// Change the visibility/enabled state of a filter.
     pub async fn set_source_filter_visibility(
         &self,
-        visibility: SourceFilterVisibility,
+        visibility: SourceFilterVisibility<'_>,
     ) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceFilterVisibility(visibility))
@@ -306,7 +309,7 @@ impl<'a> Sources<'a> {
     /// Get the audio monitoring type of the specified source.
     ///
     /// - `source_name`: Source name.
-    pub async fn get_audio_monitor_type(&self, source_name: String) -> Result<MonitorType> {
+    pub async fn get_audio_monitor_type(&self, source_name: &str) -> Result<MonitorType> {
         self.client
             .send_message::<responses::AudioMonitorType>(RequestType::GetAudioMonitorType {
                 source_name,
@@ -322,7 +325,7 @@ impl<'a> Sources<'a> {
     ///   `monitorAndOutput`.
     pub async fn set_audio_monitor_type(
         &self,
-        source_name: String,
+        source_name: &str,
         monitor_type: MonitorType,
     ) -> Result<()> {
         self.client
@@ -341,7 +344,7 @@ impl<'a> Sources<'a> {
     /// preserved if only one of these two parameters is specified.
     pub async fn take_source_screenshot(
         &self,
-        source_screenshot: SourceScreenshot,
+        source_screenshot: SourceScreenshot<'_>,
     ) -> Result<responses::SourceScreenshot> {
         self.client
             .send_message(RequestType::TakeSourceScreenshot(source_screenshot))

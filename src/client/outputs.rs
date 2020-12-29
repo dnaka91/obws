@@ -20,7 +20,7 @@ impl<'a> Outputs<'a> {
     /// Get information about a single output.
     ///
     /// - `output_name`: Output name.
-    pub async fn get_output_info(&self, output_name: String) -> Result<responses::Output> {
+    pub async fn get_output_info(&self, output_name: &str) -> Result<responses::Output> {
         self.client
             .send_message::<responses::OutputInfo>(RequestType::GetOutputInfo { output_name })
             .await
@@ -31,7 +31,7 @@ impl<'a> Outputs<'a> {
     /// add outputs to OBS may not function properly when they are controlled in this way.
     ///
     /// - `output_name`: Output name.
-    pub async fn start_output(&self, output_name: String) -> Result<()> {
+    pub async fn start_output(&self, output_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::StartOutput { output_name })
             .await
@@ -42,7 +42,7 @@ impl<'a> Outputs<'a> {
     ///
     /// - `output_name`: Output name.
     /// - `force`: Force stop (default: false).
-    pub async fn stop_output(&self, output_name: String, force: Option<bool>) -> Result<()> {
+    pub async fn stop_output(&self, output_name: &str, force: Option<bool>) -> Result<()> {
         self.client
             .send_message(RequestType::StopOutput { output_name, force })
             .await

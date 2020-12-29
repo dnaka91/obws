@@ -129,13 +129,13 @@ impl Client {
         })
     }
 
-    async fn send_message<T>(&self, req: RequestType) -> Result<T>
+    async fn send_message<T>(&self, req: RequestType<'_>) -> Result<T>
     where
         T: DeserializeOwned,
     {
         let id = self.id_counter.fetch_add(1, Ordering::SeqCst).to_string();
         let req = Request {
-            message_id: id.clone(),
+            message_id: &id,
             ty: req,
         };
         let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
@@ -175,7 +175,7 @@ impl Client {
             match password {
                 Some(password) => {
                     let auth = Self::create_auth_response(&challenge, &salt, password.as_ref());
-                    self.general().authenticate(auth).await?;
+                    self.general().authenticate(&auth).await?;
                 }
                 None => return Err(Error::NoPassword),
             }

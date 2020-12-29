@@ -1,6 +1,6 @@
 //! All requests that can be send to the API.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 use chrono::Duration;
 use either::Either;
@@ -13,15 +13,15 @@ mod ser;
 
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
-pub(crate) struct Request {
-    pub message_id: String,
+pub(crate) struct Request<'a> {
+    pub message_id: &'a str,
     #[serde(flatten)]
-    pub ty: RequestType,
+    pub ty: RequestType<'a>,
 }
 
 #[derive(Serialize)]
 #[serde(tag = "request-type")]
-pub(crate) enum RequestType {
+pub(crate) enum RequestType<'a> {
     // --------------------------------
     // General
     // --------------------------------
@@ -29,23 +29,23 @@ pub(crate) enum RequestType {
     GetAuthRequired,
     Authenticate {
         /// Response to the auth challenge.
-        auth: String,
+        auth: &'a str,
     },
     #[serde(rename_all = "kebab-case")]
     SetFilenameFormatting {
         /// Filename formatting string to set.
-        filename_formatting: String,
+        filename_formatting: &'a str,
     },
     GetFilenameFormatting,
     GetStats,
     BroadcastCustomMessage {
         /// Identifier to be choosen by the client.
-        realm: String,
+        realm: &'a str,
         /// User-defined data.
-        data: serde_json::Value,
+        data: &'a serde_json::Value,
     },
     GetVideoInfo,
-    OpenProjector(Projector),
+    OpenProjector(Projector<'a>),
     // --------------------------------
     // Sources
     // --------------------------------
@@ -54,105 +54,105 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "camelCase")]
     GetVolume {
         /// Source name.
-        source: String,
+        source: &'a str,
         /// Output volume in decibels of attenuation instead of amplitude/mul.
         use_decibel: Option<bool>,
     },
-    SetVolume(Volume),
+    SetVolume(Volume<'a>),
     GetMute {
         /// Source name.
-        source: String,
+        source: &'a str,
     },
     SetMute {
         /// Source name.
-        source: String,
+        source: &'a str,
         /// Desired mute status.
         mute: bool,
     },
     ToggleMute {
         /// Source name.
-        source: String,
+        source: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetAudioActive {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     SetSourceName {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
         /// New source name.
-        new_name: String,
+        new_name: &'a str,
     },
     SetSyncOffset {
         /// Source name.
-        source: String,
+        source: &'a str,
         /// The desired audio sync offset (in nanoseconds).
         #[serde(serialize_with = "ser::duration_nanos")]
         offset: Duration,
     },
     GetSyncOffset {
         /// Source name.
-        source: String,
+        source: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetSourceSettings {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
         /// Type of the specified source. Useful for type-checking if you expect a specific settings
         /// schema.
-        source_type: Option<String>,
+        source_type: Option<&'a str>,
     },
-    SetSourceSettings(SourceSettings),
+    SetSourceSettings(SourceSettings<'a>),
     GetTextGDIPlusProperties {
         /// Source name.
-        source: String,
+        source: &'a str,
     },
-    SetTextGDIPlusProperties(Box<TextGdiPlusProperties>),
+    SetTextGDIPlusProperties(Box<TextGdiPlusProperties<'a>>),
     GetTextFreetype2Properties {
         /// Source name.
-        source: String,
+        source: &'a str,
     },
-    SetTextFreetype2Properties(TextFreetype2Properties),
+    SetTextFreetype2Properties(TextFreetype2Properties<'a>),
     GetSpecialSources,
     #[serde(rename_all = "camelCase")]
     GetSourceFilters {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetSourceFilterInfo {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
         /// Source filter name.
-        filter_name: String,
+        filter_name: &'a str,
     },
-    AddFilterToSource(AddFilter),
+    AddFilterToSource(AddFilter<'a>),
     #[serde(rename_all = "camelCase")]
     RemoveFilterFromSource {
         /// Name of the source from which the specified filter is removed.
-        source_name: String,
+        source_name: &'a str,
         /// Name of the filter to remove.
-        filter_name: String,
+        filter_name: &'a str,
     },
-    ReorderSourceFilter(ReorderFilter),
-    MoveSourceFilter(MoveFilter),
-    SetSourceFilterSettings(SourceFilterSettings),
-    SetSourceFilterVisibility(SourceFilterVisibility),
+    ReorderSourceFilter(ReorderFilter<'a>),
+    MoveSourceFilter(MoveFilter<'a>),
+    SetSourceFilterSettings(SourceFilterSettings<'a>),
+    SetSourceFilterVisibility(SourceFilterVisibility<'a>),
     #[serde(rename_all = "camelCase")]
     GetAudioMonitorType {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     SetAudioMonitorType {
         /// Source name.
-        source_name: String,
+        source_name: &'a str,
         /// The monitor type to use. Options: `none`, `monitorOnly`, `monitorAndOutput`.
         monitor_type: MonitorType,
     },
-    TakeSourceScreenshot(SourceScreenshot),
+    TakeSourceScreenshot(SourceScreenshot<'a>),
     // --------------------------------
     // Outputs
     // --------------------------------
@@ -160,17 +160,17 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "camelCase")]
     GetOutputInfo {
         /// Output name.
-        output_name: String,
+        output_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     StartOutput {
         /// Output name.
-        output_name: String,
+        output_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     StopOutput {
         /// Output name.
-        output_name: String,
+        output_name: &'a str,
         /// Force stop (default: false).
         force: Option<bool>,
     },
@@ -180,7 +180,7 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetCurrentProfile {
         /// Name of the desired profile.
-        profile_name: String,
+        profile_name: &'a str,
     },
     GetCurrentProfile,
     ListProfiles,
@@ -195,7 +195,7 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetRecordingFolder {
         /// Path of the recording folder.
-        rec_folder: PathBuf,
+        rec_folder: &'a Path,
     },
     GetRecordingFolder,
     // --------------------------------
@@ -211,7 +211,7 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetCurrentSceneCollection {
         /// Name of the desired scene collection.
-        sc_name: String,
+        sc_name: &'a str,
     },
     GetCurrentSceneCollection,
     ListSceneCollections,
@@ -221,61 +221,61 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     GetSceneItemProperties {
         /// Name of the scene the scene item belongs to. Defaults to the current scene.
-        scene_name: Option<String>,
+        scene_name: Option<&'a str>,
         /// Scene Item name (if this field is a string) or specification (if it is an object).
         #[serde(with = "either::serde_untagged")]
-        item: Either<String, SceneItemSpecification>,
+        item: Either<&'a str, SceneItemSpecification<'a>>,
     },
-    SetSceneItemProperties(SceneItemProperties),
+    SetSceneItemProperties(SceneItemProperties<'a>),
     #[serde(rename_all = "kebab-case")]
     ResetSceneItem {
         /// Name of the scene the scene item belongs to. Defaults to the current scene.
-        scene_name: Option<String>,
+        scene_name: Option<&'a str>,
         /// Scene Item name (if this field is a string) or specification (if it is an object).
         #[serde(with = "either::serde_untagged")]
-        item: Either<String, SceneItemSpecification>,
+        item: Either<&'a str, SceneItemSpecification<'a>>,
     },
-    SetSceneItemRender(SceneItemRender),
+    SetSceneItemRender(SceneItemRender<'a>),
     DeleteSceneItem {
         /// Name of the scene the scene item belongs to. Defaults to the current scene.
-        scene: Option<String>,
+        scene: Option<&'a str>,
         /// Scene item to delete.
-        item: SceneItemSpecification, // TODO: fields are actually not optional
+        item: SceneItemSpecification<'a>, // TODO: fields are actually not optional
     },
-    AddSceneItem(AddSceneItem),
-    DuplicateSceneItem(DuplicateSceneItem),
+    AddSceneItem(AddSceneItem<'a>),
+    DuplicateSceneItem(DuplicateSceneItem<'a>),
     // --------------------------------
     // Scenes
     // --------------------------------
     #[serde(rename_all = "kebab-case")]
     SetCurrentScene {
         /// Name of the scene to switch to.
-        scene_name: String,
+        scene_name: &'a str,
     },
     GetCurrentScene,
     GetSceneList,
     #[serde(rename_all = "camelCase")]
     CreateScene {
         /// Name of the scene to create.
-        scene_name: String,
+        scene_name: &'a str,
     },
     ReorderSceneItems {
         /// Name of the scene to reorder (defaults to current).
-        scene: Option<String>,
+        scene: Option<&'a str>,
         /// Ordered list of objects with name and/or id specified. Id preferred due to uniqueness
         /// per scene.
-        items: Vec<Scene>,
+        items: &'a [Scene<'a>],
     },
-    SetSceneTransitionOverride(SceneTransitionOverride),
+    SetSceneTransitionOverride(SceneTransitionOverride<'a>),
     #[serde(rename_all = "camelCase")]
     RemoveSceneTransitionOverride {
         /// Name of the scene to remove the override from.
-        scene_name: String,
+        scene_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetSceneTransitionOverride {
         /// Name of the scene to get the override for.
-        scene_name: String,
+        scene_name: &'a str,
     },
     // --------------------------------
     // Streaming
@@ -284,15 +284,15 @@ pub(crate) enum RequestType {
     StartStopStreaming,
     StartStreaming {
         /// Special stream configuration. Please note: these won't be saved to OBS' configuration.
-        stream: Option<Stream>,
+        stream: Option<Stream<'a>>,
     },
     StopStreaming,
-    SetStreamSettings(SetStreamSettings),
+    SetStreamSettings(SetStreamSettings<'a>),
     GetStreamSettings,
     SaveStreamSettings,
     SendCaptions {
         /// Captions text.
-        text: String,
+        text: &'a str,
     },
     // --------------------------------
     // Studio Mode
@@ -302,11 +302,11 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetPreviewScene {
         /// The name of the scene to preview.
-        scene_name: String,
+        scene_name: &'a str,
     },
     TransitionToProgram {
         /// Change the active transition before switching scenes. Defaults to the active transition.
-        with_transition: Option<Transition>,
+        with_transition: Option<Transition<'a>>,
     },
     EnableStudioMode,
     DisableStudioMode,
@@ -319,7 +319,7 @@ pub(crate) enum RequestType {
     #[serde(rename_all = "kebab-case")]
     SetCurrentTransition {
         /// The name of the transition.
-        transition_name: String,
+        transition_name: &'a str,
     },
     SetTransitionDuration {
         /// Desired duration of the transition (in milliseconds).
@@ -332,7 +332,7 @@ pub(crate) enum RequestType {
 /// Request information for [`open_projector`](crate::client::General::open_projector).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct Projector {
+pub struct Projector<'a> {
     /// Type of projector: `Preview` (default), `Source`, `Scene`, `StudioProgram`, or `Multiview`
     /// (case insensitive).
     #[serde(rename = "type")]
@@ -342,9 +342,9 @@ pub struct Projector {
     /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
     /// [Qt's geometry encoding](https://doc.qt.io/qt-5/qwidget.html#saveGeometry). Corresponds to
     /// OBS's saved projectors.
-    pub geometry: Option<String>,
+    pub geometry: Option<&'a str>,
     /// Name of the source or scene to be displayed (ignored for other projector types).
-    pub name: Option<String>,
+    pub name: Option<&'a str>,
 }
 
 /// Request information for [`open_projector`](crate::client::General::open_projector) as part of
@@ -367,9 +367,9 @@ pub enum ProjectorType {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Volume {
+pub struct Volume<'a> {
     /// Source name.
-    pub source: String,
+    pub source: &'a str,
     /// Desired volume. Must be between `0.0` and `20.0` for mul, and under 26.0 for dB. OBS will
     /// interpret dB values under -100.0 as Inf. Note: The OBS volume sliders only reach a maximum
     /// of 1.0mul/0.0dB, however OBS actually supports larger values.
@@ -382,23 +382,23 @@ pub struct Volume {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SourceSettings {
+pub struct SourceSettings<'a> {
     /// Source name.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Type of the specified source. Useful for type-checking to avoid settings a set of settings
     /// incompatible with the actual source's type.
-    pub source_type: Option<String>,
+    pub source_type: Option<&'a str>,
     /// Source settings (varies between source types, may require some probing around).
-    pub source_settings: serde_json::Value,
+    pub source_settings: &'a serde_json::Value,
 }
 
 /// Request information for
 /// [`set_text_gdi_plus_properties`](crate::client::Sources::set_text_gdi_plus_properties).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct TextGdiPlusProperties {
+pub struct TextGdiPlusProperties<'a> {
     /// Name of the source.
-    pub source: String,
+    pub source: &'a str,
     /// Text Alignment ("left", "center", "right").
     pub align: Option<Align>,
     /// Background color.
@@ -418,12 +418,12 @@ pub struct TextGdiPlusProperties {
     /// Extents cy.
     pub extents_cy: Option<i64>,
     /// File path name.
-    pub file: Option<PathBuf>,
+    pub file: Option<&'a Path>,
     /// Read text from the specified file.
     pub read_from_file: Option<bool>,
     /// Holds data for the font. Ex:
     /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
-    pub font: Option<Font>,
+    pub font: Option<Font<'a>>,
     /// Gradient enabled.
     pub gradient: Option<bool>,
     /// Gradient color.
@@ -441,7 +441,7 @@ pub struct TextGdiPlusProperties {
     /// Outline opacity (0-100).
     pub outline_opacity: Option<u8>,
     /// Text content to be displayed.
-    pub text: Option<String>,
+    pub text: Option<&'a str>,
     /// Text vertical alignment ("top", "center", "bottom").
     pub valign: Option<Valign>,
     /// Vertical text enabled.
@@ -454,9 +454,9 @@ pub struct TextGdiPlusProperties {
 /// [`set_text_freetype2_properties`](crate::client::Sources::set_text_freetype2_properties).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct TextFreetype2Properties {
+pub struct TextFreetype2Properties<'a> {
     /// Source name.
-    pub source: String,
+    pub source: &'a str,
     /// Gradient top color.
     pub color1: Option<u32>,
     /// Gradient bottom color.
@@ -467,7 +467,7 @@ pub struct TextFreetype2Properties {
     pub drop_shadow: Option<bool>,
     /// Holds data for the font. Ex:
     /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
-    pub font: Option<Font>,
+    pub font: Option<Font<'a>>,
     /// Read text from the specified file.
     pub from_file: Option<bool>,
     /// Chat log.
@@ -475,9 +475,9 @@ pub struct TextFreetype2Properties {
     /// Outline.
     pub outline: Option<bool>,
     /// Text content to be displayed.
-    pub text: Option<String>,
+    pub text: Option<&'a str>,
     /// File path.
-    pub text_file: Option<PathBuf>,
+    pub text_file: Option<&'a Path>,
     /// Word wrap.
     pub word_wrap: Option<bool>,
 }
@@ -485,26 +485,26 @@ pub struct TextFreetype2Properties {
 /// Request information for [`add_filter_to_source`](crate::client::Sources::add_filter_to_source).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AddFilter {
+pub struct AddFilter<'a> {
     /// Name of the source on which the filter is added.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Name of the new filter.
-    pub filter_name: String,
+    pub filter_name: &'a str,
     /// Filter type.
-    pub filter_type: String,
+    pub filter_type: &'a str,
     /// Filter settings.
-    pub filter_settings: serde_json::Value,
+    pub filter_settings: &'a serde_json::Value,
 }
 
 /// Request information for
 /// [`reorder_source_filter`](crate::client::Sources::reorder_source_filter).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ReorderFilter {
+pub struct ReorderFilter<'a> {
     /// Name of the source to which the filter belongs.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Name of the filter to reorder.
-    pub filter_name: String,
+    pub filter_name: &'a str,
     /// Desired position of the filter in the chain.
     pub new_index: u32,
 }
@@ -512,11 +512,11 @@ pub struct ReorderFilter {
 /// Request information for [`move_source_filter`](crate::client::Sources::move_source_filter).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct MoveFilter {
+pub struct MoveFilter<'a> {
     /// Name of the source to which the filter belongs.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Name of the filter to reorder.
-    pub filter_name: String,
+    pub filter_name: &'a str,
     /// How to move the filter around in the source's filter chain. Either "up", "down", "top" or
     /// "bottom".
     pub movement_type: MovementType,
@@ -541,24 +541,24 @@ pub enum MovementType {
 /// [`set_source_filter_settings`](crate::client::Sources::set_source_filter_settings).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SourceFilterSettings {
+pub struct SourceFilterSettings<'a> {
     /// Name of the source to which the filter belongs.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Name of the filter to reconfigure.
-    pub filter_name: String,
+    pub filter_name: &'a str,
     /// New settings. These will be merged to the current filter settings.
-    pub filter_settings: serde_json::Value,
+    pub filter_settings: &'a serde_json::Value,
 }
 
 /// Request information for
 /// [`set_source_filter_visibility`](crate::client::Sources::set_source_filter_visibility).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SourceFilterVisibility {
+pub struct SourceFilterVisibility<'a> {
     /// Source name.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Source filter name.
-    pub filter_name: String,
+    pub filter_name: &'a str,
     /// New filter state.
     pub filter_enabled: bool,
 }
@@ -568,22 +568,22 @@ pub struct SourceFilterVisibility {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SourceScreenshot {
+pub struct SourceScreenshot<'a> {
     /// Source name. Note that, since scenes are also sources, you can also provide a scene name. If
     /// not provided, the currently active scene is used.
-    pub source_name: Option<String>,
+    pub source_name: Option<&'a str>,
     /// Format of the Data URI encoded picture. Can be "png", "jpg", "jpeg" or "bmp" (or any other
     /// value supported by Qt's Image module).
-    pub embed_picture_format: Option<String>,
+    pub embed_picture_format: Option<&'a str>,
     /// Full file path (file extension included) where the captured image is to be saved. Can be in
     /// a format different from [`embed_picture_format`](SourceScreenshot::embed_picture_format).
     /// Can be a relative path.
-    pub save_to_file_path: Option<PathBuf>,
+    pub save_to_file_path: Option<&'a Path>,
     /// Format to save the image file as (one of the values provided in the
     /// [`supported_image_export_formats`](crate::responses::Version::supported_image_export_formats)
     /// response field of [`get_version`](crate::client::General::get_version)). If not specified,
     /// tries to guess based on file extension.
-    pub file_format: Option<String>,
+    pub file_format: Option<&'a str>,
     /// Compression ratio between -1 and 100 to write the image with. -1 is automatic, 1 is smallest
     /// file/most compression, 100 is largest file/least compression. Varies with image type.
     pub compress_quality: Option<i8>,
@@ -598,12 +598,12 @@ pub struct SourceScreenshot {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "kebab-case")]
-pub struct SceneItemProperties {
+pub struct SceneItemProperties<'a> {
     /// Name of the scene the source item belongs to. Defaults to the current scene.
-    pub scene_name: Option<String>,
+    pub scene_name: Option<&'a str>,
     /// Scene Item name (if this field is a string) or specification (if it is an object).
     #[serde(with = "either::serde_untagged")]
-    pub item: Either<String, SceneItemSpecification>,
+    pub item: Either<&'a str, SceneItemSpecification<'a>>,
     /// Position of the scene item.
     pub position: Option<Position>,
     /// The new clockwise rotation of the item in degrees.
@@ -626,11 +626,11 @@ pub struct SceneItemProperties {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "kebab-case")]
-pub struct SceneItemRender {
+pub struct SceneItemRender<'a> {
     /// Name of the scene the scene item belongs to. Defaults to the currently active scene.
-    pub scene_name: Option<String>,
+    pub scene_name: Option<&'a str>,
     /// Scene Item name.
-    pub source: String,
+    pub source: &'a str,
     /// true = shown ; false = hidden.
     pub render: bool,
 }
@@ -638,11 +638,11 @@ pub struct SceneItemRender {
 /// Request information for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AddSceneItem {
+pub struct AddSceneItem<'a> {
     /// Name of the scene to create the scene item in.
-    pub scene_name: String,
+    pub scene_name: &'a str,
     /// Name of the source to be added.
-    pub source_name: String,
+    pub source_name: &'a str,
     /// Whether to make the sceneitem visible on creation or not. Default `true`.
     pub set_visible: bool,
 }
@@ -652,13 +652,13 @@ pub struct AddSceneItem {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DuplicateSceneItem {
+pub struct DuplicateSceneItem<'a> {
     /// Name of the scene to copy the item from. Defaults to the current scene.
-    pub from_scene: Option<String>,
+    pub from_scene: Option<&'a str>,
     /// Name of the scene to create the item in. Defaults to the current scene.
-    pub to_scene: Option<String>,
+    pub to_scene: Option<&'a str>,
     /// Scene Item to duplicate from the source scene.
-    pub item: SceneItemSpecification, // TODO: fields are actually not optional
+    pub item: SceneItemSpecification<'a>, // TODO: fields are actually not optional
 }
 
 /// Request information for
@@ -666,11 +666,11 @@ pub struct DuplicateSceneItem {
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SceneTransitionOverride {
+pub struct SceneTransitionOverride<'a> {
     /// Name of the scene to switch to.
-    pub scene_name: String,
+    pub scene_name: &'a str,
     /// Name of the transition to use.
-    pub transition_name: String,
+    pub transition_name: &'a str,
     /// Duration in milliseconds of the transition if transition is not fixed. Defaults to the
     /// current duration specified in the UI if there is no current override and this value is not
     /// given.
@@ -680,12 +680,12 @@ pub struct SceneTransitionOverride {
 
 /// Request information for [`set_stream_settings`](crate::client::Streaming::set_stream_settings).
 #[derive(Debug, Serialize)]
-pub struct SetStreamSettings {
+pub struct SetStreamSettings<'a> {
     /// The type of streaming service configuration, usually `rtmp_custom` or `rtmp_common`.
     #[serde(rename = "type")]
     pub ty: StreamType,
     /// The actual settings of the stream.
-    pub settings: StreamSettings,
+    pub settings: StreamSettings<'a>,
     /// Persist the settings to disk.
     pub save: bool,
 }
@@ -697,16 +697,16 @@ pub struct SetStreamSettings {
 /// of [`TextFreetype2Properties`].
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct Font {
+pub struct Font<'a> {
     /// Font face.
-    pub face: Option<String>,
+    pub face: Option<&'a str>,
     /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
     #[serde(serialize_with = "ser::bitflags_u8_opt")]
     pub flags: Option<FontFlags>,
     /// Font text size.
     pub size: Option<u32>,
     /// Font Style (unknown function).
-    pub style: Option<String>,
+    pub style: Option<&'a str>,
 }
 
 /// Request information for
@@ -718,9 +718,9 @@ pub struct Font {
 /// [`DuplicateSceneItem`].
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct SceneItemSpecification {
+pub struct SceneItemSpecification<'a> {
     /// Scene Item name.
-    pub name: Option<String>,
+    pub name: Option<&'a str>,
     /// Scene Item ID.
     pub id: Option<i64>,
 }
@@ -793,17 +793,17 @@ pub struct Bounds {
 /// [`ReorderLineItems`](RequestType::ReorderSceneItems).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct Scene {
+pub struct Scene<'a> {
     /// Id of a specific scene item. Unique on a scene by scene basis.
     id: Option<i64>,
     /// Name of a scene item. Sufficiently unique if no scene items share sources within the scene.
-    name: Option<String>,
+    name: Option<&'a str>,
 }
 
 /// Request information for [`start_streaming`](crate::client::Streaming::start_streaming).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct Stream {
+pub struct Stream<'a> {
     /// If specified ensures the type of stream matches the given type (usually 'rtmp_custom' or
     /// 'rtmp_common'). If the currently configured stream type does not match the given stream
     /// type, all settings must be specified in the `settings` object or an error will occur when
@@ -813,9 +813,9 @@ pub struct Stream {
     /// Adds the given object parameters as encoded query string parameters to the 'key' of the RTMP
     /// stream. Used to pass data to the RTMP service about the streaming. May be any String,
     /// Numeric, or Boolean field.
-    metadata: Option<serde_json::Value>,
+    metadata: Option<&'a serde_json::Value>,
     /// Settings for the stream.
-    settings: Option<StreamSettings>,
+    settings: Option<StreamSettings<'a>>,
 }
 
 /// Request information for [`start_streaming`](crate::client::Streaming::start_streaming) as part
@@ -823,28 +823,28 @@ pub struct Stream {
 /// of [`SetStreamSettings`].
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct StreamSettings {
+pub struct StreamSettings<'a> {
     /// The publish URL.
-    server: Option<String>,
+    server: Option<&'a str>,
     /// The publish key of the stream.
-    key: Option<String>,
+    key: Option<&'a str>,
     /// Indicates whether authentication should be used when connecting to the streaming server.
     use_auth: Option<bool>,
     /// If authentication is enabled, the username for the streaming server. Ignored if
     /// [`use_auth`](Self::use_auth) is not set to `true`.
-    username: Option<String>,
+    username: Option<&'a str>,
     /// If authentication is enabled, the password for the streaming server. Ignored if
     /// [`use_auth`](Self::use_auth) is not set to `true`.
-    password: Option<String>,
+    password: Option<&'a str>,
 }
 
 /// Request information for
 /// [`transition_to_program`](crate::client::StudioMode::transition_to_program).
 #[skip_serializing_none]
 #[derive(Debug, Serialize)]
-pub struct Transition {
+pub struct Transition<'a> {
     /// Name of the transition.
-    name: String,
+    name: &'a str,
     /// Transition duration (in milliseconds).
     #[serde(serialize_with = "ser::duration_millis_opt")]
     duration: Option<Duration>,

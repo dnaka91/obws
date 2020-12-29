@@ -28,7 +28,7 @@ impl<'a> Transitions<'a> {
     /// Set the active transition.
     ///
     /// - `transition_name`: The name of the transition.
-    pub async fn set_current_transition(&self, transition_name: String) -> Result<()> {
+    pub async fn set_current_transition(&self, transition_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetCurrentTransition { transition_name })
             .await
