@@ -1,0 +1,11 @@
+sign-commit = true
+sign-tag = true
+
+pre-release-commit-message = "Bump up version number to {{version}}"
+tag-message = "Version {{version}}"
+no-dev-version = true
+
+[[pre-release-replacements]]
+file = "README.md"
+search = 'obws = "[a-z0-9\.-]+"'
+replace = 'obws = "{{version}}"'
