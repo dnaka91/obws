@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use chrono::Duration;
 use serde::Deserialize;
 
+pub use rgb::RGBA8;
 pub use semver::Version as SemVerVersion;
 
 use crate::common::{
@@ -209,14 +210,6 @@ pub struct Mute {
     pub muted: bool,
 }
 
-/// Response value for [`get_audio_active`](crate::client::Sources::get_audio_active).
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct AudioActive {
-    /// Audio active status of the source.
-    pub audio_active: bool,
-}
-
 /// Response value for [`get_sync_offset`](crate::client::Sources::get_sync_offset).
 #[derive(Debug, Deserialize)]
 pub struct SyncOffset {
@@ -302,9 +295,11 @@ pub struct TextFreetype2Properties {
     /// Source name.
     pub source: String,
     /// Gradient top color.
-    pub color1: Option<u32>,
+    #[serde(default, deserialize_with = "de::rgba8_inverse")]
+    pub color1: Option<RGBA8>,
     /// Gradient bottom color.
-    pub color2: Option<u32>,
+    #[serde(default, deserialize_with = "de::rgba8_inverse")]
+    pub color2: Option<RGBA8>,
     /// Custom width (0 to disable).
     pub custom_width: Option<u32>,
     /// Drop shadow.
@@ -312,7 +307,7 @@ pub struct TextFreetype2Properties {
     pub drop_shadow: bool,
     /// Holds data for the font. Ex:
     /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
-    pub font: Font,
+    pub font: Option<Font>,
     /// Read text from the specified file.
     #[serde(default)]
     pub from_file: bool,
@@ -823,6 +818,7 @@ pub struct Scene {
     /// Name of the scene.
     pub name: String,
     /// Ordered list of the scene's source items.
+    #[serde(default)]
     pub sources: Vec<SceneItem>,
 }
 

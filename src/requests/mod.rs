@@ -7,6 +7,8 @@ use either::Either;
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 
+pub use rgb::RGBA8;
+
 use crate::common::{Align, Alignment, BoundsType, FontFlags, MonitorType, StreamType, Valign};
 
 mod ser;
@@ -72,11 +74,6 @@ pub(crate) enum RequestType<'a> {
     ToggleMute {
         /// Source name.
         source: &'a str,
-    },
-    #[serde(rename_all = "camelCase")]
-    GetAudioActive {
-        /// Source name.
-        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     SetSourceName {
@@ -458,9 +455,11 @@ pub struct TextFreetype2Properties<'a> {
     /// Source name.
     pub source: &'a str,
     /// Gradient top color.
-    pub color1: Option<u32>,
+    #[serde(serialize_with = "ser::rgba8_inverse_opt")]
+    pub color1: Option<RGBA8>,
     /// Gradient bottom color.
-    pub color2: Option<u32>,
+    #[serde(serialize_with = "ser::rgba8_inverse_opt")]
+    pub color2: Option<RGBA8>,
     /// Custom width (0 to disable).
     pub custom_width: Option<u32>,
     /// Drop shadow.
@@ -480,6 +479,25 @@ pub struct TextFreetype2Properties<'a> {
     pub text_file: Option<&'a Path>,
     /// Word wrap.
     pub word_wrap: Option<bool>,
+}
+
+impl<'a> From<&'a crate::responses::TextFreetype2Properties> for TextFreetype2Properties<'a> {
+    fn from(p: &'a crate::responses::TextFreetype2Properties) -> Self {
+        Self {
+            source: &p.source,
+            color1: p.color1,
+            color2: p.color2,
+            custom_width: p.custom_width,
+            drop_shadow: Some(p.drop_shadow),
+            font: p.font.as_ref().map(Into::into),
+            from_file: Some(p.from_file),
+            log_mode: Some(p.log_mode),
+            outline: Some(p.outline),
+            text: Some(&p.text),
+            text_file: p.text_file.as_deref(),
+            word_wrap: Some(p.word_wrap),
+        }
+    }
 }
 
 /// Request information for [`add_filter_to_source`](crate::client::Sources::add_filter_to_source).
@@ -569,9 +587,8 @@ pub struct SourceFilterVisibility<'a> {
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SourceScreenshot<'a> {
-    /// Source name. Note that, since scenes are also sources, you can also provide a scene name. If
-    /// not provided, the currently active scene is used.
-    pub source_name: Option<&'a str>,
+    /// Source name. Note that, since scenes are also sources, you can also provide a scene name.
+    pub source_name: &'a str,
     /// Format of the Data URI encoded picture. Can be "png", "jpg", "jpeg" or "bmp" (or any other
     /// value supported by Qt's Image module).
     pub embed_picture_format: Option<&'a str>,
@@ -723,6 +740,17 @@ pub struct Font<'a> {
     pub size: Option<u32>,
     /// Font Style (unknown function).
     pub style: Option<&'a str>,
+}
+
+impl<'a> From<&'a crate::responses::Font> for Font<'a> {
+    fn from(f: &'a crate::responses::Font) -> Self {
+        Self {
+            face: Some(&f.face),
+            flags: Some(f.flags),
+            size: Some(f.size),
+            style: Some(&f.style),
+        }
+    }
 }
 
 /// Request information for

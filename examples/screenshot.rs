@@ -19,13 +19,9 @@ async fn main() -> Result<()> {
     let screenshot = client
         .sources()
         .take_source_screenshot(SourceScreenshot {
-            source_name: Some("Start"),
+            source_name: "Start",
             embed_picture_format: Some("png"),
-            save_to_file_path: None,
-            file_format: None,
-            compress_quality: None,
-            width: None,
-            height: None,
+            ..Default::default()
         })
         .await?;
 

@@ -27,8 +27,7 @@ impl<'a> Outputs<'a> {
             .map(|o| o.output_info)
     }
 
-    /// Note: Controlling outputs is an experimental feature of obs-websocket. Some plugins which
-    /// add outputs to OBS may not function properly when they are controlled in this way.
+    /// Start an output.
     ///
     /// - `output_name`: Output name.
     pub async fn start_output(&self, output_name: &str) -> Result<()> {
@@ -37,8 +36,7 @@ impl<'a> Outputs<'a> {
             .await
     }
 
-    /// Note: Controlling outputs is an experimental feature of obs-websocket. Some plugins which
-    /// add outputs to OBS may not function properly when they are controlled in this way.
+    /// Stop an output.
     ///
     /// - `output_name`: Output name.
     /// - `force`: Force stop (default: false).

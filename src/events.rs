@@ -35,21 +35,13 @@ pub enum EventType {
         /// List of scene items in the new scene.
         sources: Vec<SceneItem>,
     },
-    /// Note: This event is not fired when the scenes are reordered.
+    /// The scene list has been modified. Scenes have been added, removed, or renamed.
     ScenesChanged,
     /// Triggered when switching to another scene collection or when renaming the current scene
     /// collection.
-    #[serde(rename_all = "camelCase")]
-    SceneCollectionChanged {
-        /// Name of the new current scene collection.
-        scene_collection: String,
-    },
+    SceneCollectionChanged,
     /// Triggered when a scene collection is created, added, renamed, or removed.
-    #[serde(rename_all = "camelCase")]
-    SceneCollectionListChanged {
-        /// Scene collections list.
-        scene_collections: Vec<SceneCollection>,
-    },
+    SceneCollectionListChanged,
     // --------------------------------
     // Transitions
     // --------------------------------
@@ -191,8 +183,7 @@ pub enum EventType {
     // --------------------------------
     // Recording
     // --------------------------------
-    /// Note: `recording_filename` is not provided in this event because this information is not
-    /// available at the time this event is emitted.
+    /// A request to start recording has been issued.
     RecordingStarting,
     /// Recording started successfully.
     RecordingStarted,
@@ -228,7 +219,7 @@ pub enum EventType {
         /// Identifier provided by the sender.
         realm: String,
         /// User-defined data.
-        data: serde_json::Value,
+        data: serde_json::Map<String, serde_json::Value>,
     },
     // --------------------------------
     // Sources
@@ -448,7 +439,7 @@ pub enum EventType {
         /// Name of the scene being previewed.
         scene_name: String,
         /// List of sources composing the scene.
-        soruces: Vec<SceneItem>,
+        sources: Vec<SceneItem>,
     },
     /// Studio Mode has been enabled or disabled.
     #[serde(rename_all = "kebab-case")]

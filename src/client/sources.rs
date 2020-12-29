@@ -87,16 +87,6 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// Get the audio's active status of a specified source.
-    ///
-    /// - `source_name`: Source name.
-    pub async fn get_audio_active(&self, source_name: &str) -> Result<bool> {
-        self.client
-            .send_message::<responses::AudioActive>(RequestType::GetAudioActive { source_name })
-            .await
-            .map(|aa| aa.audio_active)
-    }
-
     /// Note: If the new name already exists as a source, obs-websocket will return an error.
     ///
     /// - `source_name`: Source name.
