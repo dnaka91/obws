@@ -331,7 +331,7 @@ pub(crate) enum RequestType<'a> {
 
 /// Request information for [`open_projector`](crate::client::General::open_projector).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Projector<'a> {
     /// Type of projector: `Preview` (default), `Source`, `Scene`, `StudioProgram`, or `Multiview`
     /// (case insensitive).
@@ -365,7 +365,7 @@ pub enum ProjectorType {
 
 /// Request information for [`set_volume`](crate::client::Sources::set_volume).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Volume<'a> {
     /// Source name.
@@ -395,7 +395,7 @@ pub struct SourceSettings<'a> {
 /// Request information for
 /// [`set_text_gdi_plus_properties`](crate::client::Sources::set_text_gdi_plus_properties).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct TextGdiPlusProperties<'a> {
     /// Name of the source.
     pub source: &'a str,
@@ -453,7 +453,7 @@ pub struct TextGdiPlusProperties<'a> {
 /// Request information for
 /// [`set_text_freetype2_properties`](crate::client::Sources::set_text_freetype2_properties).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct TextFreetype2Properties<'a> {
     /// Source name.
     pub source: &'a str,
@@ -566,7 +566,7 @@ pub struct SourceFilterVisibility<'a> {
 /// Request information for
 /// [`take_source_screenshot`](crate::client::Sources::take_source_screenshot).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SourceScreenshot<'a> {
     /// Source name. Note that, since scenes are also sources, you can also provide a scene name. If
@@ -621,6 +621,22 @@ pub struct SceneItemProperties<'a> {
     pub bounds: Option<Bounds>,
 }
 
+impl<'a> Default for SceneItemProperties<'a> {
+    fn default() -> Self {
+        Self {
+            scene_name: None,
+            item: Either::Left(""),
+            position: None,
+            rotation: None,
+            scale: None,
+            crop: None,
+            visible: None,
+            locked: None,
+            bounds: None,
+        }
+    }
+}
+
 /// Request information for
 /// [`set_scene_item_render`](crate::client::SceneItems::set_scene_item_render).
 #[skip_serializing_none]
@@ -650,7 +666,7 @@ pub struct AddSceneItem<'a> {
 /// Request information for
 /// [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DuplicateSceneItem<'a> {
     /// Name of the scene to copy the item from. Defaults to the current scene.
@@ -696,7 +712,7 @@ pub struct SetStreamSettings<'a> {
 /// [`set_text_freetype2_properties`](crate::client::Sources::set_text_freetype2_properties) as part
 /// of [`TextFreetype2Properties`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Font<'a> {
     /// Font face.
     pub face: Option<&'a str>,
@@ -717,7 +733,7 @@ pub struct Font<'a> {
 /// [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item) as part of
 /// [`DuplicateSceneItem`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct SceneItemSpecification<'a> {
     /// Scene Item name.
     pub name: Option<&'a str>,
@@ -729,7 +745,7 @@ pub struct SceneItemSpecification<'a> {
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Position {
     /// The new x position of the source.
     pub x: Option<f64>,
@@ -744,7 +760,7 @@ pub struct Position {
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Scale {
     /// The new x scale of the item.
     pub x: Option<f64>,
@@ -756,7 +772,7 @@ pub struct Scale {
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Crop {
     /// The new amount of pixels cropped off the top of the source before scaling.
     pub top: Option<i64>,
@@ -772,7 +788,7 @@ pub struct Crop {
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Bounds {
     /// The new bounds type of the source. Can be "OBS_BOUNDS_STRETCH", "OBS_BOUNDS_SCALE_INNER",
     /// "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT",
@@ -792,7 +808,7 @@ pub struct Bounds {
 /// [`reorder_scene_items`](crate::client::Scenes::reorder_scene_items) as part of
 /// [`ReorderLineItems`](RequestType::ReorderSceneItems).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Scene<'a> {
     /// Id of a specific scene item. Unique on a scene by scene basis.
     id: Option<i64>,
@@ -802,7 +818,7 @@ pub struct Scene<'a> {
 
 /// Request information for [`start_streaming`](crate::client::Streaming::start_streaming).
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Stream<'a> {
     /// If specified ensures the type of stream matches the given type (usually 'rtmp_custom' or
     /// 'rtmp_common'). If the currently configured stream type does not match the given stream
@@ -822,7 +838,7 @@ pub struct Stream<'a> {
 /// of [`Stream`] and [`set_stream_settings`](crate::client::Streaming::set_stream_settings) as part
 /// of [`SetStreamSettings`].
 #[skip_serializing_none]
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct StreamSettings<'a> {
     /// The publish URL.
     server: Option<&'a str>,
