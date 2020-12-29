@@ -25,7 +25,6 @@ obws = "0.1.0"
 In addition, you will need to use the [tokio](https://tokio.rs) runtime (currently `v0.3.x`), to
 use this library as it makes heavy use of async/await and is bound to this runtime.
 
-
 [cargo-edit]: https://github.com/killercup/cargo-edit
 
 ### Example
@@ -57,7 +56,6 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
-
 ```
 
 ## License

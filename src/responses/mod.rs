@@ -48,7 +48,7 @@ pub struct Version {
     #[serde(deserialize_with = "de::string_comma_list")]
     pub available_requests: HashSet<String>,
     /// List of supported formats for features that use image export (like the
-    /// [`TakeSourceScreenshot`](crate::requests::RequestType::TakeSourceScreenshot) request type)
+    /// [`take_source_screenshot`](crate::client::Sources::take_source_screenshot) request)
     /// formatted as a comma-separated list string.
     #[serde(deserialize_with = "de::string_comma_list")]
     pub supported_image_export_formats: HashSet<String>,

@@ -833,8 +833,7 @@ pub struct Bounds {
 }
 
 /// Request information for
-/// [`reorder_scene_items`](crate::client::Scenes::reorder_scene_items) as part of
-/// [`ReorderLineItems`](RequestType::ReorderSceneItems).
+/// [`reorder_scene_items`](crate::client::Scenes::reorder_scene_items).
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct Scene<'a> {
