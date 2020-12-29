@@ -1,8 +1,11 @@
 # OBWS - The obws (obvious) remote control library for OBS
 
+[![Build Status][build-img]][build-url]
 [![Repository][crates-img]][crates-url]
 [![Documentation][doc-img]][doc-url]
 
+[build-img]: https://img.shields.io/github/workflow/status/dnaka91/obws/CI/main?style=for-the-badge
+[build-url]: https://github.com/dnaka91/obws/actions?query=workflow%3ACI
 [crates-img]: https://img.shields.io/crates/v/obws?style=for-the-badge
 [crates-url]: https://crates.io/crates/obws
 [doc-img]: https://img.shields.io/badge/docs.rs-obws-4d76ae?style=for-the-badge
