@@ -35,7 +35,8 @@ use this library as it makes heavy use of async/await and is bound to this runti
 Here we connect to a OBS instance, get some version information and log in to access the whole API
 and lastly print out a list of available scenes.
 
-For more usage instructions see the [docs](doc-url) or check out the [examples](examples/README.md).
+For more usage instructions see the [docs](https://docs.rs/obws) or check out the
+[examples](examples/README.md).
 
 ```rust
 use anyhow::Result;
