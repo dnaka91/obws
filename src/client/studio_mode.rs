@@ -1,8 +1,7 @@
-use anyhow::Result;
-
 use super::Client;
 use crate::requests::{RequestType, Transition};
 use crate::responses;
+use crate::Result;
 
 /// API functions related to the studio mode.
 pub struct StudioMode<'a> {

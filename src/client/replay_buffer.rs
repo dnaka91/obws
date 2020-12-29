@@ -1,7 +1,6 @@
-use anyhow::Result;
-
 use super::Client;
 use crate::requests::RequestType;
+use crate::Result;
 
 /// API functions related to the replay buffer.
 pub struct ReplayBuffer<'a> {

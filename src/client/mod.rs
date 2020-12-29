@@ -2,10 +2,12 @@
 
 use std::{
     collections::HashMap,
-    sync::{atomic::AtomicU64, Arc},
+    sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    },
 };
 
-use anyhow::{bail, Result};
 use futures_util::{
     sink::SinkExt,
     stream::{SplitSink, Stream, StreamExt},
@@ -22,6 +24,7 @@ use crate::{
     events::Event,
     requests::{Request, RequestType},
     responses::{AuthRequired, Response},
+    Error, Result,
 };
 
 pub use self::{
@@ -44,6 +47,16 @@ mod streaming;
 mod studio_mode;
 mod transitions;
 
+#[derive(Debug, thiserror::Error)]
+enum InnerError {
+    #[error("websocket message not convertible to text")]
+    IntoText(#[source] tungstenite::Error),
+    #[error("failed deserializing message")]
+    DeserializeMessage(#[source] serde_json::Error),
+    #[error("failed deserializing event")]
+    DeserializeEvent(#[source] serde_json::Error),
+}
+
 /// The client is the main entry point to access the obs-websocket API. It allows to call various
 /// functions to remote control an OBS instance as well as to listen to events caused by the user
 /// by interacting with OBS.
@@ -60,7 +73,9 @@ impl Client {
     /// Connect to a obs-websocket instance on the given host and port.
     pub async fn connect(host: impl AsRef<str>, port: u16) -> Result<Self> {
         let (socket, _) =
-            tokio_tungstenite::connect_async(format!("ws://{}:{}", host.as_ref(), port)).await?;
+            tokio_tungstenite::connect_async(format!("ws://{}:{}", host.as_ref(), port))
+                .await
+                .map_err(Error::Connect)?;
         let (write, mut read) = socket.split();
         let receivers = Arc::new(Mutex::new(HashMap::<
             String,
@@ -73,8 +88,10 @@ impl Client {
         tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
                 trace!("{}", msg);
-                let temp: Result<()> = async {
-                    let json = serde_json::from_str::<serde_json::Value>(&msg.into_text()?)?;
+                let res: Result<(), InnerError> = async {
+                    let text = msg.into_text().map_err(InnerError::IntoText)?;
+                    let json = serde_json::from_str::<serde_json::Value>(&text)
+                        .map_err(InnerError::DeserializeMessage)?;
 
                     if let Some(message_id) = json
                         .as_object()
@@ -86,7 +103,8 @@ impl Client {
                             tx.send(json).ok();
                         }
                     } else {
-                        let event = serde_json::from_value(json)?;
+                        let event =
+                            serde_json::from_value(json).map_err(InnerError::DeserializeEvent)?;
                         events_tx.send(event).ok();
                     }
 
@@ -94,7 +112,7 @@ impl Client {
                 }
                 .await;
 
-                if let Err(e) = temp {
+                if let Err(e) = res {
                     error!("failed handling message: {:?}", e);
                 }
             }
@@ -115,35 +133,33 @@ impl Client {
     where
         T: DeserializeOwned,
     {
-        let id = self
-            .id_counter
-            .fetch_add(1, std::sync::atomic::Ordering::SeqCst)
-            .to_string();
+        let id = self.id_counter.fetch_add(1, Ordering::SeqCst).to_string();
         let req = Request {
             message_id: id.clone(),
             ty: req,
         };
-        let json = serde_json::to_string(&req)?;
+        let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
 
         let (tx, rx) = oneshot::channel();
         self.receivers.lock().await.insert(id, tx);
 
         debug!("sending message: {}", json);
-        self.write.lock().await.send(Message::Text(json)).await?;
+        self.write
+            .lock()
+            .await
+            .send(Message::Text(json))
+            .await
+            .map_err(Error::Send)?;
 
-        let resp = rx.await?;
+        let mut resp = rx.await.map_err(Error::ReceiveMessage)?;
 
-        if let Some(error) = resp
-            .as_object()
-            .and_then(|o| o.get("error"))
-            .and_then(|e| e.as_str())
-        {
-            bail!("{}", error);
+        if let Some(error) = extract_error(&mut resp) {
+            return Err(Error::Api(error));
         }
 
         serde_json::from_value::<Response<T>>(resp)
             .map(|r| r.details)
-            .map_err(Into::into)
+            .map_err(Error::DeserializeResponse)
     }
 
     /// Login to the OBS websocket if an authentication is required.
@@ -161,7 +177,7 @@ impl Client {
                     let auth = Self::create_auth_response(&challenge, &salt, password.as_ref());
                     self.general().authenticate(auth).await?;
                 }
-                None => bail!("authentication required but no password provided"),
+                None => return Err(Error::NoPassword),
             }
         }
 
@@ -262,4 +278,17 @@ impl Client {
     pub fn transitions(&self) -> Transitions<'_> {
         Transitions { client: self }
     }
+}
+
+fn extract_error(value: &mut serde_json::Value) -> Option<String> {
+    value
+        .as_object_mut()
+        .and_then(|o| o.get_mut("error"))
+        .and_then(|e| {
+            if let serde_json::Value::String(msg) = e.take() {
+                Some(msg)
+            } else {
+                None
+            }
+        })
 }

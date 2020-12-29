@@ -1,8 +1,7 @@
-use anyhow::Result;
-
 use super::Client;
 use crate::requests::{RequestType, SetStreamSettings, Stream};
 use crate::responses;
+use crate::Result;
 
 /// API functions related to streaming.
 pub struct Streaming<'a> {

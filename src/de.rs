@@ -5,9 +5,28 @@ use std::convert::TryFrom;
 use std::fmt::{self, Display};
 use std::marker::PhantomData;
 
-use anyhow::{Context, Result};
 use chrono::Duration;
-use serde::de::{Deserializer, Error, Visitor};
+use serde::de::{self, Deserializer, Visitor};
+
+#[derive(Debug, thiserror::Error)]
+enum Error {
+    #[error("hours missing")]
+    HoursMissing,
+    #[error("minutes missing")]
+    MinutesMissing,
+    #[error("seconds missing")]
+    SecondsMissing,
+    #[error("milliseconds missing")]
+    MillisecondsMissing,
+    #[error("invalid integer")]
+    InvalidInteger(#[from] std::num::ParseIntError),
+    #[error("value {1} is too large for an i64: {0}")]
+    ValueTooLargeI64(#[source] std::num::TryFromIntError, u64),
+    #[error("value doesn't fit into an u8 integer: {0}")]
+    ValueDoesntFitU8(#[source] std::num::TryFromIntError),
+    #[error("conversion from u8 failed: {0}")]
+    ConversionFailed(String),
+}
 
 pub fn duration<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
 where
@@ -27,17 +46,17 @@ impl<'de> Visitor<'de> for OptDurationVisitor {
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
-        let duration = || -> Result<Duration> {
+        let duration = || -> Result<Duration, Error> {
             let mut hms = v.splitn(3, ':');
-            let hours = hms.next().context("hours missing")?.parse()?;
-            let minutes = hms.next().context("minutes missing")?.parse()?;
-            let seconds = hms.next().context("seconds missing")?;
+            let hours = hms.next().ok_or(Error::HoursMissing)?.parse()?;
+            let minutes = hms.next().ok_or(Error::MinutesMissing)?.parse()?;
+            let seconds = hms.next().ok_or(Error::SecondsMissing)?;
 
             let mut sm = seconds.splitn(2, '.');
-            let seconds = sm.next().context("seconds missing")?.parse()?;
-            let millis = sm.next().context("milliseconds missing")?.parse()?;
+            let seconds = sm.next().ok_or(Error::SecondsMissing)?.parse()?;
+            let millis = sm.next().ok_or(Error::MillisecondsMissing)?.parse()?;
 
             Ok(Duration::hours(hours)
                 + Duration::minutes(minutes)
@@ -45,12 +64,12 @@ impl<'de> Visitor<'de> for OptDurationVisitor {
                 + Duration::milliseconds(millis))
         };
 
-        duration().map(Some).map_err(Error::custom)
+        duration().map(Some).map_err(de::Error::custom)
     }
 
     fn visit_none<E>(self) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         Ok(None)
     }
@@ -81,7 +100,7 @@ impl<'de> Visitor<'de> for OptDurationMillisVisitor {
 
     fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         Ok(if v < 0 {
             None
@@ -92,17 +111,17 @@ impl<'de> Visitor<'de> for OptDurationMillisVisitor {
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         match i64::try_from(v) {
             Ok(value) => self.visit_i64(value),
-            Err(e) => Err(Error::custom(e)),
+            Err(e) => Err(de::Error::custom(Error::ValueTooLargeI64(e, v))),
         }
     }
 
     fn visit_none<E>(self) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         Ok(None)
     }
@@ -133,18 +152,18 @@ impl<'de> Visitor<'de> for DurationMillisVisitor {
 
     fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         Ok(Duration::milliseconds(v))
     }
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         match i64::try_from(v) {
             Ok(value) => self.visit_i64(value),
-            Err(e) => Err(Error::custom(e)),
+            Err(e) => Err(de::Error::custom(Error::ValueTooLargeI64(e, v))),
         }
     }
 }
@@ -167,18 +186,18 @@ impl<'de> Visitor<'de> for DurationNanosVisitor {
 
     fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         Ok(Duration::nanoseconds(v))
     }
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         match i64::try_from(v) {
             Ok(value) => self.visit_i64(value),
-            Err(e) => Err(Error::custom(e)),
+            Err(e) => Err(de::Error::custom(Error::ValueTooLargeI64(e, v))),
         }
     }
 }
@@ -209,26 +228,26 @@ where
 
     fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         u8::try_from(v)
-            .map_err(|_| Error::custom("value doesn't fit into an u8 integer"))
+            .map_err(|e| de::Error::custom(Error::ValueDoesntFitU8(e)))
             .and_then(|v| self.visit_u8(v))
     }
 
     fn visit_u8<E>(self, v: u8) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
-        T::try_from(v).map_err(Error::custom)
+        T::try_from(v).map_err(|e| de::Error::custom(Error::ConversionFailed(e.to_string())))
     }
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
     where
-        E: Error,
+        E: de::Error,
     {
         u8::try_from(v)
-            .map_err(|_| Error::custom("value doesn't fit into an u8 integer"))
+            .map_err(|e| de::Error::custom(Error::ValueDoesntFitU8(e)))
             .and_then(|v| self.visit_u8(v))
     }
 }

@@ -1,4 +1,3 @@
-use anyhow::Result;
 use chrono::Duration;
 use serde::de::DeserializeOwned;
 
@@ -10,6 +9,7 @@ use crate::requests::{
     TextGdiPlusProperties, Volume,
 };
 use crate::responses;
+use crate::Result;
 
 /// API functions related to sources.
 pub struct Sources<'a> {

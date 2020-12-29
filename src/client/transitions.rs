@@ -1,9 +1,9 @@
-use anyhow::Result;
 use chrono::Duration;
 
 use super::Client;
 use crate::requests::RequestType;
 use crate::responses;
+use crate::Result;
 
 /// API functions related to transitions.
 pub struct Transitions<'a> {

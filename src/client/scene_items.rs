@@ -1,4 +1,3 @@
-use anyhow::Result;
 use either::Either;
 
 use super::Client;
@@ -7,6 +6,7 @@ use crate::requests::{
     SceneItemSpecification,
 };
 use crate::responses;
+use crate::Result;
 
 /// API functions related to scene items.
 pub struct SceneItems<'a> {

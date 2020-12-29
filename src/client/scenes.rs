@@ -1,8 +1,7 @@
-use anyhow::Result;
-
 use super::Client;
 use crate::requests::{RequestType, Scene, SceneTransitionOverride};
 use crate::responses;
+use crate::Result;
 
 /// API functions related to scenes.
 pub struct Scenes<'a> {

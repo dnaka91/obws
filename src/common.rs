@@ -3,9 +3,10 @@
 
 use std::convert::TryFrom;
 
-use anyhow::Context;
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
+
+use crate::Error;
 
 /// Response value for [`get_current_scene`](crate::client::Scenes::get_current_scene) as part of
 /// [`CurrentScene`](crate::responses::CurrentScene),
@@ -209,10 +210,10 @@ bitflags! {
 }
 
 impl TryFrom<u8> for FontFlags {
-    type Error = anyhow::Error;
+    type Error = Error;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
-        Self::from_bits(value).context("value contains unknown flags")
+        Self::from_bits(value).ok_or(Error::UnknownFlags(value))
     }
 }
 
@@ -242,10 +243,10 @@ bitflags! {
 }
 
 impl TryFrom<u8> for Alignment {
-    type Error = anyhow::Error;
+    type Error = Error;
 
     fn try_from(value: u8) -> Result<Self, Self::Error> {
-        Self::from_bits(value).context("value contains unknown flags")
+        Self::from_bits(value).ok_or(Error::UnknownFlags(value))
     }
 }
 

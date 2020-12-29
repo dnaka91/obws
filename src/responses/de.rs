@@ -1,7 +1,6 @@
 use std::fmt;
-use std::marker::PhantomData;
-
 use std::iter::FromIterator;
+use std::marker::PhantomData;
 
 use serde::de::{Deserializer, Error, Visitor};
 

@@ -1,9 +1,9 @@
-use anyhow::Result;
 use serde::Serialize;
 
 use super::Client;
 use crate::requests::{Projector, RequestType};
 use crate::responses;
+use crate::{Error, Result};
 
 /// General functions of the API.
 pub struct General<'a> {
@@ -69,7 +69,7 @@ impl<'a> General<'a> {
         self.client
             .send_message(RequestType::BroadcastCustomMessage {
                 realm,
-                data: serde_json::to_value(&data)?,
+                data: serde_json::to_value(&data).map_err(Error::SerializeCustomData)?,
             })
             .await
     }
