@@ -295,10 +295,10 @@ pub struct TextFreetype2Properties {
     /// Source name.
     pub source: String,
     /// Gradient top color.
-    #[serde(default, deserialize_with = "de::rgba8_inverse")]
+    #[serde(default, deserialize_with = "de::rgba8_inverse_opt")]
     pub color1: Option<RGBA8>,
     /// Gradient bottom color.
-    #[serde(default, deserialize_with = "de::rgba8_inverse")]
+    #[serde(default, deserialize_with = "de::rgba8_inverse_opt")]
     pub color2: Option<RGBA8>,
     /// Custom width (0 to disable).
     pub custom_width: Option<u32>,
@@ -540,10 +540,10 @@ pub struct StreamingStatus {
     /// Current recording status.
     pub recording: bool,
     /// Time elapsed since streaming started (only present if currently streaming).
-    #[serde(deserialize_with = "crate::de::duration")]
+    #[serde(deserialize_with = "crate::de::duration_opt")]
     pub stream_timecode: Option<Duration>,
     /// Time elapsed since recording started (only present if currently recording).
-    #[serde(deserialize_with = "crate::de::duration")]
+    #[serde(deserialize_with = "crate::de::duration_opt")]
     pub rec_timecode: Option<Duration>,
     /// Always false. Retrocompatibility with OBSRemote.
     #[serde(default)]

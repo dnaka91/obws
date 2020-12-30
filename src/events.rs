@@ -9,11 +9,11 @@ use crate::common::{SceneItem, SceneItemTransform};
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Event {
-    #[serde(default, deserialize_with = "crate::de::duration")]
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
     /// Time elapsed between now and stream start (only present if OBS Studio is streaming).
     pub stream_timecode: Option<Duration>,
     /// Time elapsed between now and recording start (only present if OBS Studio is recording).
-    #[serde(default, deserialize_with = "crate::de::duration")]
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
     pub rec_timecode: Option<Duration>,
     /// The type of event.
     #[serde(flatten)]

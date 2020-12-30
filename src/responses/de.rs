@@ -44,11 +44,11 @@ where
     }
 }
 
-pub fn rgba8_inverse<'de, D>(deserializer: D) -> Result<Option<RGBA8>, D::Error>
+pub fn rgba8_inverse_opt<'de, D>(deserializer: D) -> Result<Option<RGBA8>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    deserializer.deserialize_u32(Rgba8InverseOptVisitor)
+    deserializer.deserialize_option(Rgba8InverseOptVisitor)
 }
 
 struct Rgba8InverseOptVisitor;
@@ -58,6 +58,16 @@ impl<'de> Visitor<'de> for Rgba8InverseOptVisitor {
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str("a RGBA color value encoded as integer in inverse order (ABGR)")
+    }
+
+    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        match u32::try_from(v) {
+            Ok(v) => self.visit_u32(v),
+            Err(e) => Err(Error::custom(e)),
+        }
     }
 
     fn visit_u32<E>(self, v: u32) -> Result<Self::Value, E>
@@ -70,16 +80,6 @@ impl<'de> Visitor<'de> for Rgba8InverseOptVisitor {
             (v >> 16 & 0xff) as u8,
             (v >> 24 & 0xff) as u8,
         )))
-    }
-
-    fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
-    where
-        E: Error,
-    {
-        match u32::try_from(v) {
-            Ok(v) => self.visit_u32(v),
-            Err(e) => Err(Error::custom(e)),
-        }
     }
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
@@ -110,7 +110,7 @@ impl<'de> Visitor<'de> for Rgba8InverseOptVisitor {
 #[cfg(test)]
 mod tests {
     use serde::Deserialize;
-    use serde_json::json;
+    use serde_test::{assert_de_tokens, assert_de_tokens_error, Token};
 
     use super::*;
 
@@ -122,10 +122,128 @@ mod tests {
             value: Vec<String>,
         }
 
-        let input = json! {{ "value": "a,b,c" }};
-        let expect = SimpleList {
-            value: vec!["a".to_owned(), "b".to_owned(), "c".to_owned()],
-        };
-        assert_eq!(expect, serde_json::from_value(input).unwrap());
+        assert_de_tokens(
+            &SimpleList {
+                value: vec!["a".to_owned(), "b".to_owned(), "c".to_owned()],
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleList",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Str("a,b,c"),
+                Token::StructEnd,
+            ],
+        );
+    }
+
+    #[test]
+    fn deser_rgba8_inverse_opt() {
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleColor {
+            #[serde(deserialize_with = "rgba8_inverse_opt")]
+            value: Option<RGBA8>,
+        }
+
+        assert_de_tokens(
+            &SimpleColor {
+                value: Some(RGBA8::new(1, 2, 3, 4)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(0x04030201),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleColor>(
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(i64::MIN),
+                Token::StructEnd,
+            ],
+            "out of range integral type conversion attempted",
+        );
+
+        assert_de_tokens(
+            &SimpleColor {
+                value: Some(RGBA8::new(1, 2, 3, 4)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U32(0x04030201),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleColor {
+                value: Some(RGBA8::new(1, 2, 3, 4)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(0x04030201),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleColor>(
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(u64::MAX),
+                Token::StructEnd,
+            ],
+            "out of range integral type conversion attempted",
+        );
+
+        assert_de_tokens(
+            &SimpleColor { value: None },
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::None,
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleColor {
+                value: Some(RGBA8::new(1, 2, 3, 4)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleColor",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Some,
+                Token::U32(0x04030201),
+                Token::StructEnd,
+            ],
+        );
     }
 }

@@ -28,16 +28,16 @@ enum Error {
     ConversionFailed(String),
 }
 
-pub fn duration<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
+pub fn duration_opt<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    deserializer.deserialize_option(OptDurationVisitor)
+    deserializer.deserialize_option(DurationOptVisitor)
 }
 
-struct OptDurationVisitor;
+struct DurationOptVisitor;
 
-impl<'de> Visitor<'de> for OptDurationVisitor {
+impl<'de> Visitor<'de> for DurationOptVisitor {
     type Value = Option<Duration>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -86,12 +86,12 @@ pub fn duration_millis_opt<'de, D>(deserializer: D) -> Result<Option<Duration>, 
 where
     D: Deserializer<'de>,
 {
-    deserializer.deserialize_i64(OptDurationMillisVisitor)
+    deserializer.deserialize_option(DurationMillisOptVisitor)
 }
 
-struct OptDurationMillisVisitor;
+struct DurationMillisOptVisitor;
 
-impl<'de> Visitor<'de> for OptDurationMillisVisitor {
+impl<'de> Visitor<'de> for DurationMillisOptVisitor {
     type Value = Option<Duration>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -254,28 +254,382 @@ where
 
 #[cfg(test)]
 mod tests {
+    use anyhow::Context;
+    use bitflags::bitflags;
     use serde::Deserialize;
-    use serde_json::json;
+    use serde_test::{assert_de_tokens, assert_de_tokens_error, Token};
 
     use super::*;
 
     #[test]
-    fn deser_duration() {
+    fn deser_duration_opt() {
         #[derive(Debug, PartialEq, Eq, Deserialize)]
         struct SimpleDuration {
-            #[serde(deserialize_with = "duration")]
+            #[serde(deserialize_with = "duration_opt")]
             value: Option<Duration>,
         };
 
-        let input = json! {{ "value": "02:15:04.310" }};
-        let expect = SimpleDuration {
-            value: Some(
-                Duration::hours(2)
-                    + Duration::minutes(15)
-                    + Duration::seconds(4)
-                    + Duration::milliseconds(310),
-            ),
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(
+                    Duration::hours(2)
+                        + Duration::minutes(15)
+                        + Duration::seconds(4)
+                        + Duration::milliseconds(310),
+                ),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Str("02:15:04.310"),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration { value: None },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::None,
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(
+                    Duration::hours(2)
+                        + Duration::minutes(15)
+                        + Duration::seconds(4)
+                        + Duration::milliseconds(310),
+                ),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Some,
+                Token::Str("02:15:04.310"),
+                Token::StructEnd,
+            ],
+        );
+    }
+
+    #[test]
+    fn deser_duration_millis_opt() {
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleDuration {
+            #[serde(deserialize_with = "duration_millis_opt")]
+            value: Option<Duration>,
         };
-        assert_eq!(expect, serde_json::from_value(input).unwrap());
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(Duration::milliseconds(150)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration { value: None },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(-1),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(Duration::milliseconds(150)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleDuration>(
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(u64::MAX),
+                Token::StructEnd,
+            ],
+            "value 18446744073709551615 is too large for an i64: \
+            out of range integral type conversion attempted",
+        );
+
+        assert_de_tokens(
+            &SimpleDuration { value: None },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::None,
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(Duration::milliseconds(150)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Some,
+                Token::I64(150),
+                Token::StructEnd,
+            ],
+        );
+    }
+
+    #[test]
+    fn deser_duration_millis() {
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleDuration {
+            #[serde(deserialize_with = "duration_millis")]
+            value: Duration,
+        };
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Duration::milliseconds(150),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Duration::milliseconds(150),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleDuration>(
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(u64::MAX),
+                Token::StructEnd,
+            ],
+            "value 18446744073709551615 is too large for an i64: \
+            out of range integral type conversion attempted",
+        );
+    }
+
+    #[test]
+    fn deser_duration_nanos() {
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleDuration {
+            #[serde(deserialize_with = "duration_nanos")]
+            value: Duration,
+        };
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Duration::nanoseconds(150),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Duration::nanoseconds(150),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleDuration>(
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(u64::MAX),
+                Token::StructEnd,
+            ],
+            "value 18446744073709551615 is too large for an i64: \
+            out of range integral type conversion attempted",
+        );
+    }
+
+    #[test]
+    fn deser_bitflags_u8() {
+        bitflags! {
+            struct Flags: u8 {
+                const ONE = 1;
+                const TWO = 2;
+            }
+        }
+
+        impl TryFrom<u8> for Flags {
+            type Error = anyhow::Error;
+
+            fn try_from(value: u8) -> Result<Self, Self::Error> {
+                Self::from_bits(value).context("unknown flags found")
+            }
+        }
+
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleFlags {
+            #[serde(deserialize_with = "bitflags_u8")]
+            value: Flags,
+        };
+
+        assert_de_tokens(
+            &SimpleFlags {
+                value: Flags::ONE | Flags::TWO,
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(3),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleFlags>(
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(i64::MAX),
+                Token::StructEnd,
+            ],
+            "value doesn't fit into an u8 integer: out of range integral type conversion attempted",
+        );
+
+        assert_de_tokens(
+            &SimpleFlags {
+                value: Flags::ONE | Flags::TWO,
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U8(3),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleFlags>(
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U8(100),
+                Token::StructEnd,
+            ],
+            "conversion from u8 failed: unknown flags found",
+        );
+
+        assert_de_tokens(
+            &SimpleFlags {
+                value: Flags::ONE | Flags::TWO,
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(3),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleFlags>(
+            &[
+                Token::Struct {
+                    name: "SimpleFlags",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(u64::MAX),
+                Token::StructEnd,
+            ],
+            "value doesn't fit into an u8 integer: out of range integral type conversion attempted",
+        );
     }
 }

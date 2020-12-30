@@ -34,6 +34,7 @@ tungstenite = { version = "0.11.1", default-features = false }
 anyhow = "1.0.37"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
+serde_test = "1.0.118"
 tokio = { version = "0.3.6", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
