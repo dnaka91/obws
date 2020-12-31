@@ -1,5 +1,5 @@
 use super::Client;
-use crate::requests::{RequestType, Scene, SceneTransitionOverride};
+use crate::requests::{RequestType, SceneItem, SceneTransitionOverride};
 use crate::responses;
 use crate::Result;
 
@@ -28,15 +28,6 @@ impl<'a> Scenes<'a> {
         self.client.send_message(RequestType::GetSceneList).await
     }
 
-    /// Create a new scene scene.
-    ///
-    /// - `scene_name`: Name of the scene to create.
-    pub async fn create_scene(&self, scene_name: &str) -> Result<()> {
-        self.client
-            .send_message(RequestType::CreateScene { scene_name })
-            .await
-    }
-
     /// Changes the order of scene items in the requested scene.
     ///
     /// - `scene`: Name of the scene to reorder (defaults to current).
@@ -45,7 +36,7 @@ impl<'a> Scenes<'a> {
     pub async fn reorder_scene_items(
         &self,
         scene: Option<&str>,
-        items: &[Scene<'_>],
+        items: &[SceneItem<'_>],
     ) -> Result<()> {
         self.client
             .send_message(RequestType::ReorderSceneItems { scene, items })

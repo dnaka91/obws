@@ -463,6 +463,7 @@ pub struct SceneItemProperties {
     /// If the source is visible.
     pub visible: bool,
     /// If the source is muted.
+    #[serde(default)]
     pub muted: bool,
     /// If the source's transform is locked.
     pub locked: bool,
@@ -482,14 +483,6 @@ pub struct SceneItemProperties {
     /// List of children (if this item is a group).
     #[serde(default)]
     pub group_children: Vec<SceneItemTransform>,
-}
-
-/// Response value for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct AddSceneItem {
-    /// Numerical ID of the created scene item.
-    pub item_id: i64,
 }
 
 /// Response value for [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).

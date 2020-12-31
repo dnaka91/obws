@@ -2,8 +2,7 @@ use either::Either;
 
 use super::Client;
 use crate::requests::{
-    AddSceneItem, DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender,
-    SceneItemSpecification,
+    DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender, SceneItemSpecification,
 };
 use crate::responses;
 use crate::Result;
@@ -23,7 +22,7 @@ impl<'a> SceneItems<'a> {
         &self,
         scene_name: Option<&str>,
         item: Either<&str, SceneItemSpecification<'_>>,
-    ) -> Result<Vec<responses::SceneItemProperties>> {
+    ) -> Result<responses::SceneItemProperties> {
         self.client
             .send_message(RequestType::GetSceneItemProperties { scene_name, item })
             .await
@@ -76,14 +75,6 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message(RequestType::DeleteSceneItem { scene, item })
             .await
-    }
-
-    /// Creates a scene item in a scene. In other words, this is how you add a source into a scene.
-    pub async fn add_scene_item(&self, scene_item: AddSceneItem<'_>) -> Result<i64> {
-        self.client
-            .send_message::<responses::AddSceneItem>(RequestType::AddSceneItem(scene_item))
-            .await
-            .map(|asi| asi.item_id)
     }
 
     /// Duplicates a scene item.

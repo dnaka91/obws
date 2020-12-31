@@ -239,7 +239,6 @@ pub(crate) enum RequestType<'a> {
         /// Scene item to delete.
         item: SceneItemSpecification<'a>, // TODO: fields are actually not optional
     },
-    AddSceneItem(AddSceneItem<'a>),
     DuplicateSceneItem(DuplicateSceneItem<'a>),
     // --------------------------------
     // Scenes
@@ -251,17 +250,12 @@ pub(crate) enum RequestType<'a> {
     },
     GetCurrentScene,
     GetSceneList,
-    #[serde(rename_all = "camelCase")]
-    CreateScene {
-        /// Name of the scene to create.
-        scene_name: &'a str,
-    },
     ReorderSceneItems {
         /// Name of the scene to reorder (defaults to current).
         scene: Option<&'a str>,
         /// Ordered list of objects with name and/or id specified. Id preferred due to uniqueness
         /// per scene.
-        items: &'a [Scene<'a>],
+        items: &'a [SceneItem<'a>],
     },
     SetSceneTransitionOverride(SceneTransitionOverride<'a>),
     #[serde(rename_all = "camelCase")]
@@ -668,18 +662,6 @@ pub struct SceneItemRender<'a> {
     pub render: bool,
 }
 
-/// Request information for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct AddSceneItem<'a> {
-    /// Name of the scene to create the scene item in.
-    pub scene_name: &'a str,
-    /// Name of the source to be added.
-    pub source_name: &'a str,
-    /// Whether to make the sceneitem visible on creation or not. Default `true`.
-    pub set_visible: bool,
-}
-
 /// Request information for
 /// [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
 #[skip_serializing_none]
@@ -784,6 +766,16 @@ pub struct Position {
     pub alignment: Option<Alignment>,
 }
 
+impl From<&crate::common::Position> for Position {
+    fn from(p: &crate::common::Position) -> Self {
+        Self {
+            x: Some(p.x),
+            y: Some(p.y),
+            alignment: Some(p.alignment),
+        }
+    }
+}
+
 /// Request information for
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
@@ -796,6 +788,15 @@ pub struct Scale {
     pub y: Option<f64>,
 }
 
+impl From<&crate::common::Scale> for Scale {
+    fn from(s: &crate::common::Scale) -> Self {
+        Self {
+            x: Some(s.x),
+            y: Some(s.y),
+        }
+    }
+}
+
 /// Request information for
 /// [`set_scene_item_properties`](crate::client::SceneItems::set_scene_item_properties) as part of
 /// [`SceneItemProperties`].
@@ -803,13 +804,24 @@ pub struct Scale {
 #[derive(Debug, Default, Serialize)]
 pub struct Crop {
     /// The new amount of pixels cropped off the top of the source before scaling.
-    pub top: Option<i64>,
+    pub top: Option<u32>,
     /// The new amount of pixels cropped off the bottom of the source before scaling.
-    pub bottom: Option<i64>,
+    pub bottom: Option<u32>,
     /// The new amount of pixels cropped off the left of the source before scaling.
-    pub left: Option<i64>,
+    pub left: Option<u32>,
     /// The new amount of pixels cropped off the right of the source before scaling.
-    pub right: Option<i64>,
+    pub right: Option<u32>,
+}
+
+impl From<&crate::common::Crop> for Crop {
+    fn from(c: &crate::common::Crop) -> Self {
+        Self {
+            top: Some(c.top),
+            bottom: Some(c.bottom),
+            left: Some(c.left),
+            right: Some(c.right),
+        }
+    }
 }
 
 /// Request information for
@@ -832,15 +844,26 @@ pub struct Bounds {
     pub y: Option<f64>,
 }
 
+impl From<&crate::common::Bounds> for Bounds {
+    fn from(b: &crate::common::Bounds) -> Self {
+        Self {
+            ty: Some(b.ty),
+            alignment: Some(b.alignment),
+            x: Some(b.x),
+            y: Some(b.y),
+        }
+    }
+}
+
 /// Request information for
 /// [`reorder_scene_items`](crate::client::Scenes::reorder_scene_items).
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
-pub struct Scene<'a> {
+pub struct SceneItem<'a> {
     /// Id of a specific scene item. Unique on a scene by scene basis.
-    id: Option<i64>,
+    pub id: Option<i64>,
     /// Name of a scene item. Sufficiently unique if no scene items share sources within the scene.
-    name: Option<&'a str>,
+    pub name: Option<&'a str>,
 }
 
 /// Request information for [`start_streaming`](crate::client::Streaming::start_streaming).
@@ -852,13 +875,13 @@ pub struct Stream<'a> {
     /// type, all settings must be specified in the `settings` object or an error will occur when
     /// starting the stream.
     #[serde(rename = "type")]
-    ty: Option<StreamType>,
+    pub ty: Option<StreamType>,
     /// Adds the given object parameters as encoded query string parameters to the 'key' of the RTMP
     /// stream. Used to pass data to the RTMP service about the streaming. May be any String,
     /// Numeric, or Boolean field.
-    metadata: Option<&'a serde_json::Value>,
+    pub metadata: Option<&'a serde_json::Value>,
     /// Settings for the stream.
-    settings: Option<StreamSettings<'a>>,
+    pub settings: Option<StreamSettings<'a>>,
 }
 
 /// Request information for [`start_streaming`](crate::client::Streaming::start_streaming) as part
@@ -868,17 +891,17 @@ pub struct Stream<'a> {
 #[derive(Debug, Default, Serialize)]
 pub struct StreamSettings<'a> {
     /// The publish URL.
-    server: Option<&'a str>,
+    pub server: Option<&'a str>,
     /// The publish key of the stream.
-    key: Option<&'a str>,
+    pub key: Option<&'a str>,
     /// Indicates whether authentication should be used when connecting to the streaming server.
-    use_auth: Option<bool>,
+    pub use_auth: Option<bool>,
     /// If authentication is enabled, the username for the streaming server. Ignored if
     /// [`use_auth`](Self::use_auth) is not set to `true`.
-    username: Option<&'a str>,
+    pub username: Option<&'a str>,
     /// If authentication is enabled, the password for the streaming server. Ignored if
     /// [`use_auth`](Self::use_auth) is not set to `true`.
-    password: Option<&'a str>,
+    pub password: Option<&'a str>,
 }
 
 /// Request information for
@@ -887,8 +910,8 @@ pub struct StreamSettings<'a> {
 #[derive(Debug, Serialize)]
 pub struct Transition<'a> {
     /// Name of the transition.
-    name: &'a str,
+    pub name: &'a str,
     /// Transition duration (in milliseconds).
     #[serde(serialize_with = "ser::duration_millis_opt")]
-    duration: Option<Duration>,
+    pub duration: Option<Duration>,
 }

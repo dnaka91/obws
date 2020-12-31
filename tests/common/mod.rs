@@ -4,7 +4,8 @@ use std::time::Duration;
 
 use anyhow::{ensure, Result};
 use obws::{
-    responses::{Output, Profile, Scene, SceneCollection, SourceListItem},
+    requests::SceneItem,
+    responses::{Output, Profile, Scene, SceneCollection, SourceListItem, Transition},
     Client,
 };
 use tokio::time;
@@ -13,7 +14,22 @@ pub const TEST_OUTPUT: &str = "virtualcam_output";
 pub const TEST_COLLECTION: &str = "OBWS-TEST";
 pub const TEST_PROFILE: &str = "OBWS-TEST";
 pub const TEST_SCENE: &str = "OBWS-TEST-Scene";
+pub const TEST_SCENE_2: &str = "OBWS-TEST-Scene2";
 pub const TEXT_SOURCE: &str = "OBWS-TEST-Text";
+pub const TEXT_SOURCE_2: &str = "OBWS-TEST-Text2";
+pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
+pub const TEST_TRANSITION_2: &str = "OBWS-TEST-Transition2";
+
+const SCENE_ORDER: &[SceneItem] = &[
+    SceneItem {
+        id: None,
+        name: Some(TEXT_SOURCE),
+    },
+    SceneItem {
+        id: None,
+        name: Some(TEXT_SOURCE_2),
+    },
+];
 
 static INIT: Once = Once::new();
 
@@ -61,10 +77,20 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         "scene `{}` not found, required for scenes tests",
         TEST_SCENE
     );
+    ensure!(
+        scenes.scenes.iter().any(is_required_scene_2),
+        "scene `{}` not found, required for scenes tests",
+        TEST_SCENE
+    );
 
     let sources = client.sources().get_sources_list().await?;
     ensure!(
         sources.iter().any(is_required_source),
+        "text source `{}` not found, required for sources tests",
+        TEXT_SOURCE
+    );
+    ensure!(
+        sources.iter().any(is_required_source_2),
         "text source `{}` not found, required for sources tests",
         TEXT_SOURCE
     );
@@ -82,6 +108,34 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_PROFILE
     );
 
+    let studio_mode_enabled = client.studio_mode().get_studio_mode_status().await?;
+    ensure!(
+        !studio_mode_enabled,
+        "studio mode enabled, required to be disabled for studio mode tests"
+    );
+
+    let transitions = client.transitions().get_transition_list().await?;
+    ensure!(
+        transitions.transitions.iter().any(is_required_transition),
+        "transition `{}` not found, required for transitions tests",
+        TEST_TRANSITION
+    );
+    ensure!(
+        transitions.transitions.iter().any(is_required_transition_2),
+        "transition `{}` not found, required for transitions tests",
+        TEST_TRANSITION
+    );
+
+    client.scenes().set_current_scene(TEST_SCENE).await?;
+    client
+        .scenes()
+        .reorder_scene_items(Some(TEST_SCENE), SCENE_ORDER)
+        .await?;
+    client
+        .transitions()
+        .set_current_transition(TEST_TRANSITION)
+        .await?;
+
     Ok(())
 }
 
@@ -97,12 +151,32 @@ fn is_required_scene(scene: &Scene) -> bool {
     scene.name == TEST_SCENE
 }
 
+fn is_required_scene_2(scene: &Scene) -> bool {
+    scene.name == TEST_SCENE_2
+}
+
 fn is_required_source(source: &SourceListItem) -> bool {
-    source.name == TEXT_SOURCE && source.ty == "input" && source.type_id == "text_ft2_source_v2"
+    source.name == TEXT_SOURCE && is_text_input_source(source)
+}
+
+fn is_required_source_2(source: &SourceListItem) -> bool {
+    source.name == TEXT_SOURCE_2 && is_text_input_source(source)
+}
+
+fn is_text_input_source(source: &SourceListItem) -> bool {
+    source.ty == "input" && source.type_id == "text_ft2_source_v2"
 }
 
 fn is_required_profile(profile: &Profile) -> bool {
     profile.profile_name == TEST_PROFILE
+}
+
+fn is_required_transition(transition: &Transition) -> bool {
+    transition.name == TEST_TRANSITION
+}
+
+fn is_required_transition_2(transition: &Transition) -> bool {
+    transition.name == TEST_TRANSITION_2
 }
 
 #[allow(unused_macros)]
