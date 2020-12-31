@@ -2,3 +2,5 @@
 
 .env
 Cargo.lock
+lcov.info
+tarpaulin-report.html
