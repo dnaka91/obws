@@ -3,6 +3,7 @@
 [![Build Status][build-img]][build-url]
 [![Repository][crates-img]][crates-url]
 [![Documentation][doc-img]][doc-url]
+[![Code Coverage][cover-img]][cover-url]
 
 [build-img]: https://img.shields.io/github/workflow/status/dnaka91/obws/CI/main?style=for-the-badge
 [build-url]: https://github.com/dnaka91/obws/actions?query=workflow%3ACI
@@ -10,6 +11,8 @@
 [crates-url]: https://crates.io/crates/obws
 [doc-img]: https://img.shields.io/badge/docs.rs-obws-4d76ae?style=for-the-badge
 [doc-url]: https://docs.rs/obws
+[cover-img]: https://img.shields.io/codecov/c/gh/dnaka91/obws?style=for-the-badge
+[cover-url]: https://codecov.io/gh/dnaka91/obws
 
 Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 
