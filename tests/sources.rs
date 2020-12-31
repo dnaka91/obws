@@ -16,7 +16,7 @@ use common::TEXT_SOURCE;
 mod common;
 
 #[tokio::test]
-async fn sources() -> Result<()> {
+async fn main() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.sources();
 

@@ -1,15 +1,17 @@
+use std::env;
 use std::sync::Once;
 use std::time::Duration;
 
 use anyhow::{ensure, Result};
 use obws::{
-    responses::{Output, Scene, SceneCollection, SourceListItem},
+    responses::{Output, Profile, Scene, SceneCollection, SourceListItem},
     Client,
 };
 use tokio::time;
 
 pub const TEST_OUTPUT: &str = "virtualcam_output";
 pub const TEST_COLLECTION: &str = "OBWS-TEST";
+pub const TEST_PROFILE: &str = "OBWS-TEST";
 pub const TEST_SCENE: &str = "OBWS-TEST-Scene";
 pub const TEXT_SOURCE: &str = "OBWS-TEST-Text";
 
@@ -21,8 +23,9 @@ pub async fn new_client() -> Result<Client> {
         pretty_env_logger::init();
     });
 
-    let client = Client::connect("localhost", 4444).await?;
-    client.login(std::env::var("OBS_PASSWORD").ok()).await?;
+    let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
+    let client = Client::connect(host, 4444).await?;
+    client.login(env::var("OBS_PASSWORD").ok()).await?;
 
     let collections = client.scene_collections().list_scene_collections().await?;
     ensure!(
@@ -37,7 +40,7 @@ pub async fn new_client() -> Result<Client> {
         .await?;
 
     // Give OBS some time to load the scene collection
-    time::sleep(Duration::from_millis(500)).await;
+    time::sleep(Duration::from_secs(1)).await;
 
     ensure_obs_setup(&client).await?;
 
@@ -72,6 +75,13 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         "desktop audio device required for sources tests"
     );
 
+    let profiles = client.profiles().list_profiles().await?;
+    ensure!(
+        profiles.iter().any(is_required_profile),
+        "profile `{}` not found, required for profiles tests",
+        TEST_PROFILE
+    );
+
     Ok(())
 }
 
@@ -89,4 +99,19 @@ fn is_required_scene(scene: &Scene) -> bool {
 
 fn is_required_source(source: &SourceListItem) -> bool {
     source.name == TEXT_SOURCE && source.ty == "input" && source.type_id == "text_ft2_source_v2"
+}
+
+fn is_required_profile(profile: &Profile) -> bool {
+    profile.profile_name == TEST_PROFILE
+}
+
+#[allow(unused_macros)]
+macro_rules! wait_for {
+    ($expression:expr, $pattern:pat) => {
+        while let Some(Event { ty, .. }) = $expression.next().await {
+            if matches!(ty, $pattern) {
+                break;
+            }
+        }
+    };
 }

@@ -7,7 +7,7 @@ use serde_json::json;
 mod common;
 
 #[tokio::test]
-async fn general() -> Result<()> {
+async fn main() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.general();
 
