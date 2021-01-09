@@ -50,13 +50,13 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 pub enum Error {
     /// An error occured while trying to connect to the websocket.
     #[error("failed to connect to the obs-websocket plugin")]
-    Connect(#[source] tungstenite::Error),
+    Connect(#[source] tokio_tungstenite::tungstenite::Error),
     /// Failed to serialize the message to be send to the websocket.
     #[error("failed to serialize message")]
     SerializeMessage(#[source] serde_json::Error),
     /// A message could not be send through the websocket.
     #[error("failed to send message to the obs-websocket plugin")]
-    Send(#[source] tungstenite::Error),
+    Send(#[source] tokio_tungstenite::tungstenite::Error),
     /// Tried to receive data while the send side was already closed.
     #[error("send side is closed")]
     ReceiveMessage(#[source] tokio::sync::oneshot::error::RecvError),

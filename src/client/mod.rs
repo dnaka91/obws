@@ -50,7 +50,7 @@ mod transitions;
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
     #[error("websocket message not convertible to text")]
-    IntoText(#[source] tungstenite::Error),
+    IntoText(#[source] tokio_tungstenite::tungstenite::Error),
     #[error("failed deserializing message")]
     DeserializeMessage(#[source] serde_json::Error),
     #[error("failed deserializing event")]

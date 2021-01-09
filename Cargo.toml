@@ -17,7 +17,7 @@ base64 = "0.13.0"
 bitflags = "1.2.1"
 chrono = { version = "0.4.19", default-features = false, features = ["std"] }
 either = { version = "1.6.1", features = ["serde"] }
-futures-util = { version = "0.3.8", features = ["sink"] }
+futures-util = { version = "0.3.9", features = ["sink"] }
 log = "0.4.11"
 rgb = { version = "0.8.25", default-features = false }
 semver = { version = "0.11.0", features = ["serde"] }
@@ -26,16 +26,15 @@ serde_json = "1.0.61"
 serde_with = "1.6.0"
 sha2 = "0.9.2"
 thiserror = "1.0.23"
-tokio = { version = "0.3.6", features = ["net", "sync"] }
-tokio-tungstenite = "0.12.0"
-tungstenite = { version = "0.11.1", default-features = false }
+tokio = { version = "1.0.1", features = ["net", "sync"] }
+tokio-tungstenite = "0.13.0"
 
 [dev-dependencies]
 anyhow = "1.0.37"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
 serde_test = "1.0.118"
-tokio = { version = "0.3.6", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tokio = { version = "1.0.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
 test-integration = []
