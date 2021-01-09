@@ -38,3 +38,4 @@ tokio = { version = "1.0.1", features = ["fs", "macros", "rt-multi-thread", "tim
 
 [features]
 test-integration = []
+tls = ["tokio-tungstenite/tls"]

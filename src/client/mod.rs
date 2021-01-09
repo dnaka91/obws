@@ -61,28 +61,96 @@ enum InnerError {
 /// functions to remote control an OBS instance as well as to listen to events caused by the user
 /// by interacting with OBS.
 pub struct Client {
+    /// The writer handle to the websocket stream.
     write: Mutex<MessageWriter>,
+    /// Global counter for requests that help to find out what response belongs to what previously
+    /// sent request.
     id_counter: AtomicU64,
+    /// A list of currently waiting requests to get a response back. The key is the string version
+    /// of a request ID and the value is a oneshot sender that allows to send the response back to
+    /// the other end that waits for the response.
     receivers: Arc<Mutex<HashMap<String, oneshot::Sender<serde_json::Value>>>>,
+    /// Broadcast sender that distributes received events to all current listeners. Events are
+    /// dropped if nobody listens.
     event_sender: broadcast::Sender<Event>,
 }
 
-type MessageWriter = SplitSink<WebSocketStream<TcpStream>, Message>;
+/// Base stream of a [`WebSocketStream`] if TLS is **disabled**.
+#[cfg(not(feature = "tls"))]
+type BaseStream = TcpStream;
+
+/// Base stream of a [`WebSocketStream`] if TLS is **enabled**.
+#[cfg(feature = "tls")]
+type BaseStream = tokio_tungstenite::MaybeTlsStream<TcpStream>;
+
+/// Shorthand for the writer side of a websocket stream that has been split into reader and writer.
+type MessageWriter = SplitSink<WebSocketStream<BaseStream>, Message>;
+
+/// Configuration for connecting to a obs-websocket instance.
+pub struct ConnectConfig<H>
+where
+    H: AsRef<str>,
+{
+    /// The hostname, usually `localhost` unless the OBS instance is on a remote machine.
+    host: H,
+    /// Port to connect to.
+    port: u16,
+    /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
+    #[cfg(feature = "tls")]
+    tls: bool,
+    /// Capacity of the broadcast channel for events. The default is `100` which should suffice.
+    /// If the consumption of events takes a long time and the broadcast channel fills up faster
+    /// than events are consumed, it will start dropping old messages from the queue and these will
+    /// not be send to listeners anymore.
+    broadcast_capacity: usize,
+}
+
+impl<H> ConnectConfig<H>
+where
+    H: AsRef<str>,
+{
+    #[cfg(feature = "tls")]
+    fn tls(&self) -> bool {
+        self.tls
+    }
+
+    #[cfg(not(feature = "tls"))]
+    fn tls(&self) -> bool {
+        false
+    }
+}
 
 impl Client {
     /// Connect to a obs-websocket instance on the given host and port.
     pub async fn connect(host: impl AsRef<str>, port: u16) -> Result<Self> {
-        let (socket, _) =
-            tokio_tungstenite::connect_async(format!("ws://{}:{}", host.as_ref(), port))
-                .await
-                .map_err(Error::Connect)?;
+        Self::connect_with_config(ConnectConfig {
+            host,
+            port,
+            #[cfg(feature = "tls")]
+            tls: false,
+            broadcast_capacity: 100,
+        })
+        .await
+    }
+
+    /// Connect to a obs-websocket instance with the given configuration.
+    pub async fn connect_with_config<H: AsRef<str>>(config: ConnectConfig<H>) -> Result<Self> {
+        let (socket, _) = tokio_tungstenite::connect_async(format!(
+            "{}://{}:{}",
+            if config.tls() { "wss" } else { "ws" },
+            config.host.as_ref(),
+            config.port
+        ))
+        .await
+        .map_err(Error::Connect)?;
+
         let (write, mut read) = socket.split();
         let receivers = Arc::new(Mutex::new(HashMap::<
             String,
             oneshot::Sender<serde_json::Value>,
         >::new()));
         let receivers2 = Arc::clone(&receivers);
-        let (event_sender, _) = broadcast::channel(100);
+        let (event_sender, _) = broadcast::channel(config.broadcast_capacity);
         let events_tx = event_sender.clone();
 
         tokio::spawn(async move {
