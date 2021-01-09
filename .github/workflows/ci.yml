@@ -6,7 +6,7 @@ on:
       - main
 jobs:
   check:
-    name: Check
+    name: Feature check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
