@@ -5,6 +5,27 @@ on:
     branches:
       - main
 jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Install cargo-hack
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-hack
+      - name: Check feature combinations
+        uses: actions-rs/cargo@v1
+        with:
+          command: hack
+          args: clippy --feature-powerset --no-dev-deps
   test:
     name: Test
     runs-on: ${{ matrix.os }}
