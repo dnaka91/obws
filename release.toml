@@ -9,3 +9,18 @@ no-dev-version = true
 file = "README.md"
 search = 'obws = "[a-z0-9\.-]+"'
 replace = 'obws = "{{version}}"'
+
+[[pre-release-replacements]]
+file = "CHANGELOG.md"
+search = '##\s*\[Unreleased\]\s*-\s*ReleaseDate'
+replace = '''
+## [Unreleased] - ReleaseDate
+
+## [{{version}}] - {{date}}'''
+
+[[pre-release-replacements]]
+file = "CHANGELOG.md"
+search = '\[Unreleased\]:.+HEAD'
+replace = '''
+[Unreleased]: https://github.com/dnaka91/obws/compare/v{{version}}...HEAD
+[{{version}}]: https://github.com/dnaka91/obws/compare/v{{prev_version}}...v{{version}}'''
