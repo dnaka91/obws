@@ -36,6 +36,7 @@ pub use client::Client;
 
 pub mod client;
 pub mod common;
+#[cfg(feature = "events")]
 pub mod events;
 pub mod requests;
 pub mod responses;

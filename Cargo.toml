@@ -12,7 +12,7 @@ categories = ["api-bindings", "web-programming"]
 keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
 
 [dependencies]
-async-stream = "0.3.0"
+async-stream = { version = "0.3.0", optional = true }
 base64 = "0.13.0"
 bitflags = "1.2.1"
 chrono = { version = "0.4.19", default-features = false, features = ["std"] }
@@ -37,5 +37,7 @@ serde_test = "1.0.118"
 tokio = { version = "1.0.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
+default = ["events"]
 test-integration = []
+events = ["async-stream"]
 tls = ["tokio-tungstenite/tls"]

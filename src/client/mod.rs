@@ -9,21 +9,26 @@ use std::{
     },
 };
 
+#[cfg(feature = "events")]
+use futures_util::stream::Stream;
 use futures_util::{
     sink::SinkExt,
-    stream::{SplitSink, Stream, StreamExt},
+    stream::{SplitSink, StreamExt},
 };
 use log::{debug, error, trace};
 use serde::de::DeserializeOwned;
+#[cfg(feature = "events")]
+use tokio::sync::broadcast;
 use tokio::{
     net::TcpStream,
-    sync::{broadcast, oneshot, Mutex},
+    sync::{oneshot, Mutex},
     task::JoinHandle,
 };
 use tokio_tungstenite::{tungstenite::Message, WebSocketStream};
 
+#[cfg(feature = "events")]
+use crate::events::Event;
 use crate::{
-    events::Event,
     requests::{Request, RequestType},
     responses::{AuthRequired, Response},
     Error, Result,
@@ -56,6 +61,7 @@ enum InnerError {
     #[error("failed deserializing message")]
     DeserializeMessage(#[source] serde_json::Error),
     #[error("failed deserializing event")]
+    #[cfg_attr(not(feature = "events"), allow(dead_code))]
     DeserializeEvent(#[source] serde_json::Error),
 }
 
@@ -74,6 +80,7 @@ pub struct Client {
     receivers: Arc<Mutex<HashMap<String, oneshot::Sender<serde_json::Value>>>>,
     /// Broadcast sender that distributes received events to all current listeners. Events are
     /// dropped if nobody listens.
+    #[cfg(feature = "events")]
     event_sender: broadcast::Sender<Event>,
     /// Handle to the background task that receives messages and distributes them to waiting
     /// receivers and event listeners. It allows to shut down all the machinery once the client is
@@ -108,6 +115,7 @@ where
     /// If the consumption of events takes a long time and the broadcast channel fills up faster
     /// than events are consumed, it will start dropping old messages from the queue and these will
     /// not be send to listeners anymore.
+    #[cfg_attr(not(feature = "events"), allow(dead_code))]
     broadcast_capacity: usize,
 }
 
@@ -156,7 +164,9 @@ impl Client {
             oneshot::Sender<serde_json::Value>,
         >::new()));
         let receivers2 = Arc::clone(&receivers);
+        #[cfg(feature = "events")]
         let (event_sender, _) = broadcast::channel(config.broadcast_capacity);
+        #[cfg(feature = "events")]
         let events_tx = event_sender.clone();
 
         let handle = tokio::spawn(async move {
@@ -176,10 +186,14 @@ impl Client {
                         if let Some(tx) = receivers2.lock().await.remove(message_id) {
                             tx.send(json).ok();
                         }
-                    } else {
-                        let event =
-                            serde_json::from_value(json).map_err(InnerError::DeserializeEvent)?;
-                        events_tx.send(event).ok();
+                    }
+                    else {
+                        #[cfg(feature = "events")]
+                        {
+                            let event = serde_json::from_value(json)
+                                .map_err(InnerError::DeserializeEvent)?;
+                            events_tx.send(event).ok();
+                        }
                     }
 
                     Ok(())
@@ -199,6 +213,7 @@ impl Client {
             write,
             id_counter,
             receivers,
+            #[cfg(feature = "events")]
             event_sender,
             handle: Some(handle),
         })
@@ -302,6 +317,7 @@ impl Client {
     ///
     /// **Note**: To be able to iterate over the stream you have to pin it with
     /// [`futures_util::pin_mut`] for example.
+    #[cfg(feature = "events")]
     pub fn events(&self) -> impl Stream<Item = Event> {
         let mut receiver = self.event_sender.subscribe();
 
