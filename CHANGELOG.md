@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- The client can now be shut down with the `disconnect` function and will do so automatically on
+  drop. It is still recommended to call this manually as it allows to wait for the client to fully
+  close all the internal machinery.
+
+### Changed
+
+- Events are opt-in with the `events` feature flag to reduce final binary size when events aren't
+  used.
+
+### Fixed
+
+- All fields of `ConnectConfig` have been made public to actually allow setting them.
+
 ## [0.3.0] - 2021-01-11
 
 ### Added
