@@ -25,7 +25,7 @@ Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it 
 
 ```toml
 [dependencies]
-obws = "0.3.0"
+obws = "0.4.0"
 ```
 
 In addition, you will need to use the [tokio](https://tokio.rs) runtime (currently `v0.3.x`), to
