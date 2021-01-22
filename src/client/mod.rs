@@ -99,24 +99,27 @@ type BaseStream = tokio_tungstenite::MaybeTlsStream<TcpStream>;
 /// Shorthand for the writer side of a websocket stream that has been split into reader and writer.
 type MessageWriter = SplitSink<WebSocketStream<BaseStream>, Message>;
 
+/// Default broadcast capacity used when not overwritten by the user.
+const DEFAULT_CAPACITY: usize = 100;
+
 /// Configuration for connecting to a obs-websocket instance.
 pub struct ConnectConfig<H>
 where
     H: AsRef<str>,
 {
     /// The hostname, usually `localhost` unless the OBS instance is on a remote machine.
-    host: H,
+    pub host: H,
     /// Port to connect to.
-    port: u16,
+    pub port: u16,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
     #[cfg(feature = "tls")]
-    tls: bool,
+    pub tls: bool,
     /// Capacity of the broadcast channel for events. The default is `100` which should suffice.
     /// If the consumption of events takes a long time and the broadcast channel fills up faster
     /// than events are consumed, it will start dropping old messages from the queue and these will
     /// not be send to listeners anymore.
     #[cfg_attr(not(feature = "events"), allow(dead_code))]
-    broadcast_capacity: usize,
+    pub broadcast_capacity: Option<usize>,
 }
 
 impl<H> ConnectConfig<H>
@@ -142,7 +145,7 @@ impl Client {
             port,
             #[cfg(feature = "tls")]
             tls: false,
-            broadcast_capacity: 100,
+            broadcast_capacity: None,
         })
         .await
     }
@@ -165,7 +168,8 @@ impl Client {
         >::new()));
         let receivers2 = Arc::clone(&receivers);
         #[cfg(feature = "events")]
-        let (event_sender, _) = broadcast::channel(config.broadcast_capacity);
+        let (event_sender, _) =
+            broadcast::channel(config.broadcast_capacity.unwrap_or(DEFAULT_CAPACITY));
         #[cfg(feature = "events")]
         let events_tx = event_sender.clone();
 
@@ -186,8 +190,7 @@ impl Client {
                         if let Some(tx) = receivers2.lock().await.remove(message_id) {
                             tx.send(json).ok();
                         }
-                    }
-                    else {
+                    } else {
                         #[cfg(feature = "events")]
                         {
                             let event = serde_json::from_value(json)
