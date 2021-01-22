@@ -100,6 +100,7 @@ type BaseStream = tokio_tungstenite::MaybeTlsStream<TcpStream>;
 type MessageWriter = SplitSink<WebSocketStream<BaseStream>, Message>;
 
 /// Default broadcast capacity used when not overwritten by the user.
+#[cfg(feature = "events")]
 const DEFAULT_CAPACITY: usize = 100;
 
 /// Configuration for connecting to a obs-websocket instance.
