@@ -11,6 +11,9 @@ repository = "https://github.com/dnaka91/obws"
 categories = ["api-bindings", "web-programming"]
 keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
 
+[package.metadata.docs.rs]
+features = ["events", "tls"]
+
 [dependencies]
 async-stream = { version = "0.3.0", optional = true }
 base64 = "0.13.0"
@@ -37,7 +40,15 @@ serde_test = "1.0.118"
 tokio = { version = "1.0.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
-default = ["events"]
+default = []
 test-integration = []
 events = ["async-stream"]
 tls = ["tokio-tungstenite/tls"]
+
+[[example]]
+name = "events"
+required-features = ["events"]
+
+[[test]]
+name = "recording"
+required-features = ["events"]
