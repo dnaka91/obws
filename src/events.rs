@@ -344,6 +344,81 @@ pub enum EventType {
         filters: Vec<SourceFilter>,
     },
     // --------------------------------
+    // Media
+    // --------------------------------
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPlaying {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPaused {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaRestarted {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaStopped {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaNext {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPrevious {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: These events are emitted by the OBS sources themselves. For example when the media
+    /// file starts playing. The behavior depends on the type of media source being used.
+    #[serde(rename_all = "camelCase")]
+    MediaStarted {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    /// Note: These events are emitted by the OBS sources themselves. For example when the media
+    /// file ends. The behavior depends on the type of media source being used.
+    #[serde(rename_all = "camelCase")]
+    MediaEnded {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. vlc_source or ffmpeg_source).
+        source_kind: SourceKind,
+    },
+    // --------------------------------
     // Scene Items
     // --------------------------------
     /// Scene items within a scene have been reordered.
@@ -510,4 +585,15 @@ pub enum SourceType {
     Transition,
     /// Filter for scene items.
     Filter,
+}
+
+/// Part of [`EventType::MediaPlaying`], [`EventType::MediaPaused`],
+/// [`EventType::MediaRestarted`], [`EventType::MediaStopped`],
+/// [`EventType::MediaNext`], [`EventType::MediaPrevious`],
+/// [`EventType::MediaStarted`] and [`EventType::MediaEnded`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceKind {
+    VlcSource,
+    FfmpegSource,
 }
