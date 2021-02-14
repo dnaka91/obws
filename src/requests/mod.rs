@@ -49,8 +49,67 @@ pub(crate) enum RequestType<'a> {
     GetVideoInfo,
     OpenProjector(Projector<'a>),
     // --------------------------------
+    // Media Control
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    PlayPauseMedia {
+        /// Source name.
+        source_name: &'a str,
+        /// Whether to pause or play the source. false for play, true for pause.
+        play_pause: bool,
+    },
+    #[serde(rename_all = "camelCase")]
+    RestartMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    StopMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    NextMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    PreviousMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetMediaDuration {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetMediaTime {
+        /// Source name.
+        source_name: &'a str,
+    },
+    SetMediaTime {
+        /// Source name.
+        source_name: &'a str,
+        /// Milliseconds to set the timestamp to.
+        #[serde(serialize_with = "ser::duration_millis")]
+        timestamp: Duration,
+    },
+    ScrubMedia {
+        /// Source name.
+        source_name: &'a str,
+        /// Millisecond offset (positive or negative) to offset the current media position.
+        #[serde(serialize_with = "ser::duration_millis")]
+        time_offset: Duration,
+    },
+    GetMediaState {
+        /// Source name.
+        source_name: &'a str,
+    },
+    // --------------------------------
     // Sources
     // --------------------------------
+    GetMediaSourcesList,
     GetSourcesList,
     GetSourceTypesList,
     #[serde(rename_all = "camelCase")]
