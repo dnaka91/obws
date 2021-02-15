@@ -19,23 +19,25 @@ async fn main() -> Result<()> {
 
     pin_mut!(events);
 
+    client.get_recording_status().await?;
+
     client.start_stop_recording().await?;
-    wait_for!(events, EventType::RecordingStarted);
+    wait_for!(events, EventType::RecordingStarted { .. });
     client.start_stop_recording().await?;
-    wait_for!(events, EventType::RecordingStopped);
+    wait_for!(events, EventType::RecordingStopped { .. });
 
     // Wait a little more as recording sometimes doesn't start when started/stopped frequently.
     time::sleep(Duration::from_secs(1)).await;
 
     client.start_recording().await?;
-    wait_for!(events, EventType::RecordingStarted);
+    wait_for!(events, EventType::RecordingStarted { .. });
     // Pausing doesn't seem to work currently
     // client.pause_recording().await?;
     // wait_for!(events, EventType::RecordingPaused);
     // client.resume_recording().await?;
     // wait_for!(events, EventType::RecordingResumed);
     client.stop_recording().await?;
-    wait_for!(events, EventType::RecordingStopped);
+    wait_for!(events, EventType::RecordingStopped { .. });
 
     let original = client.get_recording_folder().await?;
     client.set_recording_folder(Path::new("test")).await?;

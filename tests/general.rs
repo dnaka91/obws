@@ -35,5 +35,8 @@ async fn main() -> Result<()> {
         })
         .await?;
 
+    client.trigger_hotkey_by_name("ReplayBuffer.Save").await?;
+    client.trigger_hotkey_by_sequence("OBS_KEY_P", &[]).await?;
+
     Ok(())
 }

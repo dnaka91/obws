@@ -4,7 +4,7 @@ use serde::de::DeserializeOwned;
 use super::Client;
 use crate::common::MonitorType;
 use crate::requests::{
-    AddFilter, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
+    AddFilter, CreateSource, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
     SourceFilterVisibility, SourceScreenshot, SourceSettings, TextFreetype2Properties,
     TextGdiPlusProperties, Volume,
 };
@@ -17,6 +17,22 @@ pub struct Sources<'a> {
 }
 
 impl<'a> Sources<'a> {
+    /// List the media state of all media sources (vlc and media source).
+    pub async fn get_media_sources_list(&self) -> Result<Vec<responses::MediaSource>> {
+        self.client
+            .send_message::<responses::MediaSourcesList>(RequestType::GetMediaSourcesList)
+            .await
+            .map(|ms| ms.media_sources)
+    }
+
+    /// Create a source and add it as a scene item to a scene.
+    pub async fn create_source(&self, source: CreateSource<'_>) -> Result<i64> {
+        self.client
+            .send_message::<responses::SourceItemId>(RequestType::CreateSource(source))
+            .await
+            .map(|sii| sii.item_id)
+    }
+
     /// List all sources available in the running OBS instance.
     pub async fn get_sources_list(&self) -> Result<Vec<responses::SourceListItem>> {
         self.client
@@ -87,6 +103,18 @@ impl<'a> Sources<'a> {
             .await
     }
 
+    /// Get the audio's active status of a specified source.
+    ///
+    /// - `source_name`: Source name.
+    pub async fn get_audio_active(&self, source_name: &str) -> Result<bool> {
+        self.client
+            .send_message::<responses::AudioActive>(RequestType::GetAudioActive { source_name })
+            .await
+            .map(|aa| aa.audio_active)
+    }
+
+    /// Rename an existing source.
+    ///
     /// Note: If the new name already exists as a source, obs-websocket will return an error.
     ///
     /// - `source_name`: Source name.
@@ -326,6 +354,18 @@ impl<'a> Sources<'a> {
             .await
     }
 
+    /// Get the default settings for a given source type.
+    ///
+    /// - `source_kind`: Source kind. Also called "source id" in libobs terminology.
+    pub async fn get_source_default_settings(
+        &self,
+        source_kind: &str,
+    ) -> Result<responses::SourceDefaultSettings> {
+        self.client
+            .send_message(RequestType::GetSourceDefaultSettings { source_kind })
+            .await
+    }
+
     /// At least [`embed_picture_format`](SourceScreenshot::embed_picture_format) or
     /// [`save_to_file_path`](SourceScreenshot::save_to_file_path) must be specified.
     ///
@@ -338,6 +378,15 @@ impl<'a> Sources<'a> {
     ) -> Result<responses::SourceScreenshot> {
         self.client
             .send_message(RequestType::TakeSourceScreenshot(source_screenshot))
+            .await
+    }
+
+    /// Refreshes the specified browser source.
+    ///
+    /// - `source_name`: Source name.
+    pub async fn refresh_browser_source(&self, source_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::RefreshBrowserSource { source_name })
             .await
     }
 }

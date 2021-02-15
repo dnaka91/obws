@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 use super::Client;
-use crate::requests::{Projector, RequestType};
+use crate::requests::{KeyModifier, Projector, RequestType};
 use crate::responses;
 use crate::{Error, Result};
 
@@ -85,4 +85,35 @@ impl<'a> General<'a> {
             .send_message(RequestType::OpenProjector(projector))
             .await
     }
+
+    /// Executes hotkey routine, identified by hotkey unique name.
+    ///
+    /// - `hotkey_name`: Unique name of the hotkey, as defined when registering the hotkey (e.g.
+    ///   "ReplayBuffer.Save").
+    pub async fn trigger_hotkey_by_name(&self, hotkey_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::TriggerHotkeyByName { hotkey_name })
+            .await
+    }
+
+    /// Executes hotkey routine, identified by bound combination of keys. A single key combination
+    /// might trigger multiple hotkey routines depending on user settings.
+    ///
+    /// - `key_id`: Main key identifier (e.g. `OBS_KEY_A` for key "A"). Available identifiers
+    ///   [here](https://github.com/obsproject/obs-studio/blob/master/libobs/obs-hotkeys.h)
+    /// - `key_modifiers`: Optional key modifiers object. False entries can be ommitted.
+    pub async fn trigger_hotkey_by_sequence(
+        &self,
+        key_id: &str,
+        key_modifiers: &[KeyModifier],
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::TriggerHotkeyBySequence {
+                key_id,
+                key_modifiers,
+            })
+            .await
+    }
+
+    // TODO: Add `ExecuteBatch` request
 }

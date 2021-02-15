@@ -48,9 +48,86 @@ pub(crate) enum RequestType<'a> {
     },
     GetVideoInfo,
     OpenProjector(Projector<'a>),
+    #[serde(rename_all = "camelCase")]
+    TriggerHotkeyByName {
+        /// Unique name of the hotkey, as defined when registering the hotkey (e.g.
+        /// "ReplayBuffer.Save").
+        hotkey_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    TriggerHotkeyBySequence {
+        /// Main key identifier (e.g. `OBS_KEY_A` for key "A"). Available identifiers
+        /// [here](https://github.com/obsproject/obs-studio/blob/master/libobs/obs-hotkeys.h).
+        key_id: &'a str,
+        /// Optional key modifiers object. False entries can be omitted.
+        key_modifiers: &'a [KeyModifier],
+    },
+    // --------------------------------
+    // Media Control
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    PlayPauseMedia {
+        /// Source name.
+        source_name: &'a str,
+        /// Whether to pause or play the source. `false` for play, `true` for pause.
+        play_pause: bool,
+    },
+    #[serde(rename_all = "camelCase")]
+    RestartMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    StopMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    NextMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    PreviousMedia {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetMediaDuration {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetMediaTime {
+        /// Source name.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetMediaTime {
+        /// Source name.
+        source_name: &'a str,
+        /// Milliseconds to set the timestamp to.
+        #[serde(serialize_with = "ser::duration_millis")]
+        timestamp: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    ScrubMedia {
+        /// Source name.
+        source_name: &'a str,
+        /// Millisecond offset (positive or negative) to offset the current media position.
+        #[serde(serialize_with = "ser::duration_millis")]
+        time_offset: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetMediaState {
+        /// Source name.
+        source_name: &'a str,
+    },
     // --------------------------------
     // Sources
     // --------------------------------
+    GetMediaSourcesList,
+    CreateSource(CreateSource<'a>),
     GetSourcesList,
     GetSourceTypesList,
     #[serde(rename_all = "camelCase")]
@@ -74,6 +151,11 @@ pub(crate) enum RequestType<'a> {
     ToggleMute {
         /// Source name.
         source: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetAudioActive {
+        /// Source name.
+        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     SetSourceName {
@@ -149,7 +231,17 @@ pub(crate) enum RequestType<'a> {
         /// The monitor type to use. Options: `none`, `monitorOnly`, `monitorAndOutput`.
         monitor_type: MonitorType,
     },
+    #[serde(rename_all = "camelCase")]
+    GetSourceDefaultSettings {
+        /// Source kind. Also called "source id" in libobs terminology.
+        source_kind: &'a str,
+    },
     TakeSourceScreenshot(SourceScreenshot<'a>),
+    #[serde(rename_all = "camelCase")]
+    RefreshBrowserSource {
+        /// Source name.
+        source_name: &'a str,
+    },
     // --------------------------------
     // Outputs
     // --------------------------------
@@ -184,6 +276,7 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     // Recording
     // --------------------------------
+    GetRecordingStatus,
     StartStopRecording,
     StartRecording,
     StopRecording,
@@ -198,6 +291,7 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     // Replay Buffer
     // --------------------------------
+    GetReplayBufferStatus,
     StartStopReplayBuffer,
     StartReplayBuffer,
     StopReplayBuffer,
@@ -215,6 +309,12 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     // Scene Items
     // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemList {
+        /// Name of the scene to get the list of scene items from. Defaults to the current scene if
+        /// not specified.
+        scene_name: Option<&'a str>,
+    },
     #[serde(rename_all = "kebab-case")]
     GetSceneItemProperties {
         /// Name of the scene the scene item belongs to. Defaults to the current scene.
@@ -239,6 +339,7 @@ pub(crate) enum RequestType<'a> {
         /// Scene item to delete.
         item: SceneItemSpecification<'a>, // TODO: fields are actually not optional
     },
+    AddSceneItem(AddSceneItem<'a>),
     DuplicateSceneItem(DuplicateSceneItem<'a>),
     // --------------------------------
     // Scenes
@@ -250,6 +351,11 @@ pub(crate) enum RequestType<'a> {
     },
     GetCurrentScene,
     GetSceneList,
+    #[serde(rename_all = "camelCase")]
+    CreateScene {
+        /// Name of the scene to create.
+        scene_name: &'a str,
+    },
     ReorderSceneItems {
         /// Name of the scene to reorder (defaults to current).
         scene: Option<&'a str>,
@@ -318,6 +424,29 @@ pub(crate) enum RequestType<'a> {
         duration: Duration,
     },
     GetTransitionDuration,
+    GetTransitionPosition,
+    #[serde(rename_all = "camelCase")]
+    GetTransitionSettings {
+        /// Transition name.
+        transition_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetTransitionSettings {
+        /// Transition name.
+        transition_name: &'a str,
+        /// Transition settings (they can be partial).
+        transition_settings: &'a serde_json::Value,
+    },
+    ReleaseTBar,
+    #[serde(rename_all = "camelCase")]
+    SetTBarPosition {
+        /// T-Bar position. This value must be between 0.0 and 1.0.
+        position: f64,
+        /// Whether or not the T-Bar gets released automatically after setting its new position
+        /// (like a user releasing their mouse button after moving the T-Bar). Call `ReleaseTBar`
+        /// manually if you set `release` to false. Defaults to true.
+        release: Option<bool>,
+    },
 }
 
 /// Request information for [`open_projector`](crate::client::General::open_projector).
@@ -354,6 +483,37 @@ pub enum ProjectorType {
     Multiview,
 }
 
+/// Request information for
+/// [`trigger_hotkey_by_sequence`](crate::client::General::trigger_hotkey_by_sequence).
+#[derive(Debug, Default, Serialize)]
+pub struct KeyModifier {
+    /// Trigger Shift key.
+    pub shift: bool,
+    /// Trigger Alt key.
+    pub alt: bool,
+    /// Trigger Control (Ctrl) key.
+    pub control: bool,
+    /// Trigger Command key (Mac).
+    pub command: bool,
+}
+
+/// Request information for [`create_source`](crate::client::Sources::create_source).
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSource<'a> {
+    /// Source name.
+    pub source_name: &'a str,
+    /// Source kind, Eg. `vlc_source`.
+    pub source_kind: &'a str,
+    /// Scene to add the new source to.
+    pub scene_name: &'a str,
+    /// Source settings data.
+    pub source_settings: Option<&'a serde_json::Value>,
+    /// Set the created SceneItem as visible or not. Defaults to true.
+    pub set_visible: Option<bool>,
+}
+
 /// Request information for [`set_volume`](crate::client::Sources::set_volume).
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
@@ -365,7 +525,7 @@ pub struct Volume<'a> {
     /// interpret dB values under -100.0 as Inf. Note: The OBS volume sliders only reach a maximum
     /// of 1.0mul/0.0dB, however OBS actually supports larger values.
     pub volume: f64,
-    /// Interperet `volume` data as decibels instead of amplitude/mul.
+    /// Interpret `volume` data as decibels instead of amplitude/mul.
     pub use_decibel: Option<bool>,
 }
 
@@ -581,8 +741,11 @@ pub struct SourceFilterVisibility<'a> {
 #[derive(Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SourceScreenshot<'a> {
-    /// Source name. Note that, since scenes are also sources, you can also provide a scene name.
-    pub source_name: &'a str,
+    /// Source name.
+    ///
+    /// Note: Since scenes are also sources, you can also provide a scene name. If not provided, the
+    /// currently active scene is used.
+    pub source_name: Option<&'a str>,
     /// Format of the Data URI encoded picture. Can be "png", "jpg", "jpeg" or "bmp" (or any other
     /// value supported by Qt's Image module).
     pub embed_picture_format: Option<&'a str>,
@@ -658,8 +821,22 @@ pub struct SceneItemRender<'a> {
     pub scene_name: Option<&'a str>,
     /// Scene Item name.
     pub source: &'a str,
+    /// Scene Item id.
+    pub item: Option<i64>,
     /// true = shown ; false = hidden.
     pub render: bool,
+}
+
+/// Request information for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
+#[derive(Debug, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AddSceneItem<'a> {
+    /// Name of the scene to create the scene item in.
+    pub scene_name: &'a str,
+    /// Name of the source to be added.
+    pub source_name: &'a str,
+    /// Whether to make the sceneitem visible on creation or not. Default `true`.
+    pub set_visible: bool,
 }
 
 /// Request information for

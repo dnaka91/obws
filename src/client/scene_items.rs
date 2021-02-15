@@ -2,7 +2,8 @@ use either::Either;
 
 use super::Client;
 use crate::requests::{
-    DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender, SceneItemSpecification,
+    AddSceneItem, DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender,
+    SceneItemSpecification,
 };
 use crate::responses;
 use crate::Result;
@@ -13,6 +14,19 @@ pub struct SceneItems<'a> {
 }
 
 impl<'a> SceneItems<'a> {
+    /// Get a list of all scene items in a scene.
+    ///
+    /// - `scene_name`: Name of the scene to get the list of scene items from. Defaults to the
+    ///   current scene if not specified.
+    pub async fn get_scene_item_list(
+        &self,
+        scene_name: Option<&str>,
+    ) -> Result<responses::SceneItemList> {
+        self.client
+            .send_message(RequestType::GetSceneItemList { scene_name })
+            .await
+    }
+
     /// Gets the scene specific properties of the specified source item. Coordinates are relative to
     /// the item's parent (the scene or group it belongs to).
     ///
@@ -75,6 +89,14 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message(RequestType::DeleteSceneItem { scene, item })
             .await
+    }
+
+    /// Creates a scene item in a scene. In other words, this is how you add a source into a scene.
+    pub async fn add_scene_item(&self, scene_item: AddSceneItem<'_>) -> Result<i64> {
+        self.client
+            .send_message::<responses::SceneItemId>(RequestType::AddSceneItem(scene_item))
+            .await
+            .map(|sii| sii.item_id)
     }
 
     /// Duplicates a scene item.

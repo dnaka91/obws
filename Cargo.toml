@@ -50,5 +50,9 @@ name = "events"
 required-features = ["events"]
 
 [[test]]
+name = "media_control"
+required-features = ["events"]
+
+[[test]]
 name = "recording"
 required-features = ["events"]

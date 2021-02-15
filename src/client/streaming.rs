@@ -25,8 +25,7 @@ impl<'a> Streaming<'a> {
 
     /// Start streaming. Will return an `error` if streaming is already active.
     ///
-    /// - `stream`: Special stream configuration. Please note: these won't be saved to OBS'
-    ///   configuration.
+    /// - `stream`: Special stream configuration. Note: these won't be saved to OBS' configuration.
     pub async fn start_streaming(&self, stream: Option<Stream<'_>>) -> Result<()> {
         self.client
             .send_message(RequestType::StartStreaming { stream })

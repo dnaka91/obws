@@ -35,13 +35,14 @@ use crate::{
 };
 
 pub use self::{
-    general::General, outputs::Outputs, profiles::Profiles, recording::Recording,
-    replay_buffer::ReplayBuffer, scene_collections::SceneCollections, scene_items::SceneItems,
-    scenes::Scenes, sources::Sources, streaming::Streaming, studio_mode::StudioMode,
-    transitions::Transitions,
+    general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
+    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
+    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
+    studio_mode::StudioMode, transitions::Transitions,
 };
 
 mod general;
+mod media_control;
 mod outputs;
 mod profiles;
 mod recording;
@@ -335,6 +336,11 @@ impl Client {
     /// Access general API functions.
     pub fn general(&self) -> General<'_> {
         General { client: self }
+    }
+
+    /// Access API functions related to media control.
+    pub fn media_control(&self) -> MediaControl<'_> {
+        MediaControl { client: self }
     }
 
     /// Access API functions related to sources.

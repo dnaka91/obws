@@ -4,7 +4,9 @@ use anyhow::Result;
 use chrono::Duration;
 use obws::requests::{SceneItem, SceneTransitionOverride};
 
-use common::{TEST_SCENE, TEST_SCENE_2, TEST_TRANSITION, TEXT_SOURCE, TEXT_SOURCE_2};
+use common::{
+    TEST_BROWSER, TEST_MEDIA, TEST_SCENE, TEST_SCENE_2, TEST_TRANSITION, TEXT_SOURCE, TEXT_SOURCE_2,
+};
 
 mod common;
 
@@ -19,6 +21,10 @@ async fn main() -> Result<()> {
 
     client.get_scene_list().await?;
 
+    // TODO: Currently no way of deleting scenes so we skip this to not
+    // fill up OBS with random scenes on every run.
+    // client.create_scene("__TEMP").await?;
+
     client
         .reorder_scene_items(
             Some(TEST_SCENE),
@@ -30,6 +36,14 @@ async fn main() -> Result<()> {
                 SceneItem {
                     id: None,
                     name: Some(TEXT_SOURCE),
+                },
+                SceneItem {
+                    id: None,
+                    name: Some(TEST_BROWSER),
+                },
+                SceneItem {
+                    id: None,
+                    name: Some(TEST_MEDIA),
                 },
             ],
         )
@@ -45,6 +59,14 @@ async fn main() -> Result<()> {
                 SceneItem {
                     id: None,
                     name: Some(TEXT_SOURCE_2),
+                },
+                SceneItem {
+                    id: None,
+                    name: Some(TEST_BROWSER),
+                },
+                SceneItem {
+                    id: None,
+                    name: Some(TEST_MEDIA),
                 },
             ],
         )

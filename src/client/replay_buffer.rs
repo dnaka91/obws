@@ -1,5 +1,6 @@
 use super::Client;
 use crate::requests::RequestType;
+use crate::responses;
 use crate::Result;
 
 /// API functions related to the replay buffer.
@@ -8,6 +9,14 @@ pub struct ReplayBuffer<'a> {
 }
 
 impl<'a> ReplayBuffer<'a> {
+    /// Get the status of the OBS replay buffer.
+    pub async fn get_replay_buffer_status(&self) -> Result<bool> {
+        self.client
+            .send_message::<responses::ReplayBufferStatus>(RequestType::GetReplayBufferStatus)
+            .await
+            .map(|rbs| rbs.is_replay_buffer_active)
+    }
+
     /// Toggle the Replay Buffer on/off (depending on the current state of the replay buffer).
     pub async fn start_stop_replay_buffer(&self) -> Result<()> {
         self.client

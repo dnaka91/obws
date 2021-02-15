@@ -36,12 +36,24 @@ pub enum EventType {
         sources: Vec<SceneItem>,
     },
     /// The scene list has been modified. Scenes have been added, removed, or renamed.
-    ScenesChanged,
+    ///
+    /// Note: This event is not fired when the scenes are reordered.
+    ScenesChanged {
+        /// Scenes list.
+        scenes: Vec<Scene>,
+    },
     /// Triggered when switching to another scene collection or when renaming the current scene
     /// collection.
-    SceneCollectionChanged,
+    #[serde(rename_all = "camelCase")]
+    SceneCollectionChanged {
+        /// Name of the new current scene collection.
+        scene_collection: String,
+    },
     /// Triggered when a scene collection is created, added, renamed, or removed.
-    SceneCollectionListChanged,
+    SceneCollectionListChanged {
+        /// Scene collections list.
+        scene_collections: Vec<SceneCollection>,
+    },
     // --------------------------------
     // Transitions
     // --------------------------------
@@ -53,7 +65,10 @@ pub enum EventType {
     },
     /// The list of available transitions has been modified. Transitions have been added, removed,
     /// or renamed.
-    TransitionListChanged,
+    TransitionListChanged {
+        /// Transitions list.
+        transitions: Vec<Transition>,
+    },
     /// The active transition duration has been changed.
     #[serde(rename_all = "kebab-case")]
     TransitionDurationChanged {
@@ -74,12 +89,13 @@ pub enum EventType {
         #[serde(deserialize_with = "crate::de::duration_millis_opt")]
         duration: Option<Duration>,
         /// Source scene of the transition.
-        from_scene: String,
+        from_scene: Option<String>,
         /// Destination scene of the transition.
         to_scene: String,
     },
-    /// A transition (other than "cut") has ended. Please note that the `from_scene` field is not
-    /// available in TransitionEnd.
+    /// A transition (other than "cut") has ended.
+    ///
+    /// Note: The `from-scene` field is not available in TransitionEnd.
     #[serde(rename_all = "kebab-case")]
     TransitionEnd {
         /// Transition name.
@@ -113,9 +129,15 @@ pub enum EventType {
     // Profiles
     // --------------------------------
     /// Triggered when switching to another profile or when renaming the current profile.
-    ProfileChanged,
+    ProfileChanged {
+        /// Name of the new current profile.
+        profile: String,
+    },
     /// Triggered when a profile is created, added, renamed, or removed.
-    ProfileListChanged,
+    ProfileListChanged {
+        /// Profiles list.
+        profiles: Vec<Profile>,
+    },
     // --------------------------------
     // Streaming
     // --------------------------------
@@ -184,13 +206,28 @@ pub enum EventType {
     // Recording
     // --------------------------------
     /// A request to start recording has been issued.
+    ///
+    /// Note: `recordingFilename` is not provided in this event because this information is not
+    /// available at the time this event is emitted.
     RecordingStarting,
     /// Recording started successfully.
-    RecordingStarted,
+    #[serde(rename_all = "camelCase")]
+    RecordingStarted {
+        /// Absolute path to the file of the current recording.
+        recording_filename: String,
+    },
     /// A request to stop recording has been issued.
-    RecordingStopping,
+    #[serde(rename_all = "camelCase")]
+    RecordingStopping {
+        /// Absolute path to the file of the current recording.
+        recording_filename: String,
+    },
     /// Recording stopped successfully.
-    RecordingStopped,
+    #[serde(rename_all = "camelCase")]
+    RecordingStopped {
+        /// Absolute path to the file of the current recording.
+        recording_filename: String,
+    },
     /// Current recording paused.
     RecordingPaused,
     /// Current recording resumed.
@@ -344,6 +381,97 @@ pub enum EventType {
         filters: Vec<SourceFilter>,
     },
     // --------------------------------
+    // Media
+    // --------------------------------
+    /// Media is playing.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPlaying {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Media playback paused.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPaused {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Media playback restarted.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaRestarted {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Media playback stopped.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaStopped {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Next media started.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaNext {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Previous media started.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaPrevious {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Media playback started.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaStarted {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    /// Media playback ended.
+    ///
+    /// Note: This event is only emitted when something actively controls the media/VLC source. In
+    /// other words, the source will never emit this on its own naturally.
+    #[serde(rename_all = "camelCase")]
+    MediaEnded {
+        /// Source name.
+        source_name: String,
+        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        source_kind: String,
+    },
+    // --------------------------------
     // Scene Items
     // --------------------------------
     /// Scene items within a scene have been reordered.
@@ -452,10 +580,26 @@ pub enum EventType {
     Unknown,
 }
 
+/// Part of [`EventType::ScenesChanged`].
+#[derive(Clone, Debug, Deserialize)]
+pub struct Scene {
+    /// Name of the currently active scene.
+    pub name: String,
+    /// Ordered list of the current scene's source items.
+    pub sources: Vec<SceneItem>,
+}
+
 /// Part of [`EventType::SceneCollectionListChanged`].
 #[derive(Clone, Debug, Deserialize)]
 pub struct SceneCollection {
     /// Scene collection name.
+    pub name: String,
+}
+
+/// Part of [`EventType::TransitionListChanged`].
+#[derive(Clone, Debug, Deserialize)]
+pub struct Transition {
+    /// Transition name.
     pub name: String,
 }
 

@@ -176,6 +176,84 @@ pub enum ColorRange {
     Full,
 }
 
+/// Response value for [`get_media_duration`](crate::client::MediaControl::get_media_duration).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct MediaDuration {
+    /// The total length of media in milliseconds.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
+    pub media_duration: Duration,
+}
+
+/// Response value for [`get_media_time`](crate::client::MediaControl::get_media_time).
+#[derive(Debug, Deserialize)]
+pub(crate) struct MediaTime {
+    /// The time in milliseconds since the start of the media.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
+    pub timestamp: Duration,
+}
+
+/// Response value for [`get_media_state`](crate::client::MediaControl::get_media_state).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct GetMediaState {
+    /// The media state of the provided source.
+    pub media_state: MediaState,
+}
+
+/// Response value for [`get_media_state`](crate::client::MediaControl::get_media_state).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum MediaState {
+    /// No state.
+    None,
+    /// Media is playing.
+    Playing,
+    /// Opening file for replay.
+    Opening,
+    /// Buffering data for replay.
+    Buffering,
+    /// Media is paused.
+    Paused,
+    /// Media stopped.
+    Stopped,
+    /// All media in the playlist played.
+    Ended,
+    /// Error occured while trying to play the media.
+    Error,
+    /// Unknown state.
+    #[serde(other)]
+    Unknown,
+}
+
+/// Response value for [`get_media_sources_list`](crate::client::Sources::get_media_sources_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct MediaSourcesList {
+    /// Array of sources.
+    pub media_sources: Vec<MediaSource>,
+}
+
+/// Response value for [`get_media_sources_list`](crate::client::Sources::get_media_sources_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaSource {
+    /// Unique source name.
+    pub source_name: String,
+    /// Unique source internal type (a.k.a `ffmpeg_source` or `vlc_source`).
+    pub source_kind: String,
+    /// The current state of media for that source.
+    pub media_state: MediaState,
+}
+
+/// Response value for [`create_source`](crate::client::Sources::create_source).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SourceItemId {
+    /// ID of the SceneItem in the scene.
+    pub item_id: i64,
+}
+
 /// Response value for [`get_sources_list`](crate::client::Sources::get_sources_list).
 #[derive(Debug, Deserialize)]
 pub(crate) struct SourcesList {
@@ -208,6 +286,14 @@ pub struct Mute {
     pub name: String,
     /// Mute status of the source.
     pub muted: bool,
+}
+
+/// Response value for [`get_audio_active`](crate::client::Sources::get_audio_active).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AudioActive {
+    /// Audio active status of the source.
+    pub audio_active: bool,
 }
 
 /// Response value for [`get_sync_offset`](crate::client::Sources::get_sync_offset).
@@ -371,6 +457,17 @@ pub(crate) struct AudioMonitorType {
     pub monitor_type: MonitorType,
 }
 
+/// Response value for
+/// [`get_source_default_settings`](crate::client::Sources::get_source_default_settings).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SourceDefaultSettings {
+    /// Source kind. Same value as the `source_kind` parameter.
+    pub source_kind: String,
+    /// Settings object for source.
+    pub default_settings: serde_json::Value,
+}
+
 /// Response value for [`take_source_screenshot`](crate::client::Sources::take_source_screenshot).
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -417,12 +514,36 @@ pub(crate) struct Profiles {
     pub profiles: Vec<Profile>,
 }
 
+/// Response value for [`get_recording_status`](crate::client::Recording::get_recording_status).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordingStatus {
+    /// Current recording status.
+    pub is_recording: bool,
+    /// Whether the recording is paused or not.
+    pub is_recording_paused: bool,
+    /// Time elapsed since recording started (only present if currently recording).
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
+    pub record_timecode: Option<Duration>,
+    /// Absolute path to the recording file (only present if currently recording).
+    pub recording_filename: Option<PathBuf>,
+}
+
 /// Response value for [`get_recording_folder`](crate::client::Recording::get_recording_folder).
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) struct RecordingFolder {
     /// Path of the recording folder.
     pub rec_folder: PathBuf,
+}
+
+/// Response value for
+/// [`get_replay_buffer_status`](crate::client::ReplayBuffer::get_replay_buffer_status).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ReplayBufferStatus {
+    /// Current recording status.
+    pub is_replay_buffer_active: bool,
 }
 
 /// Response value for
@@ -441,6 +562,33 @@ pub(crate) struct CurrentSceneCollection {
 pub(crate) struct SceneCollections {
     /// Scene collections list.
     pub scene_collections: Vec<SceneCollection>,
+}
+
+/// Response value for
+/// [`get_scene_item_list`](crate::client::SceneItems::get_scene_item_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItemList {
+    /// Name of the requested (or current) scene.
+    pub scene_name: String,
+    /// Array of scene items.
+    pub scene_items: Vec<SceneItemListItem>,
+}
+
+/// Response value for
+/// [`get_scene_item_list`](crate::client::SceneItems::get_scene_item_list) as part of
+/// [`SceneItemList`].
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItemListItem {
+    /// Unique item id of the source item
+    pub item_id: i64,
+    /// ID if the scene item's source. For example `vlc_source` or `image_source`.
+    pub source_kind: String,
+    /// Name of the scene item's source.
+    pub source_name: String,
+    /// Type of the scene item's source. Either `input`, `group`, or `scene`.
+    pub source_type: String,
 }
 
 /// Response value for
@@ -483,6 +631,14 @@ pub struct SceneItemProperties {
     /// List of children (if this item is a group).
     #[serde(default)]
     pub group_children: Vec<SceneItemTransform>,
+}
+
+/// Response value for [`add_scene_item`](crate::client::SceneItems::add_scene_item).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemId {
+    /// Numerical ID of the created scene item.
+    pub item_id: i64,
 }
 
 /// Response value for [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
@@ -532,15 +688,17 @@ pub struct StreamingStatus {
     pub streaming: bool,
     /// Current recording status.
     pub recording: bool,
-    /// Time elapsed since streaming started (only present if currently streaming).
-    #[serde(deserialize_with = "crate::de::duration_opt")]
-    pub stream_timecode: Option<Duration>,
-    /// Time elapsed since recording started (only present if currently recording).
-    #[serde(deserialize_with = "crate::de::duration_opt")]
-    pub rec_timecode: Option<Duration>,
+    /// If recording is paused.
+    pub recording_paused: bool,
     /// Always false. Retrocompatibility with OBSRemote.
     #[serde(default)]
     pub preview_only: bool,
+    /// Time elapsed since streaming started (only present if currently streaming).
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
+    pub stream_timecode: Option<Duration>,
+    /// Time elapsed since recording started (only present if currently recording).
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
+    pub rec_timecode: Option<Duration>,
 }
 
 /// Response value for [`get_stream_settings`](crate::client::Streaming::get_stream_settings).
@@ -589,7 +747,7 @@ pub struct CurrentTransition {
     /// Name of the selected transition.
     pub name: String,
     /// Transition duration (in milliseconds) if supported by the transition.
-    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    #[serde(default, deserialize_with = "crate::de::duration_millis_opt")]
     pub duration: Option<Duration>,
 }
 
@@ -601,6 +759,26 @@ pub(crate) struct TransitionDuration {
     /// Duration of the current transition (in milliseconds).
     #[serde(deserialize_with = "crate::de::duration_millis")]
     pub transition_duration: Duration,
+}
+
+/// Response value for
+/// [`get_transition_position`](crate::client::Transitions::get_transition_position).
+#[derive(Debug, Deserialize)]
+pub(crate) struct TransitionPosition {
+    /// Current transition position. This value will be between 0.0 and 1.0.
+    ///
+    /// Note: Transition returns 1.0 when not active.
+    pub position: f64,
+}
+
+/// Response value for
+/// [`get_transition_settings`](crate::client::Transitions::get_transition_settings) and
+/// [`set_transition_settings`](crate::client::Transitions::set_transition_settings).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct TransitionSettings {
+    /// Current or updated transition settings.
+    pub transition_settings: serde_json::Value,
 }
 
 /// Response value for [`get_stats`](crate::client::General::get_stats).
@@ -789,7 +967,7 @@ pub struct Profile {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct SceneCollection {
-    /// Scene collection name.
+    /// Name of the scene collection.
     pub sc_name: String,
 }
 

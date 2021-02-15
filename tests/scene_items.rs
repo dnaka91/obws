@@ -15,6 +15,8 @@ async fn main() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.scene_items();
 
+    client.get_scene_item_list(Some(TEST_SCENE)).await?;
+
     let props = client
         .get_scene_item_properties(Some(TEST_SCENE), Either::Left(TEXT_SOURCE))
         .await?;
@@ -39,6 +41,7 @@ async fn main() -> Result<()> {
         .set_scene_item_render(SceneItemRender {
             scene_name: Some(TEST_SCENE),
             source: TEXT_SOURCE,
+            item: None,
             render: !props.visible,
         })
         .await?;
@@ -46,6 +49,7 @@ async fn main() -> Result<()> {
         .set_scene_item_render(SceneItemRender {
             scene_name: Some(TEST_SCENE),
             source: TEXT_SOURCE,
+            item: None,
             render: props.visible,
         })
         .await?;
@@ -69,6 +73,10 @@ async fn main() -> Result<()> {
             },
         )
         .await?;
+
+    // TODO: Need to create a source first, but there is no way to delete it afterwards.
+    // Therefore, we don't call this function until a method becomes available.
+    //client.add_scene_item(AddSceneItem{});
 
     Ok(())
 }

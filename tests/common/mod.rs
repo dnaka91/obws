@@ -19,6 +19,11 @@ pub const TEXT_SOURCE: &str = "OBWS-TEST-Text";
 pub const TEXT_SOURCE_2: &str = "OBWS-TEST-Text2";
 pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
 pub const TEST_TRANSITION_2: &str = "OBWS-TEST-Transition2";
+pub const TEST_BROWSER: &str = "OBWS-TEST-Browser";
+pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
+pub const SOURCE_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
+pub const SOURCE_KIND_BROWSER: &str = "browser_source";
+pub const SOURCE_KIND_VLC: &str = "vlc_source";
 
 const SCENE_ORDER: &[SceneItem] = &[
     SceneItem {
@@ -28,6 +33,14 @@ const SCENE_ORDER: &[SceneItem] = &[
     SceneItem {
         id: None,
         name: Some(TEXT_SOURCE_2),
+    },
+    SceneItem {
+        id: None,
+        name: Some(TEST_BROWSER),
+    },
+    SceneItem {
+        id: None,
+        name: Some(TEST_MEDIA),
     },
 ];
 
@@ -93,6 +106,16 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         sources.iter().any(is_required_source_2),
         "text source `{}` not found, required for sources tests",
         TEXT_SOURCE
+    );
+    ensure!(
+        sources.iter().any(is_required_browser_source),
+        "media source `{}` not found, required for sources tests",
+        TEST_BROWSER
+    );
+    ensure!(
+        sources.iter().any(is_required_media_source),
+        "media source `{}` not found, required for media control tests",
+        TEST_MEDIA
     );
 
     let special_sources = client.sources().get_special_sources().await?;
@@ -163,8 +186,24 @@ fn is_required_source_2(source: &SourceListItem) -> bool {
     source.name == TEXT_SOURCE_2 && is_text_input_source(source)
 }
 
+fn is_required_browser_source(source: &SourceListItem) -> bool {
+    source.name == TEST_BROWSER && is_browser_input_source(source)
+}
+
+fn is_required_media_source(source: &SourceListItem) -> bool {
+    source.name == TEST_MEDIA && is_media_input_source(source)
+}
+
 fn is_text_input_source(source: &SourceListItem) -> bool {
-    source.ty == "input" && source.type_id == "text_ft2_source_v2"
+    source.ty == "input" && source.type_id == SOURCE_KIND_TEXT_FT2
+}
+
+fn is_browser_input_source(source: &SourceListItem) -> bool {
+    source.ty == "input" && source.type_id == SOURCE_KIND_BROWSER
+}
+
+fn is_media_input_source(source: &SourceListItem) -> bool {
+    source.ty == "input" && source.type_id == SOURCE_KIND_VLC
 }
 
 fn is_required_profile(profile: &Profile) -> bool {

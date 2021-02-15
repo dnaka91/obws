@@ -11,7 +11,7 @@ use obws::{
 };
 use serde_json::json;
 
-use common::TEXT_SOURCE;
+use common::{SOURCE_KIND_VLC, TEST_BROWSER, TEST_MEDIA, TEXT_SOURCE};
 
 mod common;
 
@@ -20,8 +20,14 @@ async fn main() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.sources();
 
+    client.get_media_sources_list().await?;
     client.get_sources_list().await?;
     client.get_sources_types_list().await?;
+
+    client.get_audio_active(TEST_MEDIA).await?;
+    client.get_source_default_settings(SOURCE_KIND_VLC).await?;
+
+    client.refresh_browser_source(TEST_BROWSER).await?;
 
     // Volume
 
@@ -181,7 +187,7 @@ async fn main() -> Result<()> {
 
     client
         .take_source_screenshot(SourceScreenshot {
-            source_name: TEXT_SOURCE,
+            source_name: Some(TEXT_SOURCE),
             embed_picture_format: Some("png"),
             width: Some(10),
             ..Default::default()

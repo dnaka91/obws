@@ -11,6 +11,13 @@ pub struct Recording<'a> {
 }
 
 impl<'a> Recording<'a> {
+    /// Get current recording status.
+    pub async fn get_recording_status(&self) -> Result<responses::RecordingStatus> {
+        self.client
+            .send_message(RequestType::GetRecordingStatus)
+            .await
+    }
+
     /// Toggle recording on or off (depending on the current recording state).
     pub async fn start_stop_recording(&self) -> Result<()> {
         self.client

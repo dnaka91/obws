@@ -29,6 +29,9 @@ impl<'a> Outputs<'a> {
 
     /// Start an output.
     ///
+    /// Note: Controlling outputs is an experimental feature of obs-websocket. Some plugins which
+    /// add outputs to OBS may not function properly when they are controlled in this way.
+    ///
     /// - `output_name`: Output name.
     pub async fn start_output(&self, output_name: &str) -> Result<()> {
         self.client
@@ -37,6 +40,9 @@ impl<'a> Outputs<'a> {
     }
 
     /// Stop an output.
+    ///
+    /// Note: Controlling outputs is an experimental feature of obs-websocket. Some plugins which
+    /// add outputs to OBS may not function properly when they are controlled in this way.
     ///
     /// - `output_name`: Output name.
     /// - `force`: Force stop (default: false).
