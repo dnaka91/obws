@@ -176,6 +176,94 @@ pub enum ColorRange {
     Full,
 }
 
+/// Response value for [`get_media_duration`](crate::client::MediaControl::get_media_duration).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaDuration {
+    /// Duration of the current transition (in milliseconds).
+    #[serde(deserialize_with = "crate::de::duration_millis")]
+    pub media_duration: Duration,
+}
+
+/// Response value for [`get_media_time`](crate::client::MediaControl::get_media_time).
+#[derive(Debug, Deserialize)]
+pub struct MediaTime {
+    /// The time in milliseconds since the start of the media.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
+    pub timestamp: Duration,
+}
+
+/// Response value for [`get_media_state`](crate::client::MediaControl::get_media_state).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaState {
+    /// The media state of the provided source
+    pub media_state: MediaStateType,
+}
+
+/// The media state of the provided source.
+///
+/// Response value for [`get_media_state`](crate::client::MediaControl::get_media_state) as part
+/// of [`MediaState`] and
+/// [`get_media_sources_list`](crate::client::Sources::get_media_sources_list) as part of
+/// [`MediaSourcesItem`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum MediaStateType {
+    /// None.
+    None,
+    /// Playing.
+    Playing,
+    /// Opening.
+    Opening,
+    /// Buffering.
+    Buffering,
+    /// Paused.
+    Paused,
+    /// Stopped.
+    Stopped,
+    /// Ended.
+    Ended,
+    /// Error.
+    Error,
+    /// Unknown.
+    Unknown,
+}
+
+/// Response value for [`get_media_sources_list`](crate::client::Sources::get_media_sources_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaSourcesList {
+    /// Array of sources.
+    pub media_sources: Vec<MediaSourcesItem>,
+}
+
+/// Response value for [`get_media_sources_list`](crate::client::Sources::get_media_sources_list).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MediaSourcesItem {
+    /// Unique source name.
+    source_name: String,
+    /// Unique source internal type (a.k.a ffmpeg_source or vlc_source).
+    source_kind: SourceKind,
+    /// The current state of media for that source. States: none, playing, opening, buffering,
+    /// paused, stopped, ended, error, unknown
+    media_state: MediaStateType,
+}
+
+/// Unique source internal type
+///
+/// Response value for [`get_media_sources_list`](crate::client::Sources::get_media_sources_list)
+/// as part of [`MediaSourcesItem`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceKind {
+    /// Vlc Source.
+    VlcSource,
+    /// Ffmpeg Source.
+    FfmpegSource,
+}
+
 /// Response value for [`get_sources_list`](crate::client::Sources::get_sources_list).
 #[derive(Debug, Deserialize)]
 pub(crate) struct SourcesList {
