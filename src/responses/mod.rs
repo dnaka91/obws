@@ -243,12 +243,12 @@ pub struct MediaSourcesList {
 #[serde(rename_all = "camelCase")]
 pub struct MediaSourcesItem {
     /// Unique source name.
-    source_name: String,
+    pub source_name: String,
     /// Unique source internal type (a.k.a ffmpeg_source or vlc_source).
-    source_kind: SourceKind,
+    pub source_kind: SourceKind,
     /// The current state of media for that source. States: none, playing, opening, buffering,
     /// paused, stopped, ended, error, unknown
-    media_state: MediaStateType,
+    pub media_state: MediaStateType,
 }
 
 /// Unique source internal type
