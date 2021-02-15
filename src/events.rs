@@ -594,6 +594,8 @@ pub enum SourceType {
 #[derive(Clone, Copy, Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceKind {
+    /// Vlc Source.
     VlcSource,
+    /// Ffmpeg Source.
     FfmpegSource,
 }
