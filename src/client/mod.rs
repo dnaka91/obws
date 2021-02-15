@@ -35,10 +35,10 @@ use crate::{
 };
 
 pub use self::{
-    general::General, outputs::Outputs, profiles::Profiles, recording::Recording,
-    replay_buffer::ReplayBuffer, scene_collections::SceneCollections, scene_items::SceneItems,
-    scenes::Scenes, sources::Sources, streaming::Streaming, studio_mode::StudioMode,
-    transitions::Transitions, media_control::MediaControl
+    general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
+    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
+    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
+    studio_mode::StudioMode, transitions::Transitions,
 };
 
 mod general;
