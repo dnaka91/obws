@@ -88,6 +88,7 @@ pub(crate) enum RequestType<'a> {
         /// Source name.
         source_name: &'a str,
     },
+    #[serde(rename_all = "camelCase")]
     SetMediaTime {
         /// Source name.
         source_name: &'a str,
@@ -95,6 +96,7 @@ pub(crate) enum RequestType<'a> {
         #[serde(serialize_with = "ser::duration_millis")]
         timestamp: Duration,
     },
+    #[serde(rename_all = "camelCase")]
     ScrubMedia {
         /// Source name.
         source_name: &'a str,
@@ -102,6 +104,7 @@ pub(crate) enum RequestType<'a> {
         #[serde(serialize_with = "ser::duration_millis")]
         time_offset: Duration,
     },
+    #[serde(rename_all = "camelCase")]
     GetMediaState {
         /// Source name.
         source_name: &'a str,
