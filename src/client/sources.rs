@@ -17,6 +17,14 @@ pub struct Sources<'a> {
 }
 
 impl<'a> Sources<'a> {
+    /// List the media state of all media sources (vlc and media source)
+    pub async fn get_media_sources_list(&self) -> Result<Vec<responses::MediaSourcesItem>> {
+        self.client
+            .send_message::<responses::MediaSourcesList>(RequestType::GetMediaSourcesList)
+            .await
+            .map(|msl| msl.media_sources)
+    }
+
     /// List all sources available in the running OBS instance.
     pub async fn get_sources_list(&self) -> Result<Vec<responses::SourceListItem>> {
         self.client
