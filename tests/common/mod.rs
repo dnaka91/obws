@@ -48,6 +48,10 @@ static INIT: Once = Once::new();
 
 pub async fn new_client() -> Result<Client> {
     INIT.call_once(|| {
+        if matches!(env::var("USER").as_deref(), Ok("vagrant")) {
+            env::set_var("OBS_HOST", "192.168.10.1");
+        }
+
         dotenv::dotenv().ok();
         pretty_env_logger::init();
     });
