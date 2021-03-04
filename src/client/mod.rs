@@ -24,7 +24,7 @@ use tokio::{
     sync::{oneshot, Mutex},
     task::JoinHandle,
 };
-use tokio_tungstenite::{tungstenite::Message, WebSocketStream};
+use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -89,16 +89,8 @@ pub struct Client {
     handle: Option<JoinHandle<()>>,
 }
 
-/// Base stream of a [`WebSocketStream`] if TLS is **disabled**.
-#[cfg(not(feature = "tls"))]
-type BaseStream = TcpStream;
-
-/// Base stream of a [`WebSocketStream`] if TLS is **enabled**.
-#[cfg(feature = "tls")]
-type BaseStream = tokio_tungstenite::MaybeTlsStream<TcpStream>;
-
 /// Shorthand for the writer side of a websocket stream that has been split into reader and writer.
-type MessageWriter = SplitSink<WebSocketStream<BaseStream>, Message>;
+type MessageWriter = SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>;
 
 /// Default broadcast capacity used when not overwritten by the user.
 #[cfg(feature = "events")]
