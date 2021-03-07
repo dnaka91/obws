@@ -577,6 +577,8 @@ pub enum EventType {
     },
     /// WebSocket server is stopping.
     ServerStopping,
+    /// WebSocket server has stopped.
+    ServerStopped,
     /// Fallback value for any unknown event type.
     #[serde(other)]
     Unknown,
