@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- **BREAKING CHANGE:** Upgraded to obs-websocket `4.9.0`, adding all the new events and requests.
+  Some existing ones have changes as well.
+- Dependencies updated to the latest version, including the just released `tokio-tungstenite` with
+  support for `rustls` as TLS backend.
+- The `tls` feature now uses `rustls` instead of `native-tls` as backend.
+
+### Fixed
+
+- obs-websocket sends a non-JSON message when shutting down that is now properly handled instead of
+  failing. Thanks @715209 !
+
 ## [0.4.0] - 2021-01-22
 
 ### Added
