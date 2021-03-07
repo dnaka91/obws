@@ -172,6 +172,13 @@ impl Client {
                 trace!("{}", msg);
                 let res: Result<(), InnerError> = async {
                     let text = msg.into_text().map_err(InnerError::IntoText)?;
+                    let text = if text == "Server stopping" {
+                        debug!("Websocket server is stopping");
+                        r#"{"update-type": "ServerStopping"}"#.to_string()
+                    } else {
+                        text
+                    };
+
                     let json = serde_json::from_str::<serde_json::Value>(&text)
                         .map_err(InnerError::DeserializeMessage)?;
 

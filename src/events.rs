@@ -575,6 +575,8 @@ pub enum EventType {
         /// The new enabled state of Studio Mode.
         new_state: bool,
     },
+    /// WebSocket server is stopping.
+    ServerStopping,
     /// Fallback value for any unknown event type.
     #[serde(other)]
     Unknown,
