@@ -76,4 +76,8 @@ pub enum Error {
     /// Unknown flags were found while trying to parse bitflags.
     #[error("value {0} contains unknown flags")]
     UnknownFlags(u8),
+    /// Tried to interact with obs-websocket while not connected (for example trying to get a new
+    /// event stream).
+    #[error("currently not connected to obs-websocket")]
+    Disconnected,
 }

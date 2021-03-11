@@ -15,7 +15,7 @@ async fn main() -> Result<()> {
 
     client.login(env::var("OBS_PASSWORD").ok()).await?;
 
-    let events = client.events();
+    let events = client.events()?;
     pin_mut!(events);
 
     while let Some(event) = events.next().await {

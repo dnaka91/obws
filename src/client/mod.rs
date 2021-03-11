@@ -1,5 +1,7 @@
 //! The client to the obs-websocket API and main entry point.
 
+#[cfg(feature = "events")]
+use std::sync::Weak;
 use std::{
     collections::HashMap,
     future::Future,
@@ -82,7 +84,7 @@ pub struct Client {
     /// Broadcast sender that distributes received events to all current listeners. Events are
     /// dropped if nobody listens.
     #[cfg(feature = "events")]
-    event_sender: broadcast::Sender<Event>,
+    event_sender: Weak<broadcast::Sender<Event>>,
     /// Handle to the background task that receives messages and distributes them to waiting
     /// receivers and event listeners. It allows to shut down all the machinery once the client is
     /// no longer needed.
@@ -165,7 +167,9 @@ impl Client {
         let (event_sender, _) =
             broadcast::channel(config.broadcast_capacity.unwrap_or(DEFAULT_CAPACITY));
         #[cfg(feature = "events")]
-        let events_tx = event_sender.clone();
+        let event_sender = Arc::new(event_sender);
+        #[cfg(feature = "events")]
+        let events_tx = Arc::clone(&event_sender);
 
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
@@ -228,7 +232,7 @@ impl Client {
             id_counter,
             receivers,
             #[cfg(feature = "events")]
-            event_sender,
+            event_sender: Arc::downgrade(&event_sender),
             handle: Some(handle),
         })
     }
@@ -331,14 +335,24 @@ impl Client {
     ///
     /// **Note**: To be able to iterate over the stream you have to pin it with
     /// [`futures_util::pin_mut`] for example.
+    ///
+    /// # Errors
+    ///
+    /// Getting a new stream of events fails with [`Error::Disconnected`] if the client is
+    /// disconnected from obs-websocket. That can happen either by manually disconnecting, stopping
+    /// obs-websocket or closing OBS.
     #[cfg(feature = "events")]
-    pub fn events(&self) -> impl Stream<Item = Event> {
-        let mut receiver = self.event_sender.subscribe();
+    pub fn events(&self) -> Result<impl Stream<Item = Event>> {
+        if let Some(sender) = &self.event_sender.upgrade() {
+            let mut receiver = sender.subscribe();
 
-        async_stream::stream! {
-            while let Ok(event) = receiver.recv().await {
-                yield event;
-            }
+            Ok(async_stream::stream! {
+                while let Ok(event) = receiver.recv().await {
+                    yield event;
+                }
+            })
+        } else {
+            Err(crate::Error::Disconnected)
         }
     }
 

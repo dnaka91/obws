@@ -12,7 +12,7 @@ mod common;
 #[tokio::test]
 async fn main() -> Result<()> {
     let client = common::new_client().await?;
-    let events = client.events();
+    let events = client.events()?;
     let client = client.media_control();
 
     pin_mut!(events);
