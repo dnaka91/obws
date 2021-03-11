@@ -18,6 +18,7 @@ use futures_util::{
     stream::{SplitSink, StreamExt},
 };
 use log::{debug, error, trace};
+use semver::VersionReq;
 use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]
 use tokio::sync::broadcast;
@@ -117,6 +118,9 @@ where
     #[cfg_attr(not(feature = "events"), allow(dead_code))]
     pub broadcast_capacity: Option<usize>,
 }
+
+const OBS_STUDIO_VERSION: &str = "^26.1.2";
+const OBS_WEBSOCKET_VERSION: &str = "~4.9.0";
 
 impl<H> ConnectConfig<H>
 where
@@ -227,14 +231,42 @@ impl Client {
         let write = Mutex::new(write);
         let id_counter = AtomicU64::new(1);
 
-        Ok(Self {
+        let client = Self {
             write,
             id_counter,
             receivers,
             #[cfg(feature = "events")]
             event_sender: Arc::downgrade(&event_sender),
             handle: Some(handle),
-        })
+        };
+
+        client.verify_versions().await?;
+
+        Ok(client)
+    }
+
+    async fn verify_versions(&self) -> Result<()> {
+        let version = self.general().get_version().await?;
+        // These are guaranteed to succeed and covered by tests. Therefore, it's safe to unwrap.
+        // Unfortunately there is (currently) no "safe" way to create version req.
+        let obs_studio = VersionReq::parse(OBS_STUDIO_VERSION).unwrap();
+        let obs_websocket = VersionReq::parse(OBS_WEBSOCKET_VERSION).unwrap();
+
+        if !obs_studio.matches(&version.obs_studio_version) {
+            return Err(Error::ObsStudioVersion(
+                version.obs_studio_version,
+                obs_studio,
+            ));
+        }
+
+        if !obs_websocket.matches(&version.obs_websocket_version) {
+            return Err(Error::ObsWebsocketVersion(
+                version.obs_websocket_version,
+                obs_websocket,
+            ));
+        }
+
+        Ok(())
     }
 
     async fn send_message<T>(&self, req: RequestType<'_>) -> Result<T>
@@ -440,5 +472,25 @@ impl Drop for Client {
         // We simply drop the future as the background task has been aborted but we have no way here
         // to wait for it to fully shut down (except spinning up a new tokio runtime).
         drop(self.disconnect());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use semver::Version;
+
+    use super::*;
+
+    #[test]
+    fn verify_version_req() {
+        let obs_studio = VersionReq::parse(OBS_STUDIO_VERSION).unwrap();
+        assert!(obs_studio.matches(&Version::parse("26.1.100").unwrap()));
+        assert!(obs_studio.matches(&Version::parse("26.100.100").unwrap()));
+        assert!(!obs_studio.matches(&Version::parse("27.0.0").unwrap()));
+
+        let obs_websocket = VersionReq::parse(OBS_WEBSOCKET_VERSION).unwrap();
+        assert!(obs_websocket.matches(&Version::parse("4.9.100").unwrap()));
+        assert!(!obs_websocket.matches(&Version::parse("4.100.100").unwrap()));
+        assert!(!obs_websocket.matches(&Version::parse("5.0.0").unwrap()));
     }
 }

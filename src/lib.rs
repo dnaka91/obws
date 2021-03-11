@@ -32,7 +32,9 @@
 
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
 
-pub use client::Client;
+pub use semver::{Version, VersionReq};
+
+pub use self::client::Client;
 
 pub mod client;
 pub mod common;
@@ -80,4 +82,11 @@ pub enum Error {
     /// event stream).
     #[error("currently not connected to obs-websocket")]
     Disconnected,
+    /// The OBS studio version of the connected instance doesn't match the required version for this
+    /// crate.
+    #[error("obs studio version {0} doesn't match required {1}")]
+    ObsStudioVersion(Version, VersionReq),
+    /// The obs-websocket plugin version doesn't match the required version for this crate.
+    #[error("obs-websocket version {0} doesn't match required {1}")]
+    ObsWebsocketVersion(Version, VersionReq),
 }
