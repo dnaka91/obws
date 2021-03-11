@@ -27,7 +27,7 @@ use tokio::{
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 #[cfg(feature = "events")]
-use crate::events::Event;
+use crate::events::{Event, EventType};
 use crate::{
     requests::{Request, RequestType},
     responses::{AuthRequired, Response},
@@ -207,6 +207,16 @@ impl Client {
                 if let Err(e) = res {
                     error!("failed handling message: {:?}", e);
                 }
+            }
+
+            #[cfg(feature = "events")]
+            {
+                let event = Event {
+                    stream_timecode: None,
+                    rec_timecode: None,
+                    ty: EventType::ServerStopped,
+                };
+                events_tx.send(event).ok();
             }
         });
 
