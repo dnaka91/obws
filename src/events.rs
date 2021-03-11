@@ -121,7 +121,7 @@ pub enum EventType {
         #[serde(deserialize_with = "crate::de::duration_millis")]
         duration: Duration,
         /// Source scene of the transition.
-        from_scene: String,
+        from_scene: Option<String>,
         /// Destination scene of the transition.
         to_scene: String,
     },
