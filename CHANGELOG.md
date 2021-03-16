@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- If the connection to obs-websocket is lost, a `Event::ServerStopped` event is sent to signal the
+  disconnect. Thanks @715209 !
+
+### Changed
+
+- **BREAKING CHANGE:** `Client::events` now returns a `Result` and fails with an error when trying
+  to get a new event stream while disconnected from obs-websocket.
+- **BREAKING CHANGE:** During `Client::connect` the version of OBS Studio and obs-websocket is now
+  checked and the connection will fail if the versions are too old or too new.
+- The event streams returned from `Client::events` are properly being closed when the connection to
+  obs-websocket is disconnected in any way.
+
+### Fixed
+
+- Requests were never finishing if the connection was lost in the meantime. They're now properly
+  cancelled when a disconnect happens.
+- The `TransitionVideoEnd` event could not be deserialized as the `from_scene` field was wrongly
+  a required field and was therefore changed to be optional. Thanks @715209 !
+
 ## [0.5.0] - 2021-03-07
 
 ### Changed
