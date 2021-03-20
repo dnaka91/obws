@@ -1,7 +1,7 @@
 use serde::Serialize;
 
 use super::Client;
-use crate::requests::{KeyModifier, Projector, RequestType};
+use crate::requests::{KeyModifier, Projector, ProjectorInternal, QtGeometry, RequestType};
 use crate::responses;
 use crate::{Error, Result};
 
@@ -82,7 +82,12 @@ impl<'a> General<'a> {
     /// Open a projector window or create a projector on a monitor. Requires OBS v24.0.4 or newer.
     pub async fn open_projector(&self, projector: Projector<'_>) -> Result<()> {
         self.client
-            .send_message(RequestType::OpenProjector(projector))
+            .send_message(RequestType::OpenProjector(ProjectorInternal {
+                ty: projector.ty,
+                monitor: projector.monitor,
+                geometry: projector.geometry.map(QtGeometry::serialize).as_deref(),
+                name: projector.name,
+            }))
             .await
     }
 

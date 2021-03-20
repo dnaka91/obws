@@ -1,7 +1,7 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-use obws::requests::{Projector, ProjectorType};
+use obws::requests::{Projector, ProjectorType, QtGeometry, QtRect};
 use serde_json::json;
 
 mod common;
@@ -31,6 +31,12 @@ async fn main() -> Result<()> {
     client
         .open_projector(Projector {
             ty: Some(ProjectorType::Multiview),
+            geometry: Some(&QtGeometry::new(QtRect {
+                left: 100,
+                top: 100,
+                right: 300,
+                bottom: 300,
+            })),
             ..Default::default()
         })
         .await?;

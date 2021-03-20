@@ -2,6 +2,7 @@
 
 use std::path::Path;
 
+use bitflags::bitflags;
 use chrono::Duration;
 use either::Either;
 use serde::Serialize;
@@ -47,7 +48,7 @@ pub(crate) enum RequestType<'a> {
         data: &'a serde_json::Value,
     },
     GetVideoInfo,
-    OpenProjector(Projector<'a>),
+    OpenProjector(ProjectorInternal<'a>),
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByName {
         /// Unique name of the hotkey, as defined when registering the hotkey (e.g.
@@ -450,19 +451,17 @@ pub(crate) enum RequestType<'a> {
 }
 
 /// Request information for [`open_projector`](crate::client::General::open_projector).
-#[skip_serializing_none]
-#[derive(Debug, Default, Serialize)]
+#[derive(Debug, Default)]
 pub struct Projector<'a> {
     /// Type of projector: `Preview` (default), `Source`, `Scene`, `StudioProgram`, or `Multiview`
     /// (case insensitive).
-    #[serde(rename = "type")]
     pub ty: Option<ProjectorType>,
     /// Monitor to open the projector on. If -1 or omitted, opens a window.
     pub monitor: Option<i64>,
     /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
     /// [Qt's geometry encoding](https://doc.qt.io/qt-5/qwidget.html#saveGeometry). Corresponds to
     /// OBS's saved projectors.
-    pub geometry: Option<&'a str>,
+    pub geometry: Option<&'a QtGeometry>,
     /// Name of the source or scene to be displayed (ignored for other projector types).
     pub name: Option<&'a str>,
 }
@@ -481,6 +480,26 @@ pub enum ProjectorType {
     StudioProgram,
     /// Open a projector in multiview.
     Multiview,
+}
+
+/// Internal version of [`Projector`] which is the one that's actually send to the API. This allows
+/// to let the user define a typed version of the geometry while sending the encoded version through
+/// this struct.
+#[skip_serializing_none]
+#[derive(Debug, Default, Serialize)]
+pub(crate) struct ProjectorInternal<'a> {
+    /// Type of projector: `Preview` (default), `Source`, `Scene`, `StudioProgram`, or `Multiview`
+    /// (case insensitive).
+    #[serde(rename = "type")]
+    pub ty: Option<ProjectorType>,
+    /// Monitor to open the projector on. If -1 or omitted, opens a window.
+    pub monitor: Option<i64>,
+    /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
+    /// [Qt's geometry encoding](https://doc.qt.io/qt-5/qwidget.html#saveGeometry). Corresponds to
+    /// OBS's saved projectors.
+    pub geometry: Option<&'a str>,
+    /// Name of the source or scene to be displayed (ignored for other projector types).
+    pub name: Option<&'a str>,
 }
 
 /// Request information for
@@ -1091,4 +1110,155 @@ pub struct Transition<'a> {
     /// Transition duration (in milliseconds).
     #[serde(serialize_with = "ser::duration_millis_opt")]
     pub duration: Option<Duration>,
+}
+
+/// Request information for [`open_projector`](crate::client::General::open_projector) as part of
+/// [`Projector`].
+///
+/// This describes a position on the screen starting from the top left corner with 0.
+///
+/// ```txt
+/// Screen
+/// ┌────────────────────── X
+/// │
+/// │          top
+/// │       ┌────────┐
+/// │  left │  Rect  │ right
+/// │       └────────┘
+/// │         bottom
+/// │
+/// Y
+///
+#[derive(Clone, Copy, Debug, Default)]
+pub struct QtRect {
+    /// Left or X/horizontal position of the rectangle.
+    pub left: i32,
+    /// Top or Y/vertical position of the rectangle.
+    pub top: i32,
+    /// The right side of a rectangle counted from the left. For example with left = 100 and right =
+    /// 300 the width would be 200.
+    pub right: i32,
+    /// Bottom side of a rectangle counted from the top. For example with top = 100 and bottom = 300
+    /// the height would be 200.
+    pub bottom: i32,
+}
+
+bitflags! {
+    /// Request information for [`open_projector`](crate::client::General::open_projector) as part of
+    /// [`Projector`].
+    #[derive(Default)]
+    pub struct QtWindowState: u32 {
+        /// Window with maximum size, taking up as much space as possible but still showing
+        /// the window frame.
+        const MAXIMIZED = 2;
+        /// Show the window in fullscreen mode, taking up the whole display.
+        const FULLSCREEN = 4;
+    }
+}
+
+impl QtWindowState {
+    /// Convert the state into a byte array for usage in [`QtGeometry::serialize`] .
+    fn to_be_bytes(&self) -> [u8; 2] {
+        [
+            if self.contains(Self::MAXIMIZED) { 1 } else { 0 },
+            if self.contains(Self::FULLSCREEN) {
+                1
+            } else {
+                0
+            },
+        ]
+    }
+}
+
+/// Request information for [`open_projector`](crate::client::General::open_projector) as part of
+/// [`Projector`].
+#[derive(Debug)]
+pub struct QtGeometry {
+    /// The screen number to display a widget or [`Self::DEFAULT_SCREEN`] to let OBS pick the
+    /// default.
+    pub screen_number: i32,
+    /// Additional window state like maximized or fullscreen.
+    pub window_state: QtWindowState,
+    /// The width of the screen. Seems to have no specific effect but is used for some internal
+    /// calculations in Qt.
+    pub screen_width: i32,
+    /// The target position and size for a widget to display at.
+    pub rect: QtRect,
+}
+
+impl QtGeometry {
+    /// Value indicating to use the default screen.
+    pub const DEFAULT_SCREEN: i32 = -1;
+
+    /// Create a new geometry instance without only size information set.
+    pub fn new(rect: QtRect) -> Self {
+        Self {
+            rect,
+            ..Self::default()
+        }
+    }
+
+    /// Serialize this instance into a base64 encoded byte array.
+    ///
+    /// The exact format can be found in the
+    /// [Qt source code](https://code.woboq.org/qt5/qtbase/src/widgets/kernel/qwidget.cpp.html#_ZNK7QWidget12saveGeometryEv).
+    ///
+    /// | Length | Content                                            |
+    /// |--------|----------------------------------------------------|
+    /// | 4      | Magic number                                       |
+    /// | 2      | Major format version                               |
+    /// | 2      | Minor format version                               |
+    /// | 16     | Frame rect (lef, top, right, bottom) 4 bytes each  |
+    /// | 16     | Normal rect (lef, top, right, bottom) 4 bytes each |
+    /// | 4      | Screen number                                      |
+    /// | 1      | Window maximized (1 or 0)                          |
+    /// | 1      | Window fullscreen (1 or 0)                         |
+    /// | 4      | Screen width                                       |
+    /// | 16     | Main rect (lef, top, right, bottom) 4 bytes each   |
+    pub(crate) fn serialize(&self) -> String {
+        /// Indicator for serialized Qt geometry data.
+        const MAGIC_NUMBER: u32 = 0x1D9D0CB;
+        /// Major version of this format.
+        const MAJOR_VERSION: u16 = 3;
+        /// Minor version of this format.
+        const MINOR_VERSION: u16 = 0;
+        /// Output data length BEFORE base64 encoding. This allows to reduce allocations in the
+        /// byte buffer and must be updated whenever the format changes.
+        const DATA_LENGTH: usize = 66;
+
+        fn serialize_rect(data: &mut Vec<u8>, rect: &QtRect) {
+            data.extend(&rect.left.to_be_bytes());
+            data.extend(&rect.top.to_be_bytes());
+            data.extend(&rect.right.to_be_bytes());
+            data.extend(&rect.bottom.to_be_bytes());
+        }
+
+        let mut data = Vec::<u8>::with_capacity(DATA_LENGTH);
+
+        data.extend(&MAGIC_NUMBER.to_be_bytes());
+        data.extend(&MAJOR_VERSION.to_be_bytes());
+        data.extend(&MINOR_VERSION.to_be_bytes());
+
+        serialize_rect(&mut data, &self.rect); // frame geometry
+        serialize_rect(&mut data, &self.rect); // normal geometry
+
+        data.extend(&self.screen_number.to_be_bytes());
+        data.extend(&self.window_state.to_be_bytes());
+        data.extend(&self.screen_width.to_be_bytes());
+
+        serialize_rect(&mut data, &self.rect);
+
+        base64::encode(data)
+    }
+}
+
+impl Default for QtGeometry {
+    fn default() -> Self {
+        Self {
+            screen_number: Self::DEFAULT_SCREEN,
+            window_state: QtWindowState::default(),
+            screen_width: 0,
+            rect: QtRect::default(),
+        }
+    }
 }
