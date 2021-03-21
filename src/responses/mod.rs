@@ -140,9 +140,9 @@ pub enum VideoFormat {
     /// I444 format.
     #[serde(rename = "VIDEO_FORMAT_I444")]
     I444,
-    /// RGB format.
+    /// RGBA format.
     #[serde(rename = "VIDEO_FORMAT_RGBA")]
-    RGB,
+    Rgba,
 }
 
 /// Supported color spaces for video output.
@@ -548,8 +548,8 @@ pub(crate) struct ReplayBufferStatus {
 
 /// Response value for
 /// [`get_current_scene_collection`](crate::client::SceneCollections::get_current_scene_collection).
-#[serde(rename_all = "kebab-case")]
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub(crate) struct CurrentSceneCollection {
     /// Name of the currently active scene collection.
     pub sc_name: String,

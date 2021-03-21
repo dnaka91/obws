@@ -267,7 +267,7 @@ mod tests {
         struct SimpleDuration {
             #[serde(deserialize_with = "duration_opt")]
             value: Option<Duration>,
-        };
+        }
 
         assert_de_tokens(
             &SimpleDuration {
@@ -330,7 +330,7 @@ mod tests {
         struct SimpleDuration {
             #[serde(deserialize_with = "duration_millis_opt")]
             value: Option<Duration>,
-        };
+        }
 
         assert_de_tokens(
             &SimpleDuration {
@@ -425,7 +425,7 @@ mod tests {
         struct SimpleDuration {
             #[serde(deserialize_with = "duration_millis")]
             value: Duration,
-        };
+        }
 
         assert_de_tokens(
             &SimpleDuration {
@@ -478,7 +478,7 @@ mod tests {
         struct SimpleDuration {
             #[serde(deserialize_with = "duration_nanos")]
             value: Duration,
-        };
+        }
 
         assert_de_tokens(
             &SimpleDuration {
@@ -546,7 +546,7 @@ mod tests {
         struct SimpleFlags {
             #[serde(deserialize_with = "bitflags_u8")]
             value: Flags,
-        };
+        }
 
         assert_de_tokens(
             &SimpleFlags {
