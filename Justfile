@@ -1,21 +1,22 @@
-export OBS_HOST := if os() == "macos" { "host.docker.internal" } else { "127.0.0.1" }
-
 # list available recipes
 default:
-    @just --list
+    @just --list --unsorted
 
-# run integration tests with coverage (using Docker)
+# run integration tests with coverage
 coverage:
-    docker run --rm -it --security-opt seccomp=unconfined --network host -v $PWD:/volume -v $HOME/.cargo/registry:/usr/local/cargo/registry xd009642/tarpaulin cargo tarpaulin --out Html --out Lcov --all-features
+    cargo install grcov
+    rustup component add --toolchain nightly llvm-tools-preview
 
-# run integration tests with coverage (using Vagrant)
-coverage-vagrant:
-    vagrant up
-    vagrant ssh -c 'cd /vagrant; false; while [ "$?" -eq 1 ]; do cargo tarpaulin --all-features --no-run; done'
-    vagrant ssh -c 'cd /vagrant && cargo tarpaulin --out Html --out Lcov --all-features'
+    rm -f *.profraw ./target/debug/coverage lcov.info
+
+    RUSTFLAGS="-Zinstrument-coverage" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +nightly test --all-features
+    rustup run nightly grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage
+    rustup run nightly grcov . -s . --binary-path ./target/debug/ -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+
+    rm -f *.profraw
 
 # upload coverage to https://codecov.io
 upload-coverage:
     @# {{env_var("CODECOV_TOKEN")}}
-    just coverage-vagrant
-    bash -c "bash <(curl -s https://codecov.io/bash)"
+    just coverage
+    bash -c "bash <(curl -s https://codecov.io/bash) -f lcov.info"
