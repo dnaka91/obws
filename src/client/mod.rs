@@ -119,7 +119,7 @@ where
     pub broadcast_capacity: Option<usize>,
 }
 
-const OBS_STUDIO_VERSION: &str = "^26.1.2";
+const OBS_STUDIO_VERSION: &str = "^26.1.0";
 const OBS_WEBSOCKET_VERSION: &str = "~4.9.0";
 
 impl<H> ConnectConfig<H>
@@ -492,11 +492,13 @@ mod tests {
     #[test]
     fn verify_version_req() {
         let obs_studio = VersionReq::parse(OBS_STUDIO_VERSION).unwrap();
+        assert!(obs_studio.matches(&Version::parse("26.1.0").unwrap()));
         assert!(obs_studio.matches(&Version::parse("26.1.100").unwrap()));
         assert!(obs_studio.matches(&Version::parse("26.100.100").unwrap()));
         assert!(!obs_studio.matches(&Version::parse("27.0.0").unwrap()));
 
         let obs_websocket = VersionReq::parse(OBS_WEBSOCKET_VERSION).unwrap();
+        assert!(obs_websocket.matches(&Version::parse("4.9.0").unwrap()));
         assert!(obs_websocket.matches(&Version::parse("4.9.100").unwrap()));
         assert!(!obs_websocket.matches(&Version::parse("4.100.100").unwrap()));
         assert!(!obs_websocket.matches(&Version::parse("5.0.0").unwrap()));
