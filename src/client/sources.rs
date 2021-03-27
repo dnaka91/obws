@@ -189,7 +189,7 @@ impl<'a> Sources<'a> {
         source: &str,
     ) -> Result<responses::TextGdiPlusProperties> {
         self.client
-            .send_message(RequestType::GetTextGDIPlusProperties { source })
+            .send_message(RequestType::GetTextGdiPlusProperties { source })
             .await
     }
 
@@ -199,7 +199,7 @@ impl<'a> Sources<'a> {
         properties: TextGdiPlusProperties<'_>,
     ) -> Result<()> {
         self.client
-            .send_message(RequestType::SetTextGDIPlusProperties(Box::new(properties)))
+            .send_message(RequestType::SetTextGdiPlusProperties(Box::new(properties)))
             .await
     }
 

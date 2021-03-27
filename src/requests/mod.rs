@@ -185,11 +185,13 @@ pub(crate) enum RequestType<'a> {
         source_type: Option<&'a str>,
     },
     SetSourceSettings(SourceSettings<'a>),
-    GetTextGDIPlusProperties {
+    #[serde(rename = "GetTextGDIPlusProperties")]
+    GetTextGdiPlusProperties {
         /// Source name.
         source: &'a str,
     },
-    SetTextGDIPlusProperties(Box<TextGdiPlusProperties<'a>>),
+    #[serde(rename = "SetTextGDIPlusProperties")]
+    SetTextGdiPlusProperties(Box<TextGdiPlusProperties<'a>>),
     GetTextFreetype2Properties {
         /// Source name.
         source: &'a str,
