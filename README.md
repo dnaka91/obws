@@ -28,8 +28,7 @@ Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it 
 obws = "0.7.0"
 ```
 
-In addition, you will need to use the [tokio](https://tokio.rs) runtime (currently `v0.3.x`), to
-use this library as it makes heavy use of async/await and is bound to this runtime.
+In addition, you will need to use the lastest [tokio](https://tokio.rs) runtime to use this library as it makes heavy use of async/await and is bound to this runtime.
 
 [cargo-edit]: https://github.com/killercup/cargo-edit
 
