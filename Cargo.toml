@@ -24,20 +24,20 @@ futures-util = { version = "0.3.13", features = ["sink"] }
 log = "0.4.14"
 rgb = { version = "0.8.25", default-features = false }
 semver = { version = "0.11.0", features = ["serde"] }
-serde = { version = "1.0.123", features = ["derive"] }
+serde = { version = "1.0.125", features = ["derive"] }
 serde_json = "1.0.64"
-serde_with = "1.6.4"
+serde_with = "1.7.0"
 sha2 = "0.9.3"
 thiserror = "1.0.24"
-tokio = { version = "1.2.0", features = ["net", "rt", "sync"] }
+tokio = { version = "1.4.0", features = ["net", "rt", "sync"] }
 tokio-tungstenite = "0.14.0"
 
 [dev-dependencies]
-anyhow = "1.0.38"
+anyhow = "1.0.40"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
-serde_test = "1.0.123"
-tokio = { version = "1.2.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+serde_test = "1.0.125"
+tokio = { version = "1.4.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
 default = []
