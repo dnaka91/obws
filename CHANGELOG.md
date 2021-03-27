@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- The `open_projector`] request now accepts a struct for geometry to define the projector window
+  instead of a simple string. This allows to set the geometry without the need to know about the Qt
+  geometry works and how it has to be encoded.
+
+### Fixed
+
+- The version requirement for OBS Studio was reduced from `26.1.2` to `26.1.0` as the `x.x.2` was a
+  MacOS specific fix version and generally fix versions don't break API compatibility.
+
 ## [0.6.0] - 2021-03-16
 
 ### Added
