@@ -15,29 +15,29 @@ keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
 features = ["events", "tls"]
 
 [dependencies]
-async-stream = { version = "0.3.0", optional = true }
+async-stream = { version = "0.3.2", optional = true }
 base64 = "0.13.0"
 bitflags = "1.2.1"
 chrono = { version = "0.4.19", default-features = false, features = ["std"] }
 either = { version = "1.6.1", features = ["serde"] }
-futures-util = { version = "0.3.13", features = ["sink"] }
+futures-util = { version = "0.3.15", features = ["sink"] }
 log = "0.4.14"
-rgb = { version = "0.8.25", default-features = false }
+rgb = { version = "0.8.27", default-features = false }
 semver = { version = "0.11.0", features = ["serde"] }
-serde = { version = "1.0.125", features = ["derive"] }
+serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "1.0.64"
-serde_with = "1.7.0"
-sha2 = "0.9.3"
-thiserror = "1.0.24"
-tokio = { version = "1.4.0", features = ["net", "rt", "sync"] }
+serde_with = "1.9.1"
+sha2 = "0.9.5"
+thiserror = "1.0.25"
+tokio = { version = "1.6.0", features = ["net", "rt", "sync"] }
 tokio-tungstenite = "0.14.0"
 
 [dev-dependencies]
 anyhow = "1.0.40"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
-serde_test = "1.0.125"
-tokio = { version = "1.4.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+serde_test = "1.0.126"
+tokio = { version = "1.6.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
 default = []
