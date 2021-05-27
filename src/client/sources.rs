@@ -232,7 +232,7 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// List filters applied to a source
+    /// List filters applied to a source.
     ///
     /// - `source_name`: Source name.
     pub async fn get_source_filters(
@@ -245,7 +245,7 @@ impl<'a> Sources<'a> {
             .map(|sf| sf.filters)
     }
 
-    /// List filters applied to a source.
+    /// Get a specific filter that is applied to a source.
     ///
     /// - `source_name`: Source name.
     /// - `filter_name`: Source filter name.
