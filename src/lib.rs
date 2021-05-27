@@ -32,7 +32,7 @@
 
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
 
-pub use semver::{Version, VersionReq};
+pub use semver::{Comparator, Version};
 
 pub use self::client::Client;
 
@@ -85,8 +85,8 @@ pub enum Error {
     /// The OBS studio version of the connected instance doesn't match the required version for this
     /// crate.
     #[error("obs studio version {0} doesn't match required {1}")]
-    ObsStudioVersion(Version, VersionReq),
+    ObsStudioVersion(Version, Comparator),
     /// The obs-websocket plugin version doesn't match the required version for this crate.
     #[error("obs-websocket version {0} doesn't match required {1}")]
-    ObsWebsocketVersion(Version, VersionReq),
+    ObsWebsocketVersion(Version, Comparator),
 }

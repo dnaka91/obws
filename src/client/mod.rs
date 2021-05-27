@@ -18,7 +18,7 @@ use futures_util::{
     stream::{SplitSink, StreamExt},
 };
 use log::{debug, error, trace};
-use semver::VersionReq;
+use semver::{Comparator, Op, Prerelease};
 use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]
 use tokio::sync::broadcast;
@@ -119,8 +119,20 @@ where
     pub broadcast_capacity: Option<usize>,
 }
 
-const OBS_STUDIO_VERSION: &str = "^26.1.0";
-const OBS_WEBSOCKET_VERSION: &str = "~4.9.0";
+const OBS_STUDIO_VERSION: Comparator = Comparator {
+    op: Op::Caret,
+    major: 26,
+    minor: Some(1),
+    patch: None,
+    pre: Prerelease::EMPTY,
+};
+const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
+    op: Op::Tilde,
+    major: 4,
+    minor: Some(9),
+    patch: None,
+    pre: Prerelease::EMPTY,
+};
 
 impl<H> ConnectConfig<H>
 where
@@ -249,22 +261,18 @@ impl Client {
 
     async fn verify_versions(&self) -> Result<()> {
         let version = self.general().get_version().await?;
-        // These are guaranteed to succeed and covered by tests. Therefore, it's safe to unwrap.
-        // Unfortunately there is (currently) no "safe" way to create version req.
-        let obs_studio = VersionReq::parse(OBS_STUDIO_VERSION).unwrap();
-        let obs_websocket = VersionReq::parse(OBS_WEBSOCKET_VERSION).unwrap();
 
-        if !obs_studio.matches(&version.obs_studio_version) {
+        if !OBS_STUDIO_VERSION.matches(&version.obs_studio_version) {
             return Err(Error::ObsStudioVersion(
                 version.obs_studio_version,
-                obs_studio,
+                OBS_STUDIO_VERSION,
             ));
         }
 
-        if !obs_websocket.matches(&version.obs_websocket_version) {
+        if !OBS_WEBSOCKET_VERSION.matches(&version.obs_websocket_version) {
             return Err(Error::ObsWebsocketVersion(
                 version.obs_websocket_version,
-                obs_websocket,
+                OBS_WEBSOCKET_VERSION,
             ));
         }
 
@@ -491,16 +499,14 @@ mod tests {
 
     #[test]
     fn verify_version_req() {
-        let obs_studio = VersionReq::parse(OBS_STUDIO_VERSION).unwrap();
-        assert!(obs_studio.matches(&Version::parse("26.1.0").unwrap()));
-        assert!(obs_studio.matches(&Version::parse("26.1.100").unwrap()));
-        assert!(obs_studio.matches(&Version::parse("26.100.100").unwrap()));
-        assert!(!obs_studio.matches(&Version::parse("27.0.0").unwrap()));
+        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 0)));
+        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 100)));
+        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 100, 100)));
+        assert!(!OBS_STUDIO_VERSION.matches(&Version::new(27, 0, 0)));
 
-        let obs_websocket = VersionReq::parse(OBS_WEBSOCKET_VERSION).unwrap();
-        assert!(obs_websocket.matches(&Version::parse("4.9.0").unwrap()));
-        assert!(obs_websocket.matches(&Version::parse("4.9.100").unwrap()));
-        assert!(!obs_websocket.matches(&Version::parse("4.100.100").unwrap()));
-        assert!(!obs_websocket.matches(&Version::parse("5.0.0").unwrap()));
+        assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 0)));
+        assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 100)));
+        assert!(!OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 100, 100)));
+        assert!(!OBS_WEBSOCKET_VERSION.matches(&Version::new(5, 0, 0)));
     }
 }
