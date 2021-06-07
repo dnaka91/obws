@@ -4,4 +4,5 @@
 *.profraw
 .env
 Cargo.lock
+codecov
 lcov.info

@@ -19,7 +19,7 @@ coverage:
 upload-coverage: get-codecov
     @# {{env_var("CODECOV_TOKEN")}}
     just coverage
-    bash -c "./codecov -f lcov.info"
+    bash -c "export CODECOV_TOKEN=$CODECOV_TOKEN && ./codecov -f lcov.info"
 
 get-codecov:
     #!/usr/bin/env bash
@@ -31,3 +31,4 @@ get-codecov:
         shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
         shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM")
     done
+    chmod +x codecov
