@@ -1,6 +1,6 @@
 use chrono::Duration;
 use rgb::RGBA8;
-use serde::ser::{self, Serializer};
+use serde::ser::{self, Serialize, Serializer};
 
 #[derive(Debug, thiserror::Error)]
 enum Error {
@@ -34,6 +34,13 @@ where
         None => Err(ser::Error::custom(Error::DurationTooBig(*value))),
     }
 }
+pub fn bitflags_u8<S, T>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: Into<u8> + Copy,
+{
+    serializer.serialize_some(&(*value).into())
+}
 
 pub fn bitflags_u8_opt<S, T>(value: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
 where
@@ -41,9 +48,18 @@ where
     T: Into<u8> + Copy,
 {
     match value {
-        Some(flags) => serializer.serialize_some(&(*flags).into()),
+        Some(flags) => bitflags_u8(flags, serializer),
         None => serializer.serialize_none(),
     }
+}
+
+pub fn rgba8_inverse<S>(value: &RGBA8, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let abgr =
+        (value.a as u32) << 24 | (value.b as u32) << 16 | (value.g as u32) << 8 | (value.r as u32);
+    serializer.serialize_some(&abgr)
 }
 
 pub fn rgba8_inverse_opt<S>(value: &Option<RGBA8>, serializer: S) -> Result<S::Ok, S::Error>
@@ -51,15 +67,18 @@ where
     S: Serializer,
 {
     match value {
-        Some(rgba) => {
-            let abgr = (rgba.a as u32) << 24
-                | (rgba.b as u32) << 16
-                | (rgba.g as u32) << 8
-                | (rgba.r as u32);
-            serializer.serialize_some(&abgr)
-        }
+        Some(rgba) => rgba8_inverse(rgba, serializer),
         None => serializer.serialize_none(),
     }
+}
+
+pub fn json_string<S, T>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+    T: Serialize,
+{
+    let json = serde_json::to_string(value).map_err(ser::Error::custom)?;
+    serializer.serialize_str(&json)
 }
 
 #[cfg(test)]

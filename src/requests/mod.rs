@@ -12,6 +12,7 @@ pub use rgb::RGBA8;
 
 use crate::common::{Align, Alignment, BoundsType, FontFlags, MonitorType, StreamType, Valign};
 
+pub mod custom;
 mod ser;
 
 #[derive(Serialize)]
@@ -913,7 +914,7 @@ pub struct SetStreamSettings<'a> {
 pub struct Font<'a> {
     /// Font face.
     pub face: Option<&'a str>,
-    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
+    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=4, Strikeout=8`.
     #[serde(serialize_with = "ser::bitflags_u8_opt")]
     pub flags: Option<FontFlags>,
     /// Font text size.
