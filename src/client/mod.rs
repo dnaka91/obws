@@ -120,7 +120,7 @@ where
 }
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
-    op: Op::Caret,
+    op: Op::GreaterEq,
     major: 26,
     minor: Some(1),
     patch: None,
@@ -502,7 +502,7 @@ mod tests {
         assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 0)));
         assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 100)));
         assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 100, 100)));
-        assert!(!OBS_STUDIO_VERSION.matches(&Version::new(27, 0, 0)));
+        assert!(OBS_STUDIO_VERSION.matches(&Version::new(27, 0, 0)));
 
         assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 0)));
         assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 100)));
