@@ -15,7 +15,11 @@ impl<'a> MediaControl<'a> {
     ///
     /// - `source_name`: Source name.
     /// - `play_pause`: Whether to pause or play the source. `false` for play, `true` for pause.
-    pub async fn play_pause_media(&self, source_name: &str, play_pause: bool) -> Result<()> {
+    pub async fn play_pause_media(
+        &self,
+        source_name: &str,
+        play_pause: Option<bool>,
+    ) -> Result<()> {
         self.client
             .send_message(RequestType::PlayPauseMedia {
                 source_name,

@@ -121,4 +121,5 @@ impl<'a> General<'a> {
     }
 
     // TODO: Add `ExecuteBatch` request
+    // TODO: Add `Sleep` request (only useful together with `ExecuteBatch`)
 }

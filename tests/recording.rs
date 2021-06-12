@@ -31,11 +31,13 @@ async fn main() -> Result<()> {
 
     client.start_recording().await?;
     wait_for!(events, EventType::RecordingStarted { .. });
-    // Pausing doesn't seem to work currently
-    // client.pause_recording().await?;
-    // wait_for!(events, EventType::RecordingPaused);
-    // client.resume_recording().await?;
-    // wait_for!(events, EventType::RecordingResumed);
+    time::sleep(Duration::from_secs(1)).await;
+    client.pause_recording().await?;
+    wait_for!(events, EventType::RecordingPaused);
+    time::sleep(Duration::from_secs(1)).await;
+    client.resume_recording().await?;
+    wait_for!(events, EventType::RecordingResumed);
+    time::sleep(Duration::from_secs(1)).await;
     client.stop_recording().await?;
     wait_for!(events, EventType::RecordingStopped { .. });
 

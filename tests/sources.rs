@@ -24,6 +24,7 @@ async fn main() -> Result<()> {
     client.get_sources_list().await?;
     client.get_sources_types_list().await?;
 
+    client.get_source_active(TEST_MEDIA).await?;
     client.get_audio_active(TEST_MEDIA).await?;
     client.get_source_default_settings(SOURCE_KIND_VLC).await?;
 

@@ -113,6 +113,31 @@ pub struct Scale {
     pub x: f64,
     /// The y-scale factor of the source.
     pub y: f64,
+    /// The scale filter of the source.
+    pub filter: ScaleFilter,
+}
+
+/// Different scaling filters that can be applied to a scene item as part of [`Scale`].
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum ScaleFilter {
+    /// Disable any scaling filters.
+    #[serde(rename = "OBS_SCALE_DISABLE")]
+    Disable,
+    /// Nearest neighbor scaling.
+    #[serde(rename = "OBS_SCALE_POINT")]
+    Point,
+    /// Sharpened scaling, 16 samples.
+    #[serde(rename = "OBS_SCALE_BICUBIC")]
+    Bicubic,
+    /// Fast but blurry scaling.
+    #[serde(rename = "OBS_SCALE_BILINEAR")]
+    Bilinear,
+    /// Sharpened scaling, 36 samples.
+    #[serde(rename = "OBS_SCALE_LANCZOS")]
+    Lanczos,
+    /// Weighted sum, 4/6/9 samples.
+    #[serde(rename = "OBS_SCALE_AREA")]
+    Area,
 }
 
 /// Response value for

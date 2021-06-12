@@ -71,7 +71,7 @@ pub(crate) enum RequestType<'a> {
         /// Source name.
         source_name: &'a str,
         /// Whether to pause or play the source. `false` for play, `true` for pause.
-        play_pause: bool,
+        play_pause: Option<bool>,
     },
     #[serde(rename_all = "camelCase")]
     RestartMedia {
@@ -152,6 +152,11 @@ pub(crate) enum RequestType<'a> {
     ToggleMute {
         /// Source name.
         source: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetSourceActive {
+        /// Source name.
+        source_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetAudioActive {
@@ -450,6 +455,13 @@ pub(crate) enum RequestType<'a> {
         /// manually if you set `release` to false. Defaults to true.
         release: Option<bool>,
     },
+    // --------------------------------
+    // Virtual Cam
+    // --------------------------------
+    GetVirtualCamStatus,
+    StartStopVirtualCam,
+    StartVirtualCam,
+    StopVirtualCam,
 }
 
 /// Request information for [`open_projector`](crate::client::General::open_projector).

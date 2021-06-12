@@ -233,6 +233,13 @@ pub enum EventType {
     /// Current recording resumed.
     RecordingResumed,
     // --------------------------------
+    // Virtual Cam
+    // --------------------------------
+    /// Virtual cam started successfully.
+    VirtualCamStarted,
+    /// Virtual cam stopped successfully.
+    VirtualCamStopped,
+    // --------------------------------
     // Replay Buffer
     // --------------------------------
     /// A request to start the replay buffer has been issued.
@@ -290,6 +297,8 @@ pub enum EventType {
         source_name: String,
         /// Source volume.
         volume: f32,
+        /// Source volume in Decibel
+        volume_db: f32,
     },
     /// A source has been muted or unmuted.
     #[serde(rename_all = "camelCase")]

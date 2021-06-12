@@ -17,13 +17,13 @@ async fn main() -> Result<()> {
 
     pin_mut!(events);
 
-    client.play_pause_media(TEST_MEDIA, false).await?;
+    client.play_pause_media(TEST_MEDIA, Some(false)).await?;
     wait_for!(events, EventType::MediaPlaying { .. });
     client.next_media(TEST_MEDIA).await?;
     wait_for!(events, EventType::MediaNext { .. });
     client.previous_media(TEST_MEDIA).await?;
     wait_for!(events, EventType::MediaPrevious { .. });
-    client.play_pause_media(TEST_MEDIA, true).await?;
+    client.play_pause_media(TEST_MEDIA, Some(true)).await?;
     wait_for!(events, EventType::MediaPaused { .. });
 
     let duration = client.get_media_duration(TEST_MEDIA).await?;

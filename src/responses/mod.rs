@@ -288,6 +288,14 @@ pub struct Mute {
     pub muted: bool,
 }
 
+/// Response value for [`get_source_active`](crate::client::Sources::get_source_active).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SourceActive {
+    /// Source active status of the source.
+    pub source_active: bool,
+}
+
 /// Response value for [`get_audio_active`](crate::client::Sources::get_audio_active).
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -1017,4 +1025,16 @@ pub struct StreamSettings {
 pub struct Transition {
     /// Name of the transition.
     pub name: String,
+}
+
+/// Response value for
+/// [`get_virtual_cam_status`](crate::client::VirtualCam::get_virtual_cam_status).
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VirtualCamStatus {
+    /// Current virtual camera status.
+    pub is_virtual_cam: bool,
+    /// Time elapsed since virtual cam started (only present if virtual cam currently active).
+    #[serde(default, deserialize_with = "crate::de::duration_opt")]
+    pub virtual_cam_timecode: Option<Duration>,
 }

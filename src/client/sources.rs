@@ -103,6 +103,16 @@ impl<'a> Sources<'a> {
             .await
     }
 
+    /// Get the source's active status of a specified source (if it is showing in the final mix).
+    ///
+    /// - `source_name`: Source name.
+    pub async fn get_source_active(&self, source_name: &str) -> Result<bool> {
+        self.client
+            .send_message::<responses::SourceActive>(RequestType::GetSourceActive { source_name })
+            .await
+            .map(|sa| sa.source_active)
+    }
+
     /// Get the audio's active status of a specified source.
     ///
     /// - `source_name`: Source name.

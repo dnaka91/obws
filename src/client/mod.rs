@@ -41,7 +41,7 @@ pub use self::{
     general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
     recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
     scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
-    studio_mode::StudioMode, transitions::Transitions,
+    studio_mode::StudioMode, transitions::Transitions, virtual_cam::VirtualCam,
 };
 
 mod general;
@@ -57,6 +57,7 @@ mod sources;
 mod streaming;
 mod studio_mode;
 mod transitions;
+mod virtual_cam;
 
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
@@ -121,8 +122,8 @@ where
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
     op: Op::GreaterEq,
-    major: 26,
-    minor: Some(1),
+    major: 27,
+    minor: None,
     patch: None,
     pre: Prerelease::EMPTY,
 };
@@ -130,7 +131,7 @@ const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
     op: Op::Tilde,
     major: 4,
     minor: Some(9),
-    patch: None,
+    patch: Some(1),
     pre: Prerelease::EMPTY,
 };
 
@@ -468,6 +469,11 @@ impl Client {
     pub fn transitions(&self) -> Transitions<'_> {
         Transitions { client: self }
     }
+
+    /// Access API functions related to the virtual cam.
+    pub fn virtual_cam(&self) -> VirtualCam<'_> {
+        VirtualCam { client: self }
+    }
 }
 
 fn extract_error(value: &mut serde_json::Value) -> Option<String> {
@@ -488,25 +494,5 @@ impl Drop for Client {
         // We simply drop the future as the background task has been aborted but we have no way here
         // to wait for it to fully shut down (except spinning up a new tokio runtime).
         drop(self.disconnect());
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use semver::Version;
-
-    use super::*;
-
-    #[test]
-    fn verify_version_req() {
-        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 0)));
-        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 1, 100)));
-        assert!(OBS_STUDIO_VERSION.matches(&Version::new(26, 100, 100)));
-        assert!(OBS_STUDIO_VERSION.matches(&Version::new(27, 0, 0)));
-
-        assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 0)));
-        assert!(OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 9, 100)));
-        assert!(!OBS_WEBSOCKET_VERSION.matches(&Version::new(4, 100, 100)));
-        assert!(!OBS_WEBSOCKET_VERSION.matches(&Version::new(5, 0, 0)));
     }
 }
