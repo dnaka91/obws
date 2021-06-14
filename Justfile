@@ -23,5 +23,5 @@ upload-coverage: coverage
     cp -R target/debug/coverage/ .
     git add -A badges examples src tests coverage.json index.html
     git commit -m "Coverage for $(git rev-parse --short main)"
-    # git push
+    git push
     git checkout main
