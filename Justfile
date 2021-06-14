@@ -4,31 +4,22 @@ default:
 
 # run integration tests with coverage
 coverage:
-    cargo install grcov
+    cargo install grcov --git https://github.com/mozilla/grcov.git --rev c7a9b20d246a0cda812db509f206b38b3116cba4
     rustup component add --toolchain nightly llvm-tools-preview
 
-    rm -rf *.profraw ./target/debug/coverage lcov.info
+    rm -rf *.profraw ./target/debug/coverage
 
     RUSTFLAGS="-Zinstrument-coverage -Clink-dead-code" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +nightly test --all-features
     rustup run nightly grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage
-    rustup run nightly grcov . -s . --binary-path ./target/debug/ -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
 
     rm -f *.profraw
 
-# upload coverage to https://codecov.io
-upload-coverage: get-codecov
-    @# {{env_var("CODECOV_TOKEN")}}
-    just coverage
-    bash -c "export CODECOV_TOKEN=$CODECOV_TOKEN && ./codecov -f lcov.info"
-
-get-codecov:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    curl -s https://codecov.io/bash > codecov;
-    VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-    for i in 1 256 512
-    do
-        shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-        shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM")
-    done
-    chmod +x codecov
+# upload coverage to GitHub Pages
+upload-coverage: coverage
+    git checkout gh-pages
+    rm -rf badges examples src tests coverage.json index.html
+    cp -R target/debug/coverage/ .
+    git add -A badges examples src tests coverage.json index.html
+    git commit -m "Coverage for $(git rev-parse --short main)"
+    # git push
+    git checkout main
