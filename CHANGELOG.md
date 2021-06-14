@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- Dependabot is now used to create new PRs for version updates in cargo and GitHub Actions.
+
+### Changed
+
+- **BREAKING CHANGE:** Upgraded to obs-websocket `4.9.1`, adding a few new events and requests.
+  Unfortunately although this looks like a patch release of obs-websocket, it actually included
+  some breaking changes.
+- **BREAKING CHANGE:** As with the upgrade to `4.9.1`, the new required minimum version for OBS is
+  `27.0.0` and for obs-websocket is `4.9.1`. Versions requirements have been further relaxed for OBS
+  so that even a `28.0.0` release will work with the current version of obws.
+- Code coverage data is now directly hosted on GitHub Pages at <https://dnaka91.github.io/obws>,
+  instead of using codecov.io. This has been done to reduce the amount of dependencies on external
+  services and reduce security risks due to recent codecov incidents.
+- Several dependencies have been updated to their latest version.
+
+### Fixed
+
+- Internal renaming and fixes have been done, mostly for naming conventions or other clippy lints.
+  No logical fixes related to obs-websocket though.
+
 ## [0.7.0] - 2021-03-27
 
 ### Changed
