@@ -23,21 +23,21 @@ either = { version = "1.6.1", features = ["serde"] }
 futures-util = { version = "0.3.15", features = ["sink"] }
 log = "0.4.14"
 rgb = { version = "0.8.27", default-features = false }
-semver = { version = "1.0.0", features = ["serde"] }
+semver = { version = "1.0.3", features = ["serde"] }
 serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "1.0.64"
-serde_with = "1.9.1"
+serde_with = "1.9.4"
 sha2 = "0.9.5"
-thiserror = "1.0.25"
-tokio = { version = "1.6.0", features = ["net", "rt", "sync"] }
+thiserror = "1.0.26"
+tokio = { version = "1.8.2", features = ["net", "rt", "sync"] }
 tokio-tungstenite = "0.14.0"
 
 [dev-dependencies]
-anyhow = "1.0.40"
+anyhow = "1.0.42"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
 serde_test = "1.0.126"
-tokio = { version = "1.6.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tokio = { version = "1.8.2", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
 default = []
