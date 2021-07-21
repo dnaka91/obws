@@ -1,7 +1,4 @@
-use std::convert::TryFrom;
-use std::fmt;
-use std::iter::FromIterator;
-use std::marker::PhantomData;
+use std::{convert::TryFrom, fmt, iter::FromIterator, marker::PhantomData};
 
 use rgb::RGBA8;
 use serde::de::{Deserializer, Error, Visitor};

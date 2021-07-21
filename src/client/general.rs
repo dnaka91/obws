@@ -1,9 +1,10 @@
 use serde::Serialize;
 
 use super::Client;
-use crate::requests::{KeyModifier, Projector, ProjectorInternal, QtGeometry, RequestType};
-use crate::responses;
-use crate::{Error, Result};
+use crate::{
+    requests::{KeyModifier, Projector, ProjectorInternal, QtGeometry, RequestType},
+    responses, Error, Result,
+};
 
 /// General functions of the API.
 pub struct General<'a> {

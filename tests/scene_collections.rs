@@ -5,7 +5,7 @@ use std::time::Duration;
 use anyhow::{Context, Result};
 use tokio::time;
 
-use common::TEST_COLLECTION;
+use crate::common::TEST_COLLECTION;
 
 mod common;
 

@@ -6,7 +6,7 @@ use obws::requests::{
     DuplicateSceneItem, SceneItemProperties, SceneItemRender, SceneItemSpecification,
 };
 
-use common::{TEST_SCENE, TEXT_SOURCE};
+use crate::common::{TEST_SCENE, TEXT_SOURCE};
 
 mod common;
 

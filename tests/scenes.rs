@@ -4,7 +4,7 @@ use anyhow::Result;
 use chrono::Duration;
 use obws::requests::{SceneItem, SceneTransitionOverride};
 
-use common::{
+use crate::common::{
     TEST_BROWSER, TEST_MEDIA, TEST_SCENE, TEST_SCENE_2, TEST_TRANSITION, TEXT_SOURCE, TEXT_SOURCE_2,
 };
 

@@ -2,14 +2,15 @@ use chrono::Duration;
 use serde::de::DeserializeOwned;
 
 use super::Client;
-use crate::common::MonitorType;
-use crate::requests::{
-    AddFilter, CreateSource, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
-    SourceFilterVisibility, SourceScreenshot, SourceSettings, TextFreetype2Properties,
-    TextGdiPlusProperties, Volume,
+use crate::{
+    common::MonitorType,
+    requests::{
+        AddFilter, CreateSource, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
+        SourceFilterVisibility, SourceScreenshot, SourceSettings, TextFreetype2Properties,
+        TextGdiPlusProperties, Volume,
+    },
+    responses, Result,
 };
-use crate::responses;
-use crate::Result;
 
 /// API functions related to sources.
 pub struct Sources<'a> {

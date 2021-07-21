@@ -51,16 +51,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Setup Rust
+      - name: Setup Rust (nightly)
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
           override: true
+          components: rustfmt
       - name: Run rustfmt
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: -- --check
+      - name: Setup Rust (stable)
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
       - name: Run clippy
         uses: actions-rs/cargo@v1
         with:

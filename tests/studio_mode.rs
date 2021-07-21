@@ -1,10 +1,10 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-
 use chrono::Duration;
-use common::{TEST_SCENE_2, TEST_TRANSITION};
 use obws::requests::Transition;
+
+use crate::common::{TEST_SCENE_2, TEST_TRANSITION};
 
 mod common;
 

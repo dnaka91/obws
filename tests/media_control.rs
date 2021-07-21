@@ -4,7 +4,7 @@ use anyhow::Result;
 use futures_util::{pin_mut, StreamExt};
 use obws::events::{Event, EventType};
 
-use common::TEST_MEDIA;
+use crate::common::TEST_MEDIA;
 
 #[macro_use]
 mod common;

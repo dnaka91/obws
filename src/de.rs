@@ -1,9 +1,11 @@
 //! Custom deserializers that are used in both the [`events`](crate::events) and
 //! [`responses`](crate::responses) modules.
 
-use std::convert::TryFrom;
-use std::fmt::{self, Display};
-use std::marker::PhantomData;
+use std::{
+    convert::TryFrom,
+    fmt::{self, Display},
+    marker::PhantomData,
+};
 
 use chrono::Duration;
 use serde::de::{self, Deserializer, Visitor};

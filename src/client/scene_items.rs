@@ -1,12 +1,13 @@
 use either::Either;
 
 use super::Client;
-use crate::requests::{
-    AddSceneItem, DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender,
-    SceneItemSpecification,
+use crate::{
+    requests::{
+        AddSceneItem, DuplicateSceneItem, RequestType, SceneItemProperties, SceneItemRender,
+        SceneItemSpecification,
+    },
+    responses, Result,
 };
-use crate::responses;
-use crate::Result;
 
 /// API functions related to scene items.
 pub struct SceneItems<'a> {

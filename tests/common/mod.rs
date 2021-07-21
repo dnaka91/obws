@@ -1,6 +1,4 @@
-use std::env;
-use std::sync::Once;
-use std::time::Duration;
+use std::{env, sync::Once, time::Duration};
 
 use anyhow::{ensure, Result};
 use obws::{

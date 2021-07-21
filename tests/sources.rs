@@ -11,7 +11,7 @@ use obws::{
 };
 use serde_json::json;
 
-use common::{SOURCE_KIND_VLC, TEST_BROWSER, TEST_MEDIA, TEXT_SOURCE};
+use crate::common::{SOURCE_KIND_VLC, TEST_BROWSER, TEST_MEDIA, TEXT_SOURCE};
 
 mod common;
 

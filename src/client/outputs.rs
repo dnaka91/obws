@@ -1,7 +1,5 @@
 use super::Client;
-use crate::requests::RequestType;
-use crate::responses;
-use crate::Result;
+use crate::{requests::RequestType, responses, Result};
 
 /// API functions related to outputs.
 pub struct Outputs<'a> {

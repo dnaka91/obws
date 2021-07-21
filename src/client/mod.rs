@@ -29,19 +29,18 @@ use tokio::{
 };
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
+pub use self::{
+    general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
+    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
+    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
+    studio_mode::StudioMode, transitions::Transitions, virtual_cam::VirtualCam,
+};
 #[cfg(feature = "events")]
 use crate::events::{Event, EventType};
 use crate::{
     requests::{Request, RequestType},
     responses::{AuthRequired, Response},
     Error, Result,
-};
-
-pub use self::{
-    general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
-    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
-    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
-    studio_mode::StudioMode, transitions::Transitions, virtual_cam::VirtualCam,
 };
 
 mod general;

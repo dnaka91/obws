@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 
-use common::TEST_OUTPUT;
+use crate::common::TEST_OUTPUT;
 
 mod common;
 

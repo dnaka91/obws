@@ -1,7 +1,8 @@
 use super::Client;
-use crate::requests::{RequestType, SetStreamSettings, Stream};
-use crate::responses;
-use crate::Result;
+use crate::{
+    requests::{RequestType, SetStreamSettings, Stream},
+    responses, Result,
+};
 
 /// API functions related to streaming.
 pub struct Streaming<'a> {

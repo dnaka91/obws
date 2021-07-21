@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 
-use common::TEST_TRANSITION_2;
+use crate::common::TEST_TRANSITION_2;
 
 mod common;
 

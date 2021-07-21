@@ -1,13 +1,11 @@
 //! All responses that can be received from the API.
 
-use std::collections::HashSet;
-use std::path::PathBuf;
+use std::{collections::HashSet, path::PathBuf};
 
 use chrono::Duration;
-use serde::Deserialize;
-
 pub use rgb::RGBA8;
 pub use semver::Version as SemVerVersion;
+use serde::Deserialize;
 
 use crate::common::{
     Align, Bounds, Crop, FontFlags, MonitorType, Position, Scale, SceneItem, SceneItemTransform,
