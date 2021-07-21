@@ -1171,7 +1171,7 @@ bitflags! {
 
 impl QtWindowState {
     /// Convert the state into a byte array for usage in [`QtGeometry::serialize`] .
-    fn to_be_bytes(&self) -> [u8; 2] {
+    fn to_be_bytes(self) -> [u8; 2] {
         [
             if self.contains(Self::MAXIMIZED) { 1 } else { 0 },
             if self.contains(Self::FULLSCREEN) {
