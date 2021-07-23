@@ -7,7 +7,7 @@ For this to work, a few settings need to be set and some scene items created so 
 items to work on. This has to be done manually as the API doesn't allow to create new sources and
 scenes or modify specific settings.
 
-- Use at least OBS version `26.1.2`.
+- Use at least OBS version `27.0.0`.
 - Create a **source collection** called `OBWS-TEST`.
 - Create a **profile** called `OBWS-TEST`.
 - Create two **scene**s called `OBWS-TEST-Scene` and `OBWS-TEST-Scene2`.

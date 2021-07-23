@@ -1,7 +1,7 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-use obws::requests::{Projector, ProjectorType, QtGeometry, QtRect};
+use obws::requests::KeyModifiers;
 use serde_json::json;
 
 mod common;
@@ -12,37 +12,19 @@ async fn main() -> Result<()> {
     let client = client.general();
 
     client.get_version().await?;
-
-    client.get_auth_required().await?;
-
-    let original = client.get_filename_formatting().await?;
-    client.set_filename_formatting("test").await?;
-    client.set_filename_formatting(&original).await?;
-
-    client.get_stats().await?;
-
     client
-        .broadcast_custom_message("test", &json! {{"greeting":"hello"}})
+        .broadcast_custom_event(json! {{"hello": "world!"}})
         .await?;
 
-    client.get_video_info().await?;
-
-    // Currently no API function available to close the projector again.
-    client
-        .open_projector(Projector {
-            ty: Some(ProjectorType::Multiview),
-            geometry: Some(&QtGeometry::new(QtRect {
-                left: 100,
-                top: 100,
-                right: 300,
-                bottom: 300,
-            })),
-            ..Default::default()
-        })
-        .await?;
-
+    client.get_hotkey_list().await?;
     client.trigger_hotkey_by_name("ReplayBuffer.Save").await?;
-    client.trigger_hotkey_by_sequence("OBS_KEY_P", &[]).await?;
+    client
+        .trigger_hotkey_by_key_sequence("OBS_KEY_P", KeyModifiers::default())
+        .await?;
+
+    let enabled = client.get_studio_mode_enabled().await?;
+    client.set_studio_mode_enabled(!enabled).await?;
+    client.set_studio_mode_enabled(enabled).await?;
 
     Ok(())
 }

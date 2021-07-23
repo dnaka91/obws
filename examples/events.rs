@@ -11,9 +11,7 @@ async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "obws=debug");
     pretty_env_logger::init();
 
-    let client = Client::connect("localhost", 4444).await?;
-
-    client.login(env::var("OBS_PASSWORD").ok()).await?;
+    let client = Client::connect("localhost", 4444, env::var("OBS_PASSWORD").ok()).await?;
 
     let events = client.events()?;
     pin_mut!(events);

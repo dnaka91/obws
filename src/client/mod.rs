@@ -11,11 +11,10 @@ use std::{
     },
 };
 
-#[cfg(feature = "events")]
-use futures_util::stream::Stream;
 use futures_util::{
     sink::SinkExt,
-    stream::{SplitSink, StreamExt},
+    stream::{SplitSink, Stream, StreamExt},
+    Sink,
 };
 use log::{debug, error, trace};
 use semver::{Comparator, Op, Prerelease};
@@ -30,33 +29,21 @@ use tokio::{
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 pub use self::{
-    general::General, media_control::MediaControl, outputs::Outputs, profiles::Profiles,
-    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
-    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
-    studio_mode::StudioMode, transitions::Transitions, virtual_cam::VirtualCam,
+    config::Config, general::General, inputs::Inputs, scenes::Scenes, sources::Sources,
 };
 #[cfg(feature = "events")]
-use crate::events::{Event, EventType};
+use crate::events::Event;
 use crate::{
-    requests::{Request, RequestType},
-    responses::{AuthRequired, Response},
+    requests::{ClientRequest, RequestType},
+    responses::{ServerMessage, Status},
     Error, Result,
 };
 
+mod config;
 mod general;
-mod media_control;
-mod outputs;
-mod profiles;
-mod recording;
-mod replay_buffer;
-mod scene_collections;
-mod scene_items;
+mod inputs;
 mod scenes;
 mod sources;
-mod streaming;
-mod studio_mode;
-mod transitions;
-mod virtual_cam;
 
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
@@ -64,9 +51,10 @@ enum InnerError {
     IntoText(#[source] tokio_tungstenite::tungstenite::Error),
     #[error("failed deserializing message")]
     DeserializeMessage(#[source] serde_json::Error),
-    #[error("failed deserializing event")]
-    #[cfg_attr(not(feature = "events"), allow(dead_code))]
-    DeserializeEvent(#[source] serde_json::Error),
+    #[error("the request ID `{0}` is not an integer")]
+    InvalidRequestId(#[source] std::num::ParseIntError, String),
+    #[error("received unexpected server message: {0:?}")]
+    UnexpectedMessage(ServerMessage),
 }
 
 /// The client is the main entry point to access the obs-websocket API. It allows to call various
@@ -81,7 +69,7 @@ pub struct Client {
     /// A list of currently waiting requests to get a response back. The key is the string version
     /// of a request ID and the value is a oneshot sender that allows to send the response back to
     /// the other end that waits for the response.
-    receivers: Arc<Mutex<HashMap<u64, oneshot::Sender<serde_json::Value>>>>,
+    receivers: Arc<Mutex<ReceiverList>>,
     /// Broadcast sender that distributes received events to all current listeners. Events are
     /// dropped if nobody listens.
     #[cfg(feature = "events")]
@@ -95,19 +83,24 @@ pub struct Client {
 /// Shorthand for the writer side of a websocket stream that has been split into reader and writer.
 type MessageWriter = SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>;
 
+/// Shorthand for the list of ongoing requests that wait for a response.
+type ReceiverList = HashMap<u64, oneshot::Sender<(Status, serde_json::Value)>>;
+
 /// Default broadcast capacity used when not overwritten by the user.
 #[cfg(feature = "events")]
 const DEFAULT_CAPACITY: usize = 100;
 
 /// Configuration for connecting to a obs-websocket instance.
-pub struct ConnectConfig<H>
+pub struct ConnectConfig<H, P>
 where
     H: AsRef<str>,
+    P: AsRef<str>,
 {
     /// The hostname, usually `localhost` unless the OBS instance is on a remote machine.
     pub host: H,
     /// Port to connect to.
     pub port: u16,
+    pub password: Option<P>,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
     #[cfg(feature = "tls")]
     pub tls: bool,
@@ -127,16 +120,18 @@ const OBS_STUDIO_VERSION: Comparator = Comparator {
     pre: Prerelease::EMPTY,
 };
 const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
-    op: Op::Tilde,
-    major: 4,
-    minor: Some(9),
-    patch: Some(1),
+    op: Op::Caret,
+    major: 5,
+    minor: None,
+    patch: None,
     pre: Prerelease::EMPTY,
 };
+const RPC_VERSION: u32 = 1;
 
-impl<H> ConnectConfig<H>
+impl<H, P> ConnectConfig<H, P>
 where
     H: AsRef<str>,
+    P: AsRef<str>,
 {
     #[cfg(feature = "tls")]
     fn tls(&self) -> bool {
@@ -151,10 +146,15 @@ where
 
 impl Client {
     /// Connect to a obs-websocket instance on the given host and port.
-    pub async fn connect(host: impl AsRef<str>, port: u16) -> Result<Self> {
+    pub async fn connect(
+        host: impl AsRef<str>,
+        port: u16,
+        password: Option<impl AsRef<str>>,
+    ) -> Result<Self> {
         Self::connect_with_config(ConnectConfig {
             host,
             port,
+            password,
             #[cfg(feature = "tls")]
             tls: false,
             broadcast_capacity: None,
@@ -163,7 +163,11 @@ impl Client {
     }
 
     /// Connect to a obs-websocket instance with the given configuration.
-    pub async fn connect_with_config<H: AsRef<str>>(config: ConnectConfig<H>) -> Result<Self> {
+    pub async fn connect_with_config<H, P>(config: ConnectConfig<H, P>) -> Result<Self>
+    where
+        H: AsRef<str>,
+        P: AsRef<str>,
+    {
         let (socket, _) = tokio_tungstenite::connect_async(format!(
             "{}://{}:{}",
             if config.tls() { "wss" } else { "ws" },
@@ -173,7 +177,7 @@ impl Client {
         .await
         .map_err(Error::Connect)?;
 
-        let (write, mut read) = socket.split();
+        let (mut write, mut read) = socket.split();
         let receivers = Arc::new(Mutex::new(HashMap::<_, oneshot::Sender<_>>::new()));
         let receivers2 = Arc::clone(&receivers);
         #[cfg(feature = "events")]
@@ -184,6 +188,13 @@ impl Client {
         #[cfg(feature = "events")]
         let events_tx = Arc::clone(&event_sender);
 
+        handshake(
+            &mut write,
+            &mut read,
+            config.password.as_ref().map(AsRef::as_ref),
+        )
+        .await?;
+
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
                 trace!("{}", msg);
@@ -191,31 +202,34 @@ impl Client {
                     let text = msg.into_text().map_err(InnerError::IntoText)?;
                     let text = if text == "Server stopping" {
                         debug!("Websocket server is stopping");
-                        r#"{"update-type": "ServerStopping"}"#.to_string()
+                        r#"{"messageType":"Event","eventType":"ServerStopping"}"#.to_string()
                     } else {
                         text
                     };
 
-                    let json = serde_json::from_str::<serde_json::Value>(&text)
+                    let message = serde_json::from_str::<ServerMessage>(&text)
                         .map_err(InnerError::DeserializeMessage)?;
 
-                    if let Some(message_id) = json
-                        .as_object()
-                        .and_then(|obj| obj.get("message-id"))
-                        .and_then(|id| id.as_str())
-                        .and_then(|id| id.parse().ok())
-                    {
-                        debug!("got message with id {}", message_id);
-                        if let Some(tx) = receivers2.lock().await.remove(&message_id) {
-                            tx.send(json).ok();
+                    match message {
+                        ServerMessage::RequestResponse {
+                            request_id,
+                            request_status,
+                            response_data,
+                        } => {
+                            let request_id = request_id
+                                .parse()
+                                .map_err(|e| InnerError::InvalidRequestId(e, request_id))?;
+
+                            debug!("got message with id {}", request_id);
+                            if let Some(tx) = receivers2.lock().await.remove(&request_id) {
+                                tx.send((request_status, response_data)).ok();
+                            }
                         }
-                    } else {
                         #[cfg(feature = "events")]
-                        {
-                            let event = serde_json::from_value(json)
-                                .map_err(InnerError::DeserializeEvent)?;
+                        ServerMessage::Event(event) => {
                             events_tx.send(event).ok();
                         }
+                        _ => return Err(InnerError::UnexpectedMessage(message)),
                     }
 
                     Ok(())
@@ -228,14 +242,7 @@ impl Client {
             }
 
             #[cfg(feature = "events")]
-            {
-                let event = Event {
-                    stream_timecode: None,
-                    rec_timecode: None,
-                    ty: EventType::ServerStopped,
-                };
-                events_tx.send(event).ok();
-            }
+            events_tx.send(Event::ServerStopped).ok();
 
             // clear all outstanding receivers to stop them from waiting forever on responses
             // they'll never receive.
@@ -262,18 +269,25 @@ impl Client {
     async fn verify_versions(&self) -> Result<()> {
         let version = self.general().get_version().await?;
 
-        if !OBS_STUDIO_VERSION.matches(&version.obs_studio_version) {
+        if !OBS_STUDIO_VERSION.matches(&version.obs_version) {
             return Err(Error::ObsStudioVersion(
-                version.obs_studio_version,
+                version.obs_version,
                 OBS_STUDIO_VERSION,
             ));
         }
 
-        if !OBS_WEBSOCKET_VERSION.matches(&version.obs_websocket_version) {
+        if !OBS_WEBSOCKET_VERSION.matches(&version.obs_web_socket_version) {
             return Err(Error::ObsWebsocketVersion(
-                version.obs_websocket_version,
+                version.obs_web_socket_version,
                 OBS_WEBSOCKET_VERSION,
             ));
+        }
+
+        if RPC_VERSION != version.rpc_version {
+            return Err(Error::RpcVersion {
+                requested: RPC_VERSION,
+                negotiated: version.rpc_version,
+            });
         }
 
         Ok(())
@@ -284,8 +298,8 @@ impl Client {
         T: DeserializeOwned,
     {
         let id = self.id_counter.fetch_add(1, Ordering::SeqCst);
-        let req = Request {
-            message_id: &id.to_string(),
+        let req = ClientRequest::Request {
+            request_id: &id.to_string(),
             ty: req,
         };
         let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
@@ -307,15 +321,15 @@ impl Client {
             return Err(e);
         }
 
-        let mut resp = rx.await.map_err(Error::ReceiveMessage)?;
-
-        if let Some(error) = extract_error(&mut resp) {
-            return Err(Error::Api(error));
+        let (status, resp) = rx.await.map_err(Error::ReceiveMessage)?;
+        if !status.result {
+            return Err(Error::Api {
+                code: status.code,
+                message: status.comment,
+            });
         }
 
-        serde_json::from_value::<Response<T>>(resp)
-            .map(|r| r.details)
-            .map_err(Error::DeserializeResponse)
+        serde_json::from_value(resp).map_err(Error::DeserializeResponse)
     }
 
     /// Disconnect from obs-websocket and shut down all machinery.
@@ -336,46 +350,8 @@ impl Client {
         }
     }
 
-    /// Login to the OBS websocket if an authentication is required.
-    pub async fn login(&self, password: Option<impl AsRef<str>>) -> Result<()> {
-        let auth_required = self.general().get_auth_required().await?;
-
-        if let AuthRequired {
-            auth_required: true,
-            challenge: Some(challenge),
-            salt: Some(salt),
-        } = auth_required
-        {
-            match password {
-                Some(password) => {
-                    let auth = Self::create_auth_response(&challenge, &salt, password.as_ref());
-                    self.general().authenticate(&auth).await?;
-                }
-                None => return Err(Error::NoPassword),
-            }
-        }
-
-        Ok(())
-    }
-
-    fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
-        use sha2::{Digest, Sha256};
-
-        let mut hasher = Sha256::new();
-        hasher.update(password.as_bytes());
-        hasher.update(salt.as_bytes());
-
-        let mut auth = String::with_capacity(Sha256::output_size() * 4 / 3 + 4);
-
-        base64::encode_config_buf(hasher.finalize_reset(), base64::STANDARD, &mut auth);
-
-        hasher.update(auth.as_bytes());
-        hasher.update(challenge.as_bytes());
-        auth.clear();
-
-        base64::encode_config_buf(hasher.finalize(), base64::STANDARD, &mut auth);
-
-        auth
+    pub async fn reidentify(&self) -> Result<()> {
+        todo!("The `Reidentify` command is not yet implemented")
     }
 
     /// Get a stream of events. Each call to this function creates a new listener, therefore it's
@@ -404,49 +380,19 @@ impl Client {
         }
     }
 
+    /// Access API functions related to OBS configuration.
+    pub fn config(&self) -> Config<'_> {
+        Config { client: self }
+    }
+
     /// Access general API functions.
     pub fn general(&self) -> General<'_> {
         General { client: self }
     }
 
-    /// Access API functions related to media control.
-    pub fn media_control(&self) -> MediaControl<'_> {
-        MediaControl { client: self }
-    }
-
-    /// Access API functions related to sources.
-    pub fn sources(&self) -> Sources<'_> {
-        Sources { client: self }
-    }
-
-    /// Access API functions related to outputs.
-    pub fn outputs(&self) -> Outputs<'_> {
-        Outputs { client: self }
-    }
-
-    /// Access API functions related to profiles.
-    pub fn profiles(&self) -> Profiles<'_> {
-        Profiles { client: self }
-    }
-
-    /// Access API functions related to recording.
-    pub fn recording(&self) -> Recording<'_> {
-        Recording { client: self }
-    }
-
-    /// Access API functions related to the replay buffer.
-    pub fn replay_buffer(&self) -> ReplayBuffer<'_> {
-        ReplayBuffer { client: self }
-    }
-
-    /// Access API functions related to scene collections.
-    pub fn scene_collections(&self) -> SceneCollections<'_> {
-        SceneCollections { client: self }
-    }
-
-    /// Access API functions related to scene items.
-    pub fn scene_items(&self) -> SceneItems<'_> {
-        SceneItems { client: self }
+    /// Access API functions related to inputs.
+    pub fn inputs(&self) -> Inputs<'_> {
+        Inputs { client: self }
     }
 
     /// Access API functions related to scenes.
@@ -454,38 +400,10 @@ impl Client {
         Scenes { client: self }
     }
 
-    /// Access API functions related to streaming.
-    pub fn streaming(&self) -> Streaming<'_> {
-        Streaming { client: self }
+    /// Access API functions related to sources.
+    pub fn sources(&self) -> Sources<'_> {
+        Sources { client: self }
     }
-
-    /// Access API functions related to the studio mode.
-    pub fn studio_mode(&self) -> StudioMode<'_> {
-        StudioMode { client: self }
-    }
-
-    /// Access API functions related to transitions.
-    pub fn transitions(&self) -> Transitions<'_> {
-        Transitions { client: self }
-    }
-
-    /// Access API functions related to the virtual cam.
-    pub fn virtual_cam(&self) -> VirtualCam<'_> {
-        VirtualCam { client: self }
-    }
-}
-
-fn extract_error(value: &mut serde_json::Value) -> Option<String> {
-    value
-        .as_object_mut()
-        .and_then(|o| o.get_mut("error"))
-        .and_then(|e| {
-            if let serde_json::Value::String(msg) = e.take() {
-                Some(msg)
-            } else {
-                None
-            }
-        })
 }
 
 impl Drop for Client {
@@ -494,4 +412,111 @@ impl Drop for Client {
         // to wait for it to fully shut down (except spinning up a new tokio runtime).
         drop(self.disconnect());
     }
+}
+
+/// Errors that can occur while performaning the initial handshake with obs-websocket.
+#[derive(Debug, thiserror::Error)]
+pub enum HandshakeError {
+    /// The connection to obs-websocket was interrupted while trying to read a message.
+    #[error("connection to obs-websocket was closed")]
+    ConnectionClosed,
+    /// Receiving a message did not succeed.
+    #[error("failed reading websocket message")]
+    Receive(#[source] tokio_tungstenite::tungstenite::Error),
+    /// The WebSocket message was not convertible to text.
+    #[error("websocket message not convertible to text")]
+    IntoText(#[source] tokio_tungstenite::tungstenite::Error),
+    /// A message from obs-websocket could not be deserialized.
+    #[error("failed deserializing message")]
+    DeserializeMessage(#[source] serde_json::Error),
+    /// A message could not be serialized for sending.
+    #[error("failed serializing message")]
+    SerializeMessage(#[source] serde_json::Error),
+    /// Sending a message to obs-websocket failed.
+    #[error("failed to send message to obs-websocket")]
+    Send(#[source] tokio_tungstenite::tungstenite::Error),
+    /// Didn't receive the initial `Hello` message from obs-websocket after connecting.
+    #[error("didn't receive a `Hello` message after connecting")]
+    NoHello,
+    /// Didn't receive a `Identified` message from obs-websocket after authentication.
+    #[error("didn't receive a `Identified` message")]
+    NoIdentified,
+}
+
+async fn handshake(
+    write: &mut (impl Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Unpin),
+    read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
+    password: Option<&str>,
+) -> Result<(), HandshakeError> {
+    async fn read_message(
+        read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
+    ) -> Result<ServerMessage, HandshakeError> {
+        let message = read
+            .next()
+            .await
+            .ok_or(HandshakeError::ConnectionClosed)?
+            .map_err(HandshakeError::Receive)?
+            .into_text()
+            .map_err(HandshakeError::IntoText)?;
+
+        serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
+    }
+
+    match read_message(read).await? {
+        ServerMessage::Hello {
+            obs_web_socket_version: _,
+            rpc_version,
+            authentication,
+        } => {
+            let authentication = authentication.zip(password).map(|(auth, password)| {
+                create_auth_response(&auth.challenge, &auth.salt, password)
+            });
+
+            let req = serde_json::to_string(&ClientRequest::Identify {
+                rpc_version,
+                authentication,
+                ignore_invalid_messages: false,
+                ignore_non_fatal_request_checks: false,
+                event_subscriptions: None,
+            })
+            .map_err(HandshakeError::SerializeMessage)?;
+
+            write
+                .send(Message::Text(req))
+                .await
+                .map_err(HandshakeError::Send)?;
+        }
+        _ => return Err(HandshakeError::NoHello),
+    }
+
+    match read_message(read).await? {
+        ServerMessage::Identified {
+            negotiated_rpc_version,
+        } => {
+            debug!("identified with RPC version {}", negotiated_rpc_version);
+        }
+        _ => return Err(HandshakeError::NoIdentified),
+    }
+
+    Ok(())
+}
+
+fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
+    use sha2::{Digest, Sha256};
+
+    let mut hasher = Sha256::new();
+    hasher.update(password.as_bytes());
+    hasher.update(salt.as_bytes());
+
+    let mut auth = String::with_capacity(Sha256::output_size() * 4 / 3 + 4);
+
+    base64::encode_config_buf(hasher.finalize_reset(), base64::STANDARD, &mut auth);
+
+    hasher.update(auth.as_bytes());
+    hasher.update(challenge.as_bytes());
+    auth.clear();
+
+    base64::encode_config_buf(hasher.finalize(), base64::STANDARD, &mut auth);
+
+    auth
 }

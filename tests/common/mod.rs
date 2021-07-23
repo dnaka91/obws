@@ -1,46 +1,24 @@
-use std::{env, sync::Once, time::Duration};
+use std::{env, sync::Once};
 
 use anyhow::{ensure, Result};
 use obws::{
-    requests::SceneItem,
-    responses::{Output, Profile, Scene, SceneCollection, SourceListItem, Transition},
+    responses::{Input, Scene},
     Client,
 };
-use tokio::time;
 
-pub const TEST_OUTPUT: &str = "virtualcam_output";
-pub const TEST_COLLECTION: &str = "OBWS-TEST";
 pub const TEST_PROFILE: &str = "OBWS-TEST";
 pub const TEST_SCENE: &str = "OBWS-TEST-Scene";
 pub const TEST_SCENE_2: &str = "OBWS-TEST-Scene2";
-pub const TEXT_SOURCE: &str = "OBWS-TEST-Text";
-pub const TEXT_SOURCE_2: &str = "OBWS-TEST-Text2";
-pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
-pub const TEST_TRANSITION_2: &str = "OBWS-TEST-Transition2";
+pub const TEST_SCENE_RENAME: &str = "OBWS-TEST-Scene-Renamed";
+pub const TEST_SCENE_CREATE: &str = "OBWS-TEST-Scene-Created";
+pub const TEST_TEXT: &str = "OBWS-TEST-Text";
+pub const TEST_TEXT_2: &str = "OBWS-TEST-Text2";
 pub const TEST_BROWSER: &str = "OBWS-TEST-Browser";
+pub const TEST_BROWSER_RENAME: &str = "OBWS-TEST-Browser-Renamed";
 pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
-pub const SOURCE_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
-pub const SOURCE_KIND_BROWSER: &str = "browser_source";
-pub const SOURCE_KIND_VLC: &str = "vlc_source";
-
-const SCENE_ORDER: &[SceneItem] = &[
-    SceneItem {
-        id: None,
-        name: Some(TEXT_SOURCE),
-    },
-    SceneItem {
-        id: None,
-        name: Some(TEXT_SOURCE_2),
-    },
-    SceneItem {
-        id: None,
-        name: Some(TEST_BROWSER),
-    },
-    SceneItem {
-        id: None,
-        name: Some(TEST_MEDIA),
-    },
-];
+pub const INPUT_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
+pub const INPUT_KIND_BROWSER: &str = "browser_source";
+pub const INPUT_KIND_VLC: &str = "vlc_source";
 
 static INIT: Once = Once::new();
 
@@ -51,23 +29,7 @@ pub async fn new_client() -> Result<Client> {
     });
 
     let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
-    let client = Client::connect(host, 4444).await?;
-    client.login(env::var("OBS_PASSWORD").ok()).await?;
-
-    let collections = client.scene_collections().list_scene_collections().await?;
-    ensure!(
-        collections.iter().any(is_required_scene_collection),
-        "scene collection `{}` not found, required for all tests",
-        TEST_COLLECTION
-    );
-
-    client
-        .scene_collections()
-        .set_current_scene_collection("OBWS-TEST")
-        .await?;
-
-    // Give OBS some time to load the scene collection
-    time::sleep(Duration::from_secs(1)).await;
+    let client = Client::connect(host, 4444, env::var("OBS_PASSWORD").ok()).await?;
 
     ensure_obs_setup(&client).await?;
 
@@ -75,13 +37,6 @@ pub async fn new_client() -> Result<Client> {
 }
 
 async fn ensure_obs_setup(client: &Client) -> Result<()> {
-    let outputs = client.outputs().list_outputs().await?;
-    ensure!(
-        outputs.iter().any(is_required_output),
-        "output `{}` not found, required for output tests",
-        TEST_OUTPUT
-    );
-
     let scenes = client.scenes().get_scene_list().await?;
     ensure!(
         scenes.scenes.iter().any(is_required_scene),
@@ -93,127 +48,115 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         "scene `{}` not found, required for scenes tests",
         TEST_SCENE
     );
+    ensure!(
+        !scenes.scenes.iter().any(is_renamed_scene),
+        "scene `{}` found, must NOT be present for scenes tests",
+        TEST_SCENE_RENAME
+    );
+    ensure!(
+        !scenes.scenes.iter().any(is_created_scene),
+        "scene `{}` found, must NOT be present for scenes tests",
+        TEST_SCENE_CREATE
+    );
 
-    let sources = client.sources().get_sources_list().await?;
+    let inputs = client.inputs().get_input_list(None).await?;
     ensure!(
-        sources.iter().any(is_required_source),
-        "text source `{}` not found, required for sources tests",
-        TEXT_SOURCE
+        inputs.iter().any(is_required_text_input),
+        "text input `{}` not found, required for inputs tests",
+        TEST_TEXT
     );
     ensure!(
-        sources.iter().any(is_required_source_2),
-        "text source `{}` not found, required for sources tests",
-        TEXT_SOURCE
+        inputs.iter().any(is_required_text_2_input),
+        "text input `{}` not found, required for inputs tests",
+        TEST_TEXT
     );
     ensure!(
-        sources.iter().any(is_required_browser_source),
-        "media source `{}` not found, required for sources tests",
+        inputs.iter().any(is_required_browser_input),
+        "media input `{}` not found, required for inputs tests",
         TEST_BROWSER
     );
     ensure!(
-        sources.iter().any(is_required_media_source),
-        "media source `{}` not found, required for media control tests",
+        inputs.iter().any(is_required_media_input),
+        "media input `{}` not found, required for inputs tests",
         TEST_MEDIA
     );
-
-    let special_sources = client.sources().get_special_sources().await?;
     ensure!(
-        special_sources.desktop_1.is_some(),
-        "desktop audio device required for sources tests"
+        !inputs.iter().any(is_renamed_input),
+        "browser input `{}` found, must NOT be present for inputs tests",
+        TEST_BROWSER_RENAME
     );
 
-    let profiles = client.profiles().list_profiles().await?;
+    let profiles = client.config().get_profile_list().await?.profiles;
     ensure!(
-        profiles.iter().any(is_required_profile),
+        profiles.iter().map(String::as_str).any(is_required_profile),
         "profile `{}` not found, required for profiles tests",
         TEST_PROFILE
     );
 
-    let studio_mode_enabled = client.studio_mode().get_studio_mode_status().await?;
+    let studio_mode_enabled = client.general().get_studio_mode_enabled().await?;
     ensure!(
         !studio_mode_enabled,
         "studio mode enabled, required to be disabled for studio mode tests"
     );
 
-    let transitions = client.transitions().get_transition_list().await?;
-    ensure!(
-        transitions.transitions.iter().any(is_required_transition),
-        "transition `{}` not found, required for transitions tests",
-        TEST_TRANSITION
-    );
-    ensure!(
-        transitions.transitions.iter().any(is_required_transition_2),
-        "transition `{}` not found, required for transitions tests",
-        TEST_TRANSITION
-    );
-
-    client.scenes().set_current_scene(TEST_SCENE).await?;
     client
         .scenes()
-        .reorder_scene_items(Some(TEST_SCENE), SCENE_ORDER)
-        .await?;
-    client
-        .transitions()
-        .set_current_transition(TEST_TRANSITION)
+        .set_current_program_scene(TEST_SCENE)
         .await?;
 
     Ok(())
 }
 
-fn is_required_output(output: &Output) -> bool {
-    output.name == TEST_OUTPUT
-}
-
-fn is_required_scene_collection(output: &SceneCollection) -> bool {
-    output.sc_name == TEST_COLLECTION
-}
-
 fn is_required_scene(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE
+    scene.scene_name == TEST_SCENE
 }
 
 fn is_required_scene_2(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE_2
+    scene.scene_name == TEST_SCENE_2
 }
 
-fn is_required_source(source: &SourceListItem) -> bool {
-    source.name == TEXT_SOURCE && is_text_input_source(source)
+fn is_renamed_scene(scene: &Scene) -> bool {
+    scene.scene_name == TEST_SCENE_RENAME
 }
 
-fn is_required_source_2(source: &SourceListItem) -> bool {
-    source.name == TEXT_SOURCE_2 && is_text_input_source(source)
+fn is_created_scene(scene: &Scene) -> bool {
+    scene.scene_name == TEST_SCENE_CREATE
 }
 
-fn is_required_browser_source(source: &SourceListItem) -> bool {
-    source.name == TEST_BROWSER && is_browser_input_source(source)
+fn is_required_text_input(input: &Input) -> bool {
+    input.input_name == TEST_TEXT && is_text_input(input)
 }
 
-fn is_required_media_source(source: &SourceListItem) -> bool {
-    source.name == TEST_MEDIA && is_media_input_source(source)
+fn is_required_text_2_input(input: &Input) -> bool {
+    input.input_name == TEST_TEXT_2 && is_text_input(input)
 }
 
-fn is_text_input_source(source: &SourceListItem) -> bool {
-    source.ty == "input" && source.type_id == SOURCE_KIND_TEXT_FT2
+fn is_required_browser_input(input: &Input) -> bool {
+    input.input_name == TEST_BROWSER && is_browser_input(input)
 }
 
-fn is_browser_input_source(source: &SourceListItem) -> bool {
-    source.ty == "input" && source.type_id == SOURCE_KIND_BROWSER
+fn is_required_media_input(input: &Input) -> bool {
+    input.input_name == TEST_MEDIA && is_media_input(input)
 }
 
-fn is_media_input_source(source: &SourceListItem) -> bool {
-    source.ty == "input" && source.type_id == SOURCE_KIND_VLC
+fn is_renamed_input(input: &Input) -> bool {
+    input.input_name == TEST_BROWSER_RENAME
 }
 
-fn is_required_profile(profile: &Profile) -> bool {
-    profile.profile_name == TEST_PROFILE
+fn is_text_input(input: &Input) -> bool {
+    input.input_kind == INPUT_KIND_TEXT_FT2
 }
 
-fn is_required_transition(transition: &Transition) -> bool {
-    transition.name == TEST_TRANSITION
+fn is_browser_input(input: &Input) -> bool {
+    input.input_kind == INPUT_KIND_BROWSER
 }
 
-fn is_required_transition_2(transition: &Transition) -> bool {
-    transition.name == TEST_TRANSITION_2
+fn is_media_input(input: &Input) -> bool {
+    input.input_kind == INPUT_KIND_VLC
+}
+
+fn is_required_profile(profile: &str) -> bool {
+    profile == TEST_PROFILE
 }
 
 #[allow(unused_macros)]

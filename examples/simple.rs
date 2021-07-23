@@ -10,14 +10,12 @@ async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "obws=debug");
     pretty_env_logger::init();
 
-    let client = Client::connect("localhost", 4444).await?;
+    let client = Client::connect("localhost", 4444, env::var("OBS_PASSWORD").ok()).await?;
 
     let version = client.general().get_version().await?;
     println!("{:#?}", version);
 
-    client.login(env::var("OBS_PASSWORD").ok()).await?;
-
-    let scene_list = client.scenes().get_scene_list().await?;
+    let scene_list = client.scenes().get_scene_list().await?.scenes;
     println!("{:#?}", scene_list);
 
     Ok(())

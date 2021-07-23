@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use obws::{requests::SourceScreenshot, Client};
+use obws::{requests::GetSourceScreenshot, Client};
 use tokio::fs;
 
 #[tokio::main]
@@ -11,22 +11,21 @@ async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "obws=debug");
     pretty_env_logger::init();
 
-    let client = Client::connect("localhost", 4444).await?;
-
-    client.login(env::var("OBS_PASSWORD").ok()).await?;
+    let client = Client::connect("localhost", 4444, env::var("OBS_PASSWORD").ok()).await?;
 
     let screenshot = client
         .sources()
-        .take_source_screenshot(SourceScreenshot {
-            source_name: Some("Start"),
-            embed_picture_format: Some("png"),
-            ..Default::default()
+        .get_source_screenshot(GetSourceScreenshot {
+            source_name: "OBWS-TEST-Scene",
+            image_width: None,
+            image_height: None,
+            image_compression_quality: None,
+            image_format: "png",
         })
         .await?;
 
-    let image = screenshot.img.unwrap();
-    let pos = image.find("base64,").unwrap();
-    let image = base64::decode(&image[pos + 7..])?;
+    let pos = screenshot.find("base64,").unwrap();
+    let image = base64::decode(&screenshot[pos + 7..])?;
 
     fs::write("screenshot.png", &image).await?;
 

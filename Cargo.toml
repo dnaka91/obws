@@ -10,6 +10,7 @@ homepage = "https://github.com/dnaka91/obws"
 repository = "https://github.com/dnaka91/obws"
 categories = ["api-bindings", "web-programming"]
 keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
+resolver = "2"
 
 [package.metadata.docs.rs]
 features = ["events", "tls"]
@@ -18,14 +19,12 @@ features = ["events", "tls"]
 async-stream = { version = "0.3.2", optional = true }
 base64 = "0.13.0"
 bitflags = "1.2.1"
-chrono = { version = "0.4.19", default-features = false, features = ["std"] }
-either = { version = "1.6.1", features = ["serde"] }
 futures-util = { version = "0.3.15", features = ["sink"] }
 log = "0.4.14"
-rgb = { version = "0.8.27", default-features = false }
 semver = { version = "1.0.3", features = ["serde"] }
 serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "1.0.64"
+serde_repr = "0.1.7"
 serde_with = "1.9.4"
 sha2 = "0.9.5"
 thiserror = "1.0.26"
@@ -47,12 +46,4 @@ tls = ["tokio-tungstenite/rustls-tls"]
 
 [[example]]
 name = "events"
-required-features = ["events"]
-
-[[test]]
-name = "media_control"
-required-features = ["events"]
-
-[[test]]
-name = "recording"
 required-features = ["events"]

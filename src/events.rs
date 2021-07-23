@@ -1,589 +1,223 @@
 //! All events that can be received from the API.
 
-use chrono::Duration;
+use std::{collections::BTreeMap, path::PathBuf};
+
 use serde::Deserialize;
-
-use crate::common::{SceneItem, SceneItemTransform};
-
-/// Events are sent when a recognized action occurs within OBS.
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct Event {
-    #[serde(default, deserialize_with = "crate::de::duration_opt")]
-    /// Time elapsed between now and stream start (only present if OBS Studio is streaming).
-    pub stream_timecode: Option<Duration>,
-    /// Time elapsed between now and recording start (only present if OBS Studio is recording).
-    #[serde(default, deserialize_with = "crate::de::duration_opt")]
-    pub rec_timecode: Option<Duration>,
-    /// The type of event.
-    #[serde(flatten)]
-    pub ty: EventType,
-}
 
 /// All possible event types that can occur while the user interacts with OBS.
 #[derive(Clone, Debug, Deserialize)]
-#[serde(tag = "update-type")]
-pub enum EventType {
+#[serde(tag = "eventType", content = "eventData")]
+pub enum Event {
     // --------------------------------
-    // Scenes
+    // Config
     // --------------------------------
-    /// Indicates a scene change.
-    #[serde(rename_all = "kebab-case")]
-    SwitchScenes {
-        /// The new scene.
-        scene_name: String,
-        /// List of scene items in the new scene.
-        sources: Vec<SceneItem>,
-    },
-    /// The scene list has been modified. Scenes have been added, removed, or renamed.
-    ///
-    /// Note: This event is not fired when the scenes are reordered.
-    ScenesChanged {
-        /// Scenes list.
-        scenes: Vec<Scene>,
-    },
-    /// Triggered when switching to another scene collection or when renaming the current scene
-    /// collection.
     #[serde(rename_all = "camelCase")]
-    SceneCollectionChanged {
-        /// Name of the new current scene collection.
-        scene_collection: String,
+    CurrentSceneCollectionChanged {
+        scene_collection_name: String,
     },
-    /// Triggered when a scene collection is created, added, renamed, or removed.
+    #[serde(rename_all = "camelCase")]
     SceneCollectionListChanged {
-        /// Scene collections list.
-        scene_collections: Vec<SceneCollection>,
+        scene_collections: Vec<String>,
     },
-    // --------------------------------
-    // Transitions
-    // --------------------------------
-    /// The active transition has been changed.
-    #[serde(rename_all = "kebab-case")]
-    SwitchTransition {
-        /// The name of the new active transition.
-        transition_name: String,
+    #[serde(rename_all = "camelCase")]
+    CurrentProfileChanged {
+        profile_name: String,
     },
-    /// The list of available transitions has been modified. Transitions have been added, removed,
-    /// or renamed.
-    TransitionListChanged {
-        /// Transitions list.
-        transitions: Vec<Transition>,
-    },
-    /// The active transition duration has been changed.
-    #[serde(rename_all = "kebab-case")]
-    TransitionDurationChanged {
-        /// New transition duration.
-        #[serde(deserialize_with = "crate::de::duration_millis")]
-        new_duration: Duration,
-    },
-    /// A transition (other than "cut") has begun.
-    #[serde(rename_all = "kebab-case")]
-    TransitionBegin {
-        /// Transition name.
-        name: String,
-        /// Transition type.
-        #[serde(rename = "type")]
-        ty: String,
-        /// Transition duration (in milliseconds). Will be -1 for any transition with a fixed
-        /// duration, such as a Stinger, due to limitations of the OBS API.
-        #[serde(deserialize_with = "crate::de::duration_millis_opt")]
-        duration: Option<Duration>,
-        /// Source scene of the transition.
-        from_scene: Option<String>,
-        /// Destination scene of the transition.
-        to_scene: String,
-    },
-    /// A transition (other than "cut") has ended.
-    ///
-    /// Note: The `from-scene` field is not available in TransitionEnd.
-    #[serde(rename_all = "kebab-case")]
-    TransitionEnd {
-        /// Transition name.
-        name: String,
-        /// Transition type.
-        #[serde(rename = "type")]
-        ty: String,
-        /// Transition duration (in milliseconds).
-        #[serde(deserialize_with = "crate::de::duration_millis")]
-        duration: Duration,
-        /// Destination scene of the transition.
-        to_scene: String,
-    },
-    /// A stinger transition has finished playing its video.
-    #[serde(rename_all = "kebab-case")]
-    TransitionVideoEnd {
-        /// Transition name.
-        name: String,
-        /// Transition type.
-        #[serde(rename = "type")]
-        ty: String,
-        /// Transition duration (in milliseconds).
-        #[serde(deserialize_with = "crate::de::duration_millis")]
-        duration: Duration,
-        /// Source scene of the transition.
-        from_scene: Option<String>,
-        /// Destination scene of the transition.
-        to_scene: String,
-    },
-    // --------------------------------
-    // Profiles
-    // --------------------------------
-    /// Triggered when switching to another profile or when renaming the current profile.
-    ProfileChanged {
-        /// Name of the new current profile.
-        profile: String,
-    },
-    /// Triggered when a profile is created, added, renamed, or removed.
+    #[serde(rename_all = "camelCase")]
     ProfileListChanged {
-        /// Profiles list.
-        profiles: Vec<Profile>,
+        profiles: Vec<String>,
     },
     // --------------------------------
-    // Streaming
+    // Filters
     // --------------------------------
-    /// A request to start streaming has been issued.
-    #[serde(rename_all = "kebab-case")]
-    StreamStarting {
-        /// Always false (retrocompatibility).
-        #[serde(default)]
-        preview_only: bool,
-    },
-    /// Streaming started successfully.
-    StreamStarted,
-    /// A request to stop streaming has been issued.
-    #[serde(rename_all = "kebab-case")]
-    StreamStopping {
-        /// Always false (retrocompatibility).
-        #[serde(default)]
-        preview_only: bool,
-    },
-    /// Streaming stopped successfully.
-    StreamStopped,
-    /// Emitted every 2 seconds when stream is active.
-    #[serde(rename_all = "kebab-case")]
-    StreamStatus {
-        /// Current streaming state.
-        streaming: bool,
-        /// Current recording state.
-        recording: bool,
-        /// Replay Buffer status.
-        replay_buffer_active: bool,
-        /// Amount of data per second (in bytes) transmitted by the stream encoder.
-        bytes_per_sec: u64,
-        /// Amount of data per second (in kilobits) transmitted by the stream encoder.
-        kbits_per_sec: u64,
-        /// Percentage of dropped frames.
-        strain: f64,
-        /// Total time (in seconds) since the stream started.
-        total_stream_time: u64,
-        /// Total number of frames transmitted since the stream started.
-        num_total_frames: u64,
-        /// Number of frames dropped by the encoder since the stream started.
-        num_dropped_frames: u64,
-        /// Current framerate.
-        fps: f64,
-        /// Number of frames rendered.
-        render_total_frames: u64,
-        /// Number of frames missed due to rendering lag.
-        render_missed_frames: u64,
-        /// Number of frames outputted.
-        output_total_frames: u64,
-        /// Number of frames skipped due to encoding lag.
-        output_skipped_frames: u64,
-        /// Average frame time (in milliseconds).
-        average_frame_time: f64,
-        /// Current CPU usage (percentage).
-        cpu_usage: f64,
-        /// Current RAM usage (in megabytes).
-        memory_usage: f64,
-        /// Free recording disk space (in megabytes).
-        free_disk_space: f64,
-        /// Always false (retrocompatibility).
-        #[serde(default)]
-        preview_only: bool,
-    },
-    // --------------------------------
-    // Recording
-    // --------------------------------
-    /// A request to start recording has been issued.
-    ///
-    /// Note: `recordingFilename` is not provided in this event because this information is not
-    /// available at the time this event is emitted.
-    RecordingStarting,
-    /// Recording started successfully.
-    #[serde(rename_all = "camelCase")]
-    RecordingStarted {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
-    /// A request to stop recording has been issued.
-    #[serde(rename_all = "camelCase")]
-    RecordingStopping {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
-    /// Recording stopped successfully.
-    #[serde(rename_all = "camelCase")]
-    RecordingStopped {
-        /// Absolute path to the file of the current recording.
-        recording_filename: String,
-    },
-    /// Current recording paused.
-    RecordingPaused,
-    /// Current recording resumed.
-    RecordingResumed,
-    // --------------------------------
-    // Virtual Cam
-    // --------------------------------
-    /// Virtual cam started successfully.
-    VirtualCamStarted,
-    /// Virtual cam stopped successfully.
-    VirtualCamStopped,
-    // --------------------------------
-    // Replay Buffer
-    // --------------------------------
-    /// A request to start the replay buffer has been issued.
-    ReplayStarting,
-    /// Replay Buffer started successfully.
-    ReplayStarted,
-    /// A request to stop the replay buffer has been issued.
-    ReplayStopping,
-    /// Replay Buffer stopped successfully.
-    ReplayStopped,
-    // --------------------------------
-    // Other
-    // --------------------------------
-    /// OBS is exiting.
-    Exiting,
     // --------------------------------
     // General
     // --------------------------------
-    /// A custom broadcast message, sent by the server, requested by one of the websocket clients.
-    BroadcastCustomMessage {
-        /// Identifier provided by the sender.
-        realm: String,
-        /// User-defined data.
-        data: serde_json::Map<String, serde_json::Value>,
+    ExitStarted,
+    #[serde(rename_all = "camelCase")]
+    StudioModeStateChanged {
+        studio_mode_enabled: bool,
     },
     // --------------------------------
-    // Sources
+    // Inputs
     // --------------------------------
-    /// A source has been created. A source can be an input, a scene or a transition.
     #[serde(rename_all = "camelCase")]
-    SourceCreated {
-        /// Source name.
-        source_name: String,
-        /// Source type. Can be "input", "scene", "transition" or "filter".
-        source_type: SourceType,
-        /// Source kind.
-        source_kind: String,
-        /// Source settings.
-        source_settings: serde_json::Value,
+    InputCreated {
+        input_name: String,
+        input_kind: String,
+        unversioned_input_kind: String,
+        input_settings: serde_json::Value,
+        default_input_settings: serde_json::Value,
     },
-    /// A source has been destroyed/removed. A source can be an input, a scene or a transition.
     #[serde(rename_all = "camelCase")]
-    SourceDestroyed {
-        /// Source name.
-        source_name: String,
-        /// Source type. Can be "input", "scene", "transition" or "filter".
-        source_type: SourceType,
-        /// Source kind.
-        source_kind: String,
+    InputRemoved {
+        input_name: String,
     },
-    /// The volume of a source has changed.
     #[serde(rename_all = "camelCase")]
-    SourceVolumeChanged {
-        /// Source name.
-        source_name: String,
-        /// Source volume.
-        volume: f32,
-        /// Source volume in Decibel
-        volume_db: f32,
+    InputNameChanged {
+        old_input_name: String,
+        input_name: String,
     },
-    /// A source has been muted or unmuted.
     #[serde(rename_all = "camelCase")]
-    SourceMuteStateChanged {
-        /// Source name.
-        source_name: String,
-        /// Mute status of the source.
-        muted: bool,
+    InputActiveStateChanged {
+        input_name: String,
+        video_active: bool,
     },
-    /// A source has removed audio.
     #[serde(rename_all = "camelCase")]
-    SourceAudioDeactivated {
-        /// Source name.
-        source_name: String,
+    InputShowStateChanged {
+        input_name: String,
+        video_showing: bool,
     },
-    /// A source has added audio.
     #[serde(rename_all = "camelCase")]
-    SourceAudioActivated {
-        /// Source name.
-        source_name: String,
+    InputMuteStateChanged {
+        input_name: String,
+        input_muted: bool,
     },
-    /// The audio sync offset of a source has changed.
     #[serde(rename_all = "camelCase")]
-    SourceAudioSyncOffsetChanged {
-        /// Source name.
-        source_name: String,
-        /// Audio sync offset of the source (in nanoseconds).
-        #[serde(deserialize_with = "crate::de::duration_nanos")]
-        sync_offset: Duration,
+    InputVolumeChanged {
+        input_name: String,
+        input_volume_mul: f64,
+        input_volume_db: f64,
     },
-    /// Audio mixer routing changed on a source.
     #[serde(rename_all = "camelCase")]
-    SourceAudioMixersChanged {
-        /// Source name.
-        source_name: String,
-        /// Routing status of the source for each audio mixer (array of 6 values).
-        mixers: [AudioMixer; 6],
-        /// Raw mixer flags (little-endian, one bit per mixer) as an hexadecimal value.
-        hex_mixers_value: String,
+    InputAudioSyncOffsetChanged {
+        input_name: String,
+        input_audio_sync_offset: i64,
     },
-    /// A source has been renamed.
     #[serde(rename_all = "camelCase")]
-    SourceRenamed {
-        /// Previous source name.
-        previous_name: String,
-        /// New source name.
-        new_name: String,
-        /// Type of source (input, scene, filter, transition).
-        source_type: SourceType,
-    },
-    /// A filter was added to a source.
-    #[serde(rename_all = "camelCase")]
-    SourceFilterAdded {
-        /// Source name.
-        source_name: String,
-        /// Filter name.
-        filter_name: String,
-        /// Filter type.
-        filter_type: String,
-        /// Filter settings.
-        filter_settings: serde_json::Value,
-    },
-    /// A filter was removed from a source.
-    #[serde(rename_all = "camelCase")]
-    SourceFilterRemoved {
-        /// Source name.
-        source_name: String,
-        /// Filter name.
-        filter_name: String,
-        /// Filter type.
-        filter_type: String,
-    },
-    /// The visibility/enabled state of a filter changed.
-    #[serde(rename_all = "camelCase")]
-    SourceFilterVisibilityChanged {
-        /// Source name.
-        source_name: String,
-        /// Filter name.
-        filter_name: String,
-        /// New filter state.
-        filter_enabled: bool,
-    },
-    /// Filters in a source have been reordered.
-    #[serde(rename_all = "camelCase")]
-    SourceFiltersReordered {
-        /// Source name.
-        source_name: String,
-        /// Ordered Filters list.
-        filters: Vec<SourceFilter>,
+    InputAudioTracksChanged {
+        input_name: String,
+        input_audio_tracks: BTreeMap<String, bool>,
     },
     // --------------------------------
-    // Media
+    // Media Inputs
     // --------------------------------
-    /// Media is playing.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaPlaying {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    MediaInputPlaybackStarted {
+        input_name: String,
     },
-    /// Media playback paused.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaPaused {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    MediaInputPlaybackEnded {
+        input_name: String,
     },
-    /// Media playback restarted.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaRestarted {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    MediaInputActionTriggered {
+        input_name: String,
+        media_action: MediaAction,
     },
-    /// Media playback stopped.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
+    // --------------------------------
+    // Outputs
+    // --------------------------------
     #[serde(rename_all = "camelCase")]
-    MediaStopped {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    StreamStateChanged {
+        output_active: bool,
+        output_state: OutputState,
     },
-    /// Next media started.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaNext {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    RecordStateChanged {
+        output_active: bool,
+        output_state: OutputState,
     },
-    /// Previous media started.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaPrevious {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    ReplayBufferStateChanged {
+        output_active: bool,
+        output_state: OutputState,
     },
-    /// Media playback started.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaStarted {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    VirtualcamStateChanged {
+        output_active: bool,
+        output_state: OutputState,
     },
-    /// Media playback ended.
-    ///
-    /// Note: This event is only emitted when something actively controls the media/VLC source. In
-    /// other words, the source will never emit this on its own naturally.
     #[serde(rename_all = "camelCase")]
-    MediaEnded {
-        /// Source name.
-        source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
-        source_kind: String,
+    ReplayBufferSaved {
+        saved_replay_path: PathBuf,
     },
     // --------------------------------
     // Scene Items
     // --------------------------------
-    /// Scene items within a scene have been reordered.
-    #[serde(rename_all = "kebab-case")]
-    SourceOrderChanged {
-        /// Name of the scene where items have been reordered.
+    #[serde(rename_all = "camelCase")]
+    SceneItemCreated {
         scene_name: String,
-        /// Ordered list of scene items.
-        scene_items: Vec<SourceOrderSceneItem>,
+        input_name: String,
+        scene_item_id: u64,
+        scene_item_index: u32,
     },
-    /// A scene item has been added to a scene.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemAdded {
-        /// Name of the scene.
-        scene_name: String,
-        /// Name of the item added to the scene.
-        item_name: String,
-        /// Scene item ID.
-        item_id: i64,
-    },
-    /// A scene item has been removed from a scene.
-    #[serde(rename_all = "kebab-case")]
+    #[serde(rename_all = "camelCase")]
     SceneItemRemoved {
-        /// Name of the scene.
         scene_name: String,
-        /// Name of the item removed from the scene.
-        item_name: String,
-        /// Scene item ID.
-        item_id: i64,
+        input_name: String,
+        scene_item_id: u64,
+        scene_item_index: u32,
     },
-    /// A scene item's visibility has been toggled.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemVisibilityChanged {
-        /// Name of the scene.
+    #[serde(rename_all = "camelCase")]
+    SceneItemReindexed {
         scene_name: String,
-        /// Name of the item in the scene.
-        item_name: String,
-        /// Scene item ID.
-        item_id: i64,
-        /// New visibility state of the item.
-        item_visible: bool,
+        scene_items: Vec<BasicSceneItem>,
     },
-    /// A scene item's locked status has been toggled.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemLockChanged {
-        /// Name of the scene.
+    #[serde(rename_all = "camelCase")]
+    SceneItemEnableStateChanged {
         scene_name: String,
-        /// Name of the item in the scene.
-        item_name: String,
-        /// Scene item ID.
-        item_id: i64,
-        /// New locked state of the item.
-        item_locked: bool,
+        scene_item_id: u64,
+        scene_item_enabled: bool,
     },
-    /// A scene item's transform has been changed.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemTransformChanged {
-        /// Name of the scene.
+    #[serde(rename_all = "camelCase")]
+    SceneItemLockStateChanged {
         scene_name: String,
-        /// Name of the item in the scene.
-        item_name: String,
-        /// Scene item ID.
-        item_id: i64,
-        /// Scene item transform properties.
-        transform: SceneItemTransform,
+        scene_item_id: u64,
+        scene_item_locked: bool,
     },
-    /// A scene item is selected.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemSelected {
-        /// Name of the scene.
+    SceneItemTransformChanged,
+    // --------------------------------
+    // Scenes
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    SceneCreated {
         scene_name: String,
-        /// Name of the item in the scene.
-        item_name: String,
-        /// ID of the item in the scene.
-        item_id: i64,
+        is_group: bool,
     },
-    /// A scene item is deselected.
-    #[serde(rename_all = "kebab-case")]
-    SceneItemDeselected {
-        /// Name of the scene.
+    #[serde(rename_all = "camelCase")]
+    SceneRemoved {
         scene_name: String,
-        /// Name of the item in the scene.
-        item_name: String,
-        /// ID of the item in the scene.
-        item_id: i64,
+        is_group: bool,
+    },
+    #[serde(rename_all = "camelCase")]
+    SceneNameChanged {
+        old_scene_name: String,
+        scene_name: String,
+    },
+    #[serde(rename_all = "camelCase")]
+    CurrentSceneChanged {
+        scene_name: String,
+    },
+    #[serde(rename_all = "camelCase")]
+    CurrentPreviewSceneChanged {
+        scene_name: String,
+    },
+    #[serde(rename_all = "camelCase")]
+    SceneListChanged {
+        scenes: Vec<Scene>,
     },
     // --------------------------------
-    // Studio Mode
+    // Transitions
     // --------------------------------
-    /// The selected preview scene has changed (only available in Studio Mode).
-    #[serde(rename_all = "kebab-case")]
-    PreviewSceneChanged {
-        /// Name of the scene being previewed.
-        scene_name: String,
-        /// List of sources composing the scene.
-        sources: Vec<SceneItem>,
+    #[serde(rename_all = "camelCase")]
+    TransitionCreated {
+        transition_name: String,
+        transition_kind: String,
+        transition_fixed: bool,
     },
-    /// Studio Mode has been enabled or disabled.
-    #[serde(rename_all = "kebab-case")]
-    StudioModeSwitched {
-        /// The new enabled state of Studio Mode.
-        new_state: bool,
+    #[serde(rename_all = "camelCase")]
+    TransitionRemoved {
+        transition_name: String,
     },
+    #[serde(rename_all = "camelCase")]
+    TransitionNameChanged {
+        old_transition_name: String,
+        transition_name: String,
+    },
+    // --------------------------------
+    // Custom
+    // --------------------------------
     /// WebSocket server is stopping.
     ServerStopping,
     /// WebSocket server has stopped.
@@ -593,78 +227,53 @@ pub enum EventType {
     Unknown,
 }
 
-/// Part of [`EventType::ScenesChanged`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct Scene {
-    /// Name of the currently active scene.
-    pub name: String,
-    /// Ordered list of the current scene's source items.
-    pub sources: Vec<SceneItem>,
-}
-
-/// Part of [`EventType::SceneCollectionListChanged`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct SceneCollection {
-    /// Scene collection name.
-    pub name: String,
-}
-
-/// Part of [`EventType::TransitionListChanged`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct Transition {
-    /// Transition name.
-    pub name: String,
-}
-
-/// Part of [`EventType::ProfileListChanged`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct Profile {
-    /// Profile name.
-    pub name: String,
-}
-
-/// Part of [`EventType::SourceAudioMixersChanged`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct AudioMixer {
-    /// Mixer number.
-    pub id: i64,
-    /// Routing status.
-    pub enabled: bool,
-}
-
-/// Part of [`EventType::SourceFiltersReordered`].
-#[derive(Clone, Debug, Deserialize)]
-pub struct SourceFilter {
-    /// Filter name.
-    pub name: String,
-    /// Filter type.
-    #[serde(rename = "type")]
-    pub ty: String,
-    /// Filter visibility status.
-    pub enabled: bool,
-}
-
-/// Part of [`EventType::SourceOrderChanged`].
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct SourceOrderSceneItem {
-    /// Item source name.
-    pub source_name: String,
-    /// Scene item unique ID.
-    pub item_id: i64,
-}
-
-/// Part of [`EventType::SourceCreated`], [`EventType::SourceDestroyed`] and
-/// [`EventType::SourceRenamed`].
 #[derive(Clone, Copy, Debug, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum SourceType {
-    /// An input source.
-    Input,
-    /// A scene.
-    Scene,
-    /// Transition between scenes.
-    Transition,
-    /// Filter for scene items.
-    Filter,
+pub enum MediaAction {
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE")]
+    Pause,
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY")]
+    Play,
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART")]
+    Restart,
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP")]
+    Stop,
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NEXT")]
+    Next,
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PREVIOUS")]
+    Previous,
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum OutputState {
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTING")]
+    Starting,
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTED")]
+    Started,
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STOPPING")]
+    Stopping,
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STOPPED")]
+    Stopped,
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_PAUSED")]
+    Paused,
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_RESUMED")]
+    Resumed,
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BasicSceneItem {
+    scene_item_id: u64,
+    scene_item_index: u32,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Scene {
+    scene_name: String,
+    scene_index: u32,
+    is_group: bool,
 }

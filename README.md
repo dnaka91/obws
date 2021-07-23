@@ -25,7 +25,7 @@ Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it 
 
 ```toml
 [dependencies]
-obws = "0.8.0"
+obws = { git = "https://github.com/dnaka91/obws.git", branch = "v5-api" }
 ```
 
 In addition, you will need to use the lastest [tokio](https://tokio.rs) runtime to use this library
@@ -48,14 +48,11 @@ use obws::Client;
 #[tokio::main]
 async fn main() -> Result<()> {
     /// Connect to the OBS instance through obs-websocket.
-    let client = Client::connect("localhost", 4444).await?;
+    let client = Client::connect("localhost", 4444, Some("password")).await?;
 
     /// Get and print out version information of OBS and obs-websocket.
     let version = client.general().get_version().await?;
     println!("{:#?}", version);
-
-    /// Optionally log-in (if enabled in obs-websocket) to allow other APIs and receive events.
-    client.login(Some("password")).await?;
 
     /// Get a list of available scenes and print them out.
     let scene_list = client.scenes().get_scene_list().await?;
