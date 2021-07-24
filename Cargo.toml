@@ -26,6 +26,7 @@ rgb = { version = "0.8.27", default-features = false }
 semver = { version = "1.0.3", features = ["serde"] }
 serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "1.0.64"
+serde_repr = "0.1.7"
 serde_with = "1.9.4"
 sha2 = "0.9.5"
 thiserror = "1.0.26"

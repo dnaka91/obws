@@ -228,7 +228,7 @@ bitflags! {
         /// Make the text appear cursive.
         const ITALIC = 2;
         /// Underline the text with a straight line.
-        const UNDERLINE = 5;
+        const UNDERLINE = 4;
         /// Strikeout the text.
         const STRIKEOUT = 8;
     }

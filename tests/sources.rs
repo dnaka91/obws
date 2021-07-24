@@ -77,7 +77,7 @@ async fn main() -> Result<()> {
         .get_source_settings::<serde_json::Value>(TEXT_SOURCE, None)
         .await?;
     client
-        .set_source_settings::<serde_json::Value>(SourceSettings {
+        .set_source_settings::<_, serde_json::Value>(SourceSettings {
             source_name: &settings.source_name,
             source_type: Some(&settings.source_type),
             source_settings: &settings.source_settings,

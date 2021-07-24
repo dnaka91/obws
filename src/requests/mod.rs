@@ -11,6 +11,7 @@ use serde_with::skip_serializing_none;
 
 use crate::common::{Align, Alignment, BoundsType, FontFlags, MonitorType, StreamType, Valign};
 
+pub mod custom;
 mod ser;
 
 #[derive(Serialize)]
@@ -188,7 +189,7 @@ pub(crate) enum RequestType<'a> {
         /// schema.
         source_type: Option<&'a str>,
     },
-    SetSourceSettings(SourceSettings<'a>),
+    SetSourceSettings(SourceSettingsInternal<'a>),
     #[serde(rename = "GetTextGDIPlusProperties")]
     GetTextGdiPlusProperties {
         /// Source name.
@@ -562,17 +563,31 @@ pub struct Volume<'a> {
 }
 
 /// Request information for [`set_source_settings`](crate::client::Sources::set_source_settings).
-#[skip_serializing_none]
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceSettings<'a> {
+#[derive(Debug)]
+pub struct SourceSettings<'a, T> {
     /// Source name.
     pub source_name: &'a str,
     /// Type of the specified source. Useful for type-checking to avoid settings a set of settings
     /// incompatible with the actual source's type.
     pub source_type: Option<&'a str>,
     /// Source settings (varies between source types, may require some probing around).
-    pub source_settings: &'a serde_json::Value,
+    pub source_settings: &'a T,
+}
+
+/// Internal version of [`SourceSettings`] which is the one that's actually send to the API. This
+/// allows to let the user define a typed version of the settings while sending the encoded version
+/// through this struct.
+#[skip_serializing_none]
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SourceSettingsInternal<'a> {
+    /// Source name.
+    pub source_name: &'a str,
+    /// Type of the specified source. Useful for type-checking to avoid settings a set of settings
+    /// incompatible with the actual source's type.
+    pub source_type: Option<&'a str>,
+    /// Source settings (varies between source types, may require some probing around).
+    pub source_settings: serde_json::Value,
 }
 
 /// Request information for
@@ -924,7 +939,7 @@ pub struct SetStreamSettings<'a> {
 pub struct Font<'a> {
     /// Font face.
     pub face: Option<&'a str>,
-    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
+    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=4, Strikeout=8`.
     #[serde(serialize_with = "ser::bitflags_u8_opt")]
     pub flags: Option<FontFlags>,
     /// Font text size.

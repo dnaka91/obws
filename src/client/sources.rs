@@ -1,15 +1,15 @@
 use chrono::Duration;
-use serde::de::DeserializeOwned;
+use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
     common::MonitorType,
     requests::{
         AddFilter, CreateSource, MoveFilter, ReorderFilter, RequestType, SourceFilterSettings,
-        SourceFilterVisibility, SourceScreenshot, SourceSettings, TextFreetype2Properties,
-        TextGdiPlusProperties, Volume,
+        SourceFilterVisibility, SourceScreenshot, SourceSettings, SourceSettingsInternal,
+        TextFreetype2Properties, TextGdiPlusProperties, Volume,
     },
-    responses, Result,
+    responses, Error, Result,
 };
 
 /// API functions related to sources.
@@ -180,15 +180,21 @@ impl<'a> Sources<'a> {
     }
 
     /// Set settings of the specified source.
-    pub async fn set_source_settings<T>(
+    pub async fn set_source_settings<T, R>(
         &self,
-        source_settings: SourceSettings<'_>,
-    ) -> Result<responses::SourceSettings<T>>
+        source_settings: SourceSettings<'_, T>,
+    ) -> Result<responses::SourceSettings<R>>
     where
-        T: DeserializeOwned,
+        T: Serialize,
+        R: DeserializeOwned,
     {
         self.client
-            .send_message(RequestType::SetSourceSettings(source_settings))
+            .send_message(RequestType::SetSourceSettings(SourceSettingsInternal {
+                source_name: source_settings.source_name,
+                source_type: source_settings.source_type,
+                source_settings: serde_json::to_value(source_settings.source_settings)
+                    .map_err(Error::SerializeCustomData)?,
+            }))
             .await
     }
 

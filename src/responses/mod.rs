@@ -807,7 +807,7 @@ pub struct ObsStats {
     pub cpu_usage: f64,
     /// Current RAM usage (in megabytes).
     pub memory_usage: f64,
-    /// Free recording disk space (in megabytes)
+    /// Free recording disk space (in megabytes).
     pub free_disk_space: f64,
 }
 
@@ -886,7 +886,7 @@ pub struct Caps {
 pub struct Font {
     /// Font face.
     pub face: String,
-    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=5, Strikeout=8`.
+    /// Font text styling flag. `Bold=1, Italic=2, Bold Italic=3, Underline=4, Strikeout=8`.
     #[serde(deserialize_with = "crate::de::bitflags_u8")]
     pub flags: FontFlags,
     /// Font text size.
