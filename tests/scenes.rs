@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
     client.set_current_program_scene(other).await?;
     client.set_current_program_scene(&current).await?;
 
-    let current = client.get_current_preview_scene().await?.unwrap();
+    let current = client.get_current_preview_scene().await?;
     let other = &scenes
         .iter()
         .find(|s| s.scene_name != current)

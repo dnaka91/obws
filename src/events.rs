@@ -2,6 +2,7 @@
 
 use std::{collections::BTreeMap, path::PathBuf};
 
+use chrono::Duration;
 use serde::Deserialize;
 
 /// All possible event types that can occur while the user interacts with OBS.
@@ -82,7 +83,8 @@ pub enum Event {
     #[serde(rename_all = "camelCase")]
     InputAudioSyncOffsetChanged {
         input_name: String,
-        input_audio_sync_offset: i64,
+        #[serde(deserialize_with = "crate::de::duration_millis")]
+        input_audio_sync_offset: Duration,
     },
     #[serde(rename_all = "camelCase")]
     InputAudioTracksChanged {

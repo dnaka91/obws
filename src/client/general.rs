@@ -1,9 +1,9 @@
+use serde::Serialize;
+
 use super::Client;
 use crate::{
     requests::{KeyModifiers, RequestType},
-    responses,
-    responses::{Hotkeys, StudioModeEnabled},
-    Result,
+    responses, Error, Result,
 };
 
 /// General functions of the API.
@@ -16,15 +16,20 @@ impl<'a> General<'a> {
         self.client.send_message(RequestType::GetVersion).await
     }
 
-    pub async fn broadcast_custom_event(&self, event_data: serde_json::Value) -> Result<()> {
+    pub async fn broadcast_custom_event<T>(&self, event_data: &T) -> Result<()>
+    where
+        T: Serialize,
+    {
         self.client
-            .send_message(RequestType::BroadcastCustomEvent { event_data })
+            .send_message(RequestType::BroadcastCustomEvent {
+                event_data: serde_json::to_value(event_data).map_err(Error::SerializeCustomData)?,
+            })
             .await
     }
 
     pub async fn get_hotkey_list(&self) -> Result<Vec<String>> {
         self.client
-            .send_message::<Hotkeys>(RequestType::GetHotkeyList)
+            .send_message::<responses::Hotkeys>(RequestType::GetHotkeyList)
             .await
             .map(|h| h.hotkeys)
     }
@@ -50,7 +55,7 @@ impl<'a> General<'a> {
 
     pub async fn get_studio_mode_enabled(&self) -> Result<bool> {
         self.client
-            .send_message::<StudioModeEnabled>(RequestType::GetStudioModeEnabled)
+            .send_message::<responses::StudioModeEnabled>(RequestType::GetStudioModeEnabled)
             .await
             .map(|sme| sme.studio_mode_enabled)
     }

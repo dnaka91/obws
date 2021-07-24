@@ -15,17 +15,17 @@ async fn main() -> Result<()> {
     client.get_input_list(None).await?;
     client.get_input_kind_list(false).await?;
     client
-        .get_input_default_settings(INPUT_KIND_BROWSER)
+        .get_input_default_settings::<serde_json::Value>(INPUT_KIND_BROWSER)
         .await?;
 
     let settings = client
-        .get_input_settings(TEST_BROWSER)
+        .get_input_settings::<serde_json::Value>(TEST_BROWSER)
         .await?
         .input_settings;
     client
         .set_input_settings(SetInputSettings {
             input_name: TEST_BROWSER,
-            input_settings: settings,
+            input_settings: &settings,
             overlay: false,
         })
         .await?;

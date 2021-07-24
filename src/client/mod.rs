@@ -30,6 +30,7 @@ use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 pub use self::{
     config::Config, general::General, inputs::Inputs, scenes::Scenes, sources::Sources,
+    streaming::Streaming,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -44,6 +45,7 @@ mod general;
 mod inputs;
 mod scenes;
 mod sources;
+mod streaming;
 
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
@@ -202,7 +204,11 @@ impl Client {
                     let text = msg.into_text().map_err(InnerError::IntoText)?;
                     let text = if text == "Server stopping" {
                         debug!("Websocket server is stopping");
-                        r#"{"messageType":"Event","eventType":"ServerStopping"}"#.to_string()
+                        let event = serde_json::json! {{
+                            "messageType": "Event",
+                            "eventType": "ServerStopping"
+                        }};
+                        event.to_string()
                     } else {
                         text
                     };
@@ -403,6 +409,11 @@ impl Client {
     /// Access API functions related to sources.
     pub fn sources(&self) -> Sources<'_> {
         Sources { client: self }
+    }
+
+    /// Access API functions related to streaming.
+    pub fn streaming(&self) -> Streaming<'_> {
+        Streaming { client: self }
     }
 }
 

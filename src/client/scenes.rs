@@ -24,7 +24,7 @@ impl<'a> Scenes<'a> {
             .await
     }
 
-    pub async fn get_current_preview_scene(&self) -> Result<Option<String>> {
+    pub async fn get_current_preview_scene(&self) -> Result<String> {
         self.client
             .send_message::<responses::CurrentPreviewScene>(RequestType::GetCurrentPreviewScene)
             .await

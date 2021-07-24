@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use obws::requests::KeyModifiers;
-use serde_json::json;
+use serde::Serialize;
 
 mod common;
 
@@ -13,7 +13,7 @@ async fn main() -> Result<()> {
 
     client.get_version().await?;
     client
-        .broadcast_custom_event(json! {{"hello": "world!"}})
+        .broadcast_custom_event(&CustomEvent { hello: "world!" })
         .await?;
 
     client.get_hotkey_list().await?;
@@ -27,4 +27,9 @@ async fn main() -> Result<()> {
     client.set_studio_mode_enabled(enabled).await?;
 
     Ok(())
+}
+
+#[derive(Serialize)]
+struct CustomEvent<'a> {
+    hello: &'a str,
 }

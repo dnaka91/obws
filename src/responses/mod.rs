@@ -1,5 +1,6 @@
 //! All responses that can be received from the API.
 
+use chrono::Duration;
 pub use semver::Version as SemVerVersion;
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
@@ -168,6 +169,8 @@ pub enum StatusCode {
     DirectoryCreationFailed = 706,
     /// The combination of request parameters cannot be used to perform an action.
     CannotAct = 707,
+    /// Creation of a new stream service failed.
+    StreamServiceCreationFailed = 708,
 }
 
 #[derive(Debug, Deserialize)]
@@ -189,6 +192,24 @@ pub struct Profiles {
 pub struct ProfileParameter {
     pub parameter_value: Option<String>,
     pub default_parameter_value: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VideoSettings {
+    pub fps_numerator: u32,
+    pub fps_denominator: u32,
+    pub base_width: u32,
+    pub base_height: u32,
+    pub output_width: u32,
+    pub output_height: u32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StreamServiceSettings<T> {
+    pub stream_service_type: String,
+    pub stream_service_settings: T,
 }
 
 #[derive(Debug, Deserialize)]
@@ -229,40 +250,40 @@ pub struct Input {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InputKinds {
+pub(crate) struct InputKinds {
     pub input_kinds: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct DefaultInputSettings {
-    pub default_input_settings: serde_json::Value,
+pub(crate) struct DefaultInputSettings<T> {
+    pub default_input_settings: T,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InputSettings {
-    pub input_settings: serde_json::Value,
+pub struct InputSettings<T> {
+    pub input_settings: T,
     pub input_kind: String,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct InputMuted {
+pub(crate) struct InputMuted {
     pub input_muted: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InputVolume {
-    pub input_volume_mul: f64,
-    pub input_volume_db: f64,
+    pub input_volume_mul: f32,
+    pub input_volume_db: f32,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SceneItemId {
-    pub scene_item_id: String,
+pub(crate) struct SceneItemId {
+    pub scene_item_id: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -290,7 +311,7 @@ pub(crate) struct CurrentProgramScene {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentPreviewScene {
-    pub current_preview_scene_name: Option<String>,
+    pub current_preview_scene_name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -304,4 +325,14 @@ pub struct SourceActive {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ImageData {
     pub image_data: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StreamStatus {
+    pub output_active: bool,
+    #[serde(deserialize_with = "crate::de::duration_timecode")]
+    pub output_timecode: Duration,
+    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    pub output_duration: Duration,
 }

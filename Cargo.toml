@@ -19,6 +19,7 @@ features = ["events", "tls"]
 async-stream = { version = "0.3.2", optional = true }
 base64 = "0.13.0"
 bitflags = "1.2.1"
+chrono = { version = "0.4.19", features = ["serde"] }
 futures-util = { version = "0.3.15", features = ["sink"] }
 log = "0.4.14"
 semver = { version = "1.0.3", features = ["serde"] }

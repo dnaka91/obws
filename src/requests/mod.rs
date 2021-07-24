@@ -59,6 +59,14 @@ pub(crate) enum RequestType<'a> {
         parameter_name: &'a str,
     },
     SetProfileParameter(SetProfileParameter<'a>),
+    GetVideoSettings,
+    SetVideoSettings(SetVideoSettings),
+    GetStreamServiceSettings,
+    #[serde(rename_all = "camelCase")]
+    SetStreamServiceSettings {
+        stream_service_type: &'a str,
+        stream_service_settings: serde_json::Value,
+    },
     // --------------------------------
     // General
     // --------------------------------
@@ -101,7 +109,7 @@ pub(crate) enum RequestType<'a> {
     GetInputSettings {
         input_name: &'a str,
     },
-    SetInputSettings(SetInputSettings<'a>),
+    SetInputSettings(SetInputSettingsInternal<'a>),
     #[serde(rename_all = "camelCase")]
     GetInputMute {
         input_name: &'a str,
@@ -130,7 +138,7 @@ pub(crate) enum RequestType<'a> {
         input_name: &'a str,
         new_input_name: &'a str,
     },
-    CreateInput(CreateInput<'a>),
+    CreateInput(CreateInputInternal<'a>),
     // --------------------------------
     // Scenes
     // --------------------------------
@@ -167,14 +175,44 @@ pub(crate) enum RequestType<'a> {
     },
     GetSourceScreenshot(GetSourceScreenshot<'a>),
     SaveSourceScreenshot(SaveSourceScreenshot<'a>),
+    // --------------------------------
+    // Streaming
+    // --------------------------------
+    GetStreamStatus,
+    StartStream,
+    StopStream,
 }
 
-#[derive(Serialize)]
+#[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetProfileParameter<'a> {
     pub parameter_category: &'a str,
     pub parameter_name: &'a str,
     pub parameter_value: Option<&'a str>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetVideoSettings {
+    pub fps_numerator: Option<u32>,
+    pub fps_denominator: Option<u32>,
+    pub base_width: Option<u32>,
+    pub base_height: Option<u32>,
+    pub output_width: Option<u32>,
+    pub output_height: Option<u32>,
+}
+
+impl From<crate::responses::VideoSettings> for SetVideoSettings {
+    fn from(v: crate::responses::VideoSettings) -> Self {
+        Self {
+            fps_numerator: Some(v.fps_numerator),
+            fps_denominator: Some(v.fps_denominator),
+            base_width: Some(v.base_width),
+            base_height: Some(v.base_height),
+            output_width: Some(v.output_width),
+            output_height: Some(v.output_height),
+        }
+    }
 }
 
 #[derive(Default, Serialize)]
@@ -185,9 +223,15 @@ pub struct KeyModifiers {
     pub command: bool,
 }
 
-#[derive(Serialize)]
+pub struct SetInputSettings<'a, T> {
+    pub input_name: &'a str,
+    pub input_settings: &'a T,
+    pub overlay: bool,
+}
+
+#[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SetInputSettings<'a> {
+pub(crate) struct SetInputSettingsInternal<'a> {
     pub input_name: &'a str,
     pub input_settings: serde_json::Value,
     pub overlay: bool,
@@ -196,14 +240,22 @@ pub struct SetInputSettings<'a> {
 #[derive(Serialize)]
 pub enum Volume {
     #[serde(rename = "inputVolumeMul")]
-    Mul(f64),
+    Mul(f32),
     #[serde(rename = "inputVolumeDb")]
-    Db(f64),
+    Db(f32),
 }
 
-#[derive(Serialize)]
+pub struct CreateInput<'a, T> {
+    pub scene_name: &'a str,
+    pub input_name: &'a str,
+    pub input_kind: &'a str,
+    pub input_settings: Option<T>,
+    pub scene_item_enabled: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateInput<'a> {
+pub(crate) struct CreateInputInternal<'a> {
     pub scene_name: &'a str,
     pub input_name: &'a str,
     pub input_kind: &'a str,
@@ -211,23 +263,23 @@ pub struct CreateInput<'a> {
     pub scene_item_enabled: Option<bool>,
 }
 
-#[derive(Serialize)]
+#[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSourceScreenshot<'a> {
     pub source_name: &'a str,
+    pub image_format: &'a str,
     pub image_width: Option<u32>,
     pub image_height: Option<u32>,
     pub image_compression_quality: Option<i32>,
-    pub image_format: &'a str,
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveSourceScreenshot<'a> {
     pub source_name: &'a str,
-    pub image_file_path: &'a Path,
+    pub image_format: &'a str,
     pub image_width: Option<u32>,
     pub image_height: Option<u32>,
     pub image_compression_quality: Option<i32>,
-    pub image_format: &'a str,
+    pub image_file_path: &'a Path,
 }

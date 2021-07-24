@@ -1,7 +1,12 @@
+use serde::{de::DeserializeOwned, Serialize};
+
 use super::Client;
 use crate::{
-    requests::{CreateInput, RequestType, SetInputSettings, Volume},
-    responses, Result,
+    requests::{
+        CreateInput, CreateInputInternal, RequestType, SetInputSettings, SetInputSettingsInternal,
+        Volume,
+    },
+    responses, Error, Result,
 };
 
 /// API functions related to inputs.
@@ -24,24 +29,41 @@ impl<'a> Inputs<'a> {
             .map(|ik| ik.input_kinds)
     }
 
-    pub async fn get_input_default_settings(&self, input_kind: &str) -> Result<serde_json::Value> {
+    pub async fn get_input_default_settings<'de, T>(&self, input_kind: &str) -> Result<T>
+    where
+        T: DeserializeOwned,
+    {
         self.client
-            .send_message::<responses::DefaultInputSettings>(RequestType::GetInputDefaultSettings {
-                input_kind,
-            })
+            .send_message::<responses::DefaultInputSettings<T>>(
+                RequestType::GetInputDefaultSettings { input_kind },
+            )
             .await
             .map(|dis| dis.default_input_settings)
     }
 
-    pub async fn get_input_settings(&self, input_name: &str) -> Result<responses::InputSettings> {
+    pub async fn get_input_settings<T>(
+        &self,
+        input_name: &str,
+    ) -> Result<responses::InputSettings<T>>
+    where
+        T: DeserializeOwned,
+    {
         self.client
             .send_message(RequestType::GetInputSettings { input_name })
             .await
     }
 
-    pub async fn set_input_settings(&self, settings: SetInputSettings<'_>) -> Result<()> {
+    pub async fn set_input_settings<T>(&self, settings: SetInputSettings<'_, T>) -> Result<()>
+    where
+        T: Serialize,
+    {
         self.client
-            .send_message(RequestType::SetInputSettings(settings))
+            .send_message(RequestType::SetInputSettings(SetInputSettingsInternal {
+                input_name: settings.input_name,
+                input_settings: serde_json::to_value(&settings.input_settings)
+                    .map_err(Error::SerializeCustomData)?,
+                overlay: settings.overlay,
+            }))
             .await
     }
 
@@ -92,9 +114,23 @@ impl<'a> Inputs<'a> {
             .await
     }
 
-    pub async fn create_input(&self, input: CreateInput<'_>) -> Result<String> {
+    pub async fn create_input<T>(&self, input: CreateInput<'_, T>) -> Result<i64>
+    where
+        T: Serialize,
+    {
         self.client
-            .send_message::<responses::SceneItemId>(RequestType::CreateInput(input))
+            .send_message::<responses::SceneItemId>(RequestType::CreateInput(CreateInputInternal {
+                scene_name: input.scene_name,
+                input_name: input.input_name,
+                input_kind: input.input_kind,
+                input_settings: input
+                    .input_settings
+                    .map(|settings| {
+                        serde_json::to_value(&settings).map_err(Error::SerializeCustomData)
+                    })
+                    .transpose()?,
+                scene_item_enabled: input.scene_item_enabled,
+            }))
             .await
             .map(|sii| sii.scene_item_id)
     }
