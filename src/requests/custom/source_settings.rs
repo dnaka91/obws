@@ -22,7 +22,7 @@ pub const SOURCE_COLOR_SOURCE_V3: &str = "color_source_v3";
 pub const SOURCE_DISPLAY_CAPTURE: &str = "display_capture";
 /// Identifier for image sources.
 pub const SOURCE_IMAGE_SOURCE: &str = "image_source";
-/// Identifier for image slideshow sources.
+/// Identifier for image slide-show sources.
 pub const SOURCE_SLIDESHOW: &str = "slideshow";
 /// Identifier for FFmpeg video sources.
 pub const SOURCE_FFMPEG_SOURCE: &str = "ffmpeg_source";
@@ -35,14 +35,14 @@ pub const SOURCE_AV_CAPTURE_INPUT: &str = "av_capture_input";
 /// Identifier for source window capture sources.
 pub const SOURCE_WINDOW_CAPTURE: &str = "window_capture";
 
-/// Settings specific to a CoreAudio input capture source.
+/// Settings specific to a **CoreAudio** input capture source.
 #[derive(Serialize)]
 pub struct CoreaudioInputCapture<'a> {
     /// Input device identifier.
     pub device_id: &'a str,
 }
 
-/// Settings specific to a CoreAudio output capture source.
+/// Settings specific to a **CoreAudio** output capture source.
 #[derive(Serialize)]
 pub struct CoreaudioOutputCapture<'a> {
     /// Output device identifier.
@@ -153,7 +153,7 @@ pub enum CropMode<'a> {
         window_name: &'a str,
         /// ID of the window.
         window: u32,
-        /// List up windows with empty names in the UI dropdown selection.
+        /// List up windows with empty names in the UI drop-down selection.
         show_empty_names: bool,
     },
     /// A combination of [`Self::ToWindow`] and [`Self::Manual`], cropping to the window first, then
@@ -165,7 +165,7 @@ pub enum CropMode<'a> {
         window_name: &'a str,
         /// ID of the window.
         window: u32,
-        /// List up windows with empty names in the UI dropdown selection.
+        /// List up windows with empty names in the UI drop-down selection.
         show_empty_names: bool,
         /// Left side cropping.
         left: f64,
@@ -261,7 +261,7 @@ impl<'a> Default for ImageSource<'a> {
     }
 }
 
-/// Settings specific to an image slideshow source.
+/// Settings specific to an image slide-show source.
 #[derive(Serialize)]
 pub struct Slideshow<'a> {
     /// Behavior of playback in relation to visibility.
@@ -276,10 +276,10 @@ pub struct Slideshow<'a> {
     /// Minimum value is `0ms`.
     #[serde(serialize_with = "ser::duration_millis")]
     pub transition_speed: Duration,
-    /// Wether to endlessly loop the slideshow images.
+    /// Whether to endlessly loop the slide-show images.
     #[serde(rename = "loop")]
     pub loop_: bool,
-    /// Hide when slideshow is done.
+    /// Hide when slide-show is done.
     pub hide: bool,
     /// Randomize playback.
     pub randomize: bool,
@@ -335,7 +335,7 @@ pub enum PlaybackBehavior {
     AlwaysPlay,
     /// Stop when not visible, restart when visible.
     StopRestart,
-    /// Pause when not visible, unpause when visible
+    /// Pause when not visible, un-pause when visible
     PauseUnpause,
 }
 
@@ -345,7 +345,7 @@ pub enum PlaybackBehavior {
 pub enum SlideMode {
     /// Automatic.
     ModeAuto,
-    /// Manual (Use hotkeys to control slideshow).
+    /// Manual (Use hotkeys to control slide-show).
     ModeManual,
 }
 
@@ -361,7 +361,7 @@ impl Default for SlideMode {
 pub enum Transition {
     /// Immediately replace without animation.
     Cut,
-    /// Gradualy fade between the two images until the new one is fully visible.
+    /// Gradually fade between the two images until the new one is fully visible.
     Fade,
     /// Swipe the new image over the old one.
     Swipe,
@@ -415,7 +415,7 @@ impl From<CustomSize> for String {
     }
 }
 
-/// Settings specific to a FFmpeg video source.
+/// Settings specific to a **FFmpeg** video source.
 #[derive(Serialize)]
 pub struct FfmpegSource<'a> {
     /// Whether the source is a local file or remote.
@@ -424,7 +424,7 @@ pub struct FfmpegSource<'a> {
     pub local_file: &'a Path,
     /// Endlessly play the media.  Only used if [`Self::is_local_file`] is set to `true`.
     pub looping: bool,
-    /// Network buffering in MegaBytes. Only used if [`Self::is_local_file`] is set to `false`.
+    /// Network buffering in Megabytes. Only used if [`Self::is_local_file`] is set to `false`.
     pub buffering_mb: u8,
     /// URL of the remote media file. Only used if [`Self::is_local_file`] is set to `false`.
     pub input: &'a str,
@@ -443,7 +443,7 @@ pub struct FfmpegSource<'a> {
     pub speed_percent: u8,
     /// YUV color range.
     pub color_range: ColorRange,
-    /// Whether the media source is seekable. Only used if [`Self::is_local_file`] is set to
+    /// Whether the media source is seek-able. Only used if [`Self::is_local_file`] is set to
     /// `false`.
     pub seekable: bool,
 }
@@ -466,7 +466,7 @@ impl Default for ColorRange {
     }
 }
 
-/// Settings specific to a FreeType2 text source.
+/// Settings specific to a **FreeType2** text source.
 #[derive(Serialize)]
 pub struct TextFt2SourceV2<'a> {
     /// Draw the text with smoothed corners.
@@ -549,19 +549,19 @@ impl<'a> Default for Font<'a> {
     }
 }
 
-/// Settings specific to a VLC video source.
+/// Settings specific to a **VLC** video source.
 #[derive(Serialize)]
 pub struct VlcSource<'a> {
-    /// Loop playlist.
+    /// Loop play-list.
     #[serde(rename = "bool")]
     pub loop_: bool,
-    /// Shuffle playlist.
+    /// Shuffle play-list.
     pub shuffle: bool,
     /// Visibility behavior.
     pub playback_behavior: PlaybackBehavior,
     /// List of files to play.
     pub playlist: &'a [SlideshowFile<'a>],
-    /// Network caching time. Mimimum value is `100ms`.
+    /// Network caching time. Minimum value is `100ms`.
     #[serde(serialize_with = "ser::duration_millis")]
     pub network_caching: Duration,
     /// Audio track. Minimum value is `1`.
@@ -631,7 +631,7 @@ impl Default for ColorSpace {
     }
 }
 
-/// Video color rnage as part of an [`AvCaptureInput`].
+/// Video color range as part of an [`AvCaptureInput`].
 #[derive(Serialize_repr)]
 #[repr(i8)]
 pub enum VideoRange {

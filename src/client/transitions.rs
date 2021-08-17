@@ -10,14 +10,14 @@ pub struct Transitions<'a> {
 }
 
 impl<'a> Transitions<'a> {
-    /// List of all transitions available in the frontend's dropdown menu.
+    /// List of all transitions available in the front-end's drop-down menu.
     pub async fn get_transition_list(&self) -> Result<responses::TransitionList> {
         self.client
             .send_message(RequestType::GetTransitionList)
             .await
     }
 
-    /// Get the name of the currently selected transition in the frontend's dropdown menu.
+    /// Get the name of the currently selected transition in the front-end's drop-down menu.
     pub async fn get_current_transition(&self) -> Result<responses::CurrentTransition> {
         self.client
             .send_message(RequestType::GetCurrentTransition)
@@ -108,8 +108,8 @@ impl<'a> Transitions<'a> {
     /// over.
     ///
     /// - `position`: T-Bar position. This value must be between 0.0 and 1.0.
-    /// - `release`: Whether or not the T-Bar gets released automatically after setting its new
-    ///   position (like a user releasing their mouse button after moving the T-Bar). Call
+    /// - `release`: Whether the T-Bar gets released automatically after setting its new position
+    ///   (like a user releasing their mouse button after moving the T-Bar). Call
     ///   [`release_t_bar`](Self::release_t_bar) manually if you set `release` to false. Defaults to
     ///   true.
     pub async fn set_t_bar_position(&self, position: f64, release: Option<bool>) -> Result<()> {

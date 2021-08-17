@@ -35,14 +35,14 @@ pub(crate) enum Status {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Version {
-    /// OBSRemote compatible API version. Fixed to 1.1 for retrocompatibility.
+    /// `OBSRemote` compatible API version. Fixed to 1.1 for retro-compatibility.
     pub version: f64,
     /// obs-websocket plugin version.
     pub obs_websocket_version: SemVerVersion,
     /// OBS Studio program version.
     pub obs_studio_version: SemVerVersion,
     /// List of available request types, formatted as a comma-separated list string (e.g. :
-    /// "Method1,Method2,Method3").
+    /// `"Method1,Method2,Method3"`).
     #[serde(deserialize_with = "de::string_comma_list")]
     pub available_requests: HashSet<String>,
     /// List of supported formats for features that use image export (like the
@@ -58,9 +58,9 @@ pub struct Version {
 pub struct AuthRequired {
     /// Indicates whether authentication is required.
     pub auth_required: bool,
-    /// A random string that will be used to generate the auth response.
+    /// A random string that will be used to generate the authentication response.
     pub challenge: Option<String>,
-    /// Applied to the password when generating the auth response.
+    /// Applied to the password when generating the authentication response.
     pub salt: Option<String>,
 }
 
@@ -68,7 +68,7 @@ pub struct AuthRequired {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) struct FilenameFormatting {
-    /// Current filename formatting string.
+    /// Current file name formatting string.
     pub filename_formatting: String,
 }
 
@@ -215,9 +215,9 @@ pub enum MediaState {
     Paused,
     /// Media stopped.
     Stopped,
-    /// All media in the playlist played.
+    /// All media in the play-list played.
     Ended,
-    /// Error occured while trying to play the media.
+    /// Error occurred while trying to play the media.
     Error,
     /// Unknown state.
     #[serde(other)]
@@ -248,7 +248,7 @@ pub struct MediaSource {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SourceItemId {
-    /// ID of the SceneItem in the scene.
+    /// ID of the scene item in the scene.
     pub item_id: i64,
 }
 
@@ -271,7 +271,8 @@ pub(crate) struct SourceTypesList {
 pub struct Volume {
     /// Source name.
     pub name: String,
-    /// Volume of the source. Between `0.0` and `20.0` if using mul, under `26.0` if using dB.
+    /// Volume of the source. Between `0.0` and `20.0` if using **mul**, under `26.0` if using
+    /// **dB**.
     pub volume: f64,
     /// Indicates whether the source is muted.
     pub muted: bool,
@@ -345,9 +346,9 @@ pub struct TextGdiPlusProperties {
     pub color: u32,
     /// Extents wrap.
     pub extents: bool,
-    /// Extents cx.
+    /// Extents `cx`.
     pub extents_cx: i64,
-    /// Extents cy.
+    /// Extents `cy`.
     pub extents_cy: i64,
     /// File path name.
     pub file: PathBuf,
@@ -696,7 +697,7 @@ pub struct StreamingStatus {
     pub recording: bool,
     /// If recording is paused.
     pub recording_paused: bool,
-    /// Always false. Retrocompatibility with OBSRemote.
+    /// Always false. Retro-compatibility with `OBSRemote`.
     #[serde(default)]
     pub preview_only: bool,
     /// Time elapsed since streaming started (only present if currently streaming).
@@ -791,7 +792,7 @@ pub(crate) struct TransitionSettings {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct ObsStats {
-    /// Current framerate.
+    /// Current frame rate.
     pub fps: f64,
     /// Number of frames rendered.
     pub render_total_frames: u64,
@@ -866,7 +867,7 @@ pub struct Caps {
     pub has_video: bool,
     /// True if sources of this type provide audio.
     pub has_audio: bool,
-    /// True if interaction with this sources of this type is possible.
+    /// True if interaction with sources of this type is possible.
     pub can_interact: bool,
     /// True if sources of this type composite one or more sub-sources.
     pub is_composite: bool,
@@ -929,7 +930,7 @@ pub struct Output {
     pub settings: serde_json::Value,
     /// Output status (active or not).
     pub active: bool,
-    /// Output reconnection status (reconnecting or not).
+    /// Output re-connection status (reconnecting or not).
     pub reconnecting: bool,
     /// Output congestion.
     pub congestion: f64,
@@ -1003,9 +1004,9 @@ pub struct Scene {
 /// part of [`GetStreamSettings`].
 #[derive(Debug, Deserialize)]
 pub struct StreamSettings {
-    /// The publish URL.
+    /// The publishing URL.
     pub server: String,
-    /// The publish key of the stream.
+    /// The publishing key of the stream.
     pub key: String,
     /// Indicates whether authentication should be used when connecting to the streaming server.
     pub use_auth: bool,

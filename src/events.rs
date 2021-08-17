@@ -95,7 +95,7 @@ pub enum EventType {
     },
     /// A transition (other than "cut") has ended.
     ///
-    /// Note: The `from-scene` field is not available in TransitionEnd.
+    /// Note: The `from-scene` field is not available in `TransitionEnd`.
     #[serde(rename_all = "kebab-case")]
     TransitionEnd {
         /// Transition name.
@@ -144,7 +144,7 @@ pub enum EventType {
     /// A request to start streaming has been issued.
     #[serde(rename_all = "kebab-case")]
     StreamStarting {
-        /// Always false (retrocompatibility).
+        /// Always false (retro-compatibility).
         #[serde(default)]
         preview_only: bool,
     },
@@ -153,7 +153,7 @@ pub enum EventType {
     /// A request to stop streaming has been issued.
     #[serde(rename_all = "kebab-case")]
     StreamStopping {
-        /// Always false (retrocompatibility).
+        /// Always false (retro-compatibility).
         #[serde(default)]
         preview_only: bool,
     },
@@ -180,7 +180,7 @@ pub enum EventType {
         num_total_frames: u64,
         /// Number of frames dropped by the encoder since the stream started.
         num_dropped_frames: u64,
-        /// Current framerate.
+        /// Current frame rate.
         fps: f64,
         /// Number of frames rendered.
         render_total_frames: u64,
@@ -198,7 +198,7 @@ pub enum EventType {
         memory_usage: f64,
         /// Free recording disk space (in megabytes).
         free_disk_space: f64,
-        /// Always false (retrocompatibility).
+        /// Always false (retro-compatibility).
         #[serde(default)]
         preview_only: bool,
     },
@@ -258,7 +258,7 @@ pub enum EventType {
     // --------------------------------
     // General
     // --------------------------------
-    /// A custom broadcast message, sent by the server, requested by one of the websocket clients.
+    /// A custom broadcast message, sent by the server, requested by one of the web-socket clients.
     BroadcastCustomMessage {
         /// Identifier provided by the sender.
         realm: String,
@@ -300,7 +300,7 @@ pub enum EventType {
         /// Source volume in Decibel
         volume_db: f32,
     },
-    /// A source has been muted or unmuted.
+    /// A source has been muted or un-muted.
     #[serde(rename_all = "camelCase")]
     SourceMuteStateChanged {
         /// Source name.
@@ -400,7 +400,7 @@ pub enum EventType {
     MediaPlaying {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Media playback paused.
@@ -411,7 +411,7 @@ pub enum EventType {
     MediaPaused {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Media playback restarted.
@@ -422,7 +422,7 @@ pub enum EventType {
     MediaRestarted {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Media playback stopped.
@@ -433,7 +433,7 @@ pub enum EventType {
     MediaStopped {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Next media started.
@@ -444,7 +444,7 @@ pub enum EventType {
     MediaNext {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Previous media started.
@@ -455,7 +455,7 @@ pub enum EventType {
     MediaPrevious {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Media playback started.
@@ -466,7 +466,7 @@ pub enum EventType {
     MediaStarted {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     /// Media playback ended.
@@ -477,7 +477,7 @@ pub enum EventType {
     MediaEnded {
         /// Source name.
         source_name: String,
-        /// The ID type of the source (Eg. `vlc_source` or `ffmpeg_source`).
+        /// The ID type of the source (for example `vlc_source` or `ffmpeg_source`).
         source_kind: String,
     },
     // --------------------------------
@@ -584,9 +584,9 @@ pub enum EventType {
         /// The new enabled state of Studio Mode.
         new_state: bool,
     },
-    /// WebSocket server is stopping.
+    /// Web-socket server is stopping.
     ServerStopping,
-    /// WebSocket server has stopped.
+    /// Web-socket server has stopped.
     ServerStopped,
     /// Fallback value for any unknown event type.
     #[serde(other)]

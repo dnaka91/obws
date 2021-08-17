@@ -31,18 +31,18 @@ pub(crate) enum RequestType<'a> {
     GetVersion,
     GetAuthRequired,
     Authenticate {
-        /// Response to the auth challenge.
+        /// Response to the authentication challenge.
         auth: &'a str,
     },
     #[serde(rename_all = "kebab-case")]
     SetFilenameFormatting {
-        /// Filename formatting string to set.
+        /// File name formatting string to set.
         filename_formatting: &'a str,
     },
     GetFilenameFormatting,
     GetStats,
     BroadcastCustomMessage {
-        /// Identifier to be choosen by the client.
+        /// Identifier to be chosen by the client.
         realm: &'a str,
         /// User-defined data.
         data: &'a serde_json::Value,
@@ -52,7 +52,7 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByName {
         /// Unique name of the hotkey, as defined when registering the hotkey (e.g.
-        /// "ReplayBuffer.Save").
+        /// `ReplayBuffer.Save`).
         hotkey_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
@@ -241,7 +241,7 @@ pub(crate) enum RequestType<'a> {
     },
     #[serde(rename_all = "camelCase")]
     GetSourceDefaultSettings {
-        /// Source kind. Also called "source id" in libobs terminology.
+        /// Source kind. Also called "source id" in _libobs_ terminology.
         source_kind: &'a str,
     },
     TakeSourceScreenshot(SourceScreenshot<'a>),
@@ -450,9 +450,9 @@ pub(crate) enum RequestType<'a> {
     SetTBarPosition {
         /// T-Bar position. This value must be between 0.0 and 1.0.
         position: f64,
-        /// Whether or not the T-Bar gets released automatically after setting its new position
-        /// (like a user releasing their mouse button after moving the T-Bar). Call `ReleaseTBar`
-        /// manually if you set `release` to false. Defaults to true.
+        /// Whether the T-Bar gets released automatically after setting its new position (like a
+        /// user releasing their mouse button after moving the T-Bar). Call `ReleaseTBar` manually
+        /// if you set `release` to false. Defaults to true.
         release: Option<bool>,
     },
     // --------------------------------
@@ -472,7 +472,7 @@ pub struct Projector<'a> {
     pub ty: Option<ProjectorType>,
     /// Monitor to open the projector on. If -1 or omitted, opens a window.
     pub monitor: Option<i64>,
-    /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
+    /// Size and position of the projector window (only if monitor is -1). Encoded in `Base64` using
     /// [Qt's geometry encoding](https://doc.qt.io/qt-5/qwidget.html#saveGeometry). Corresponds to
     /// OBS's saved projectors.
     pub geometry: Option<&'a QtGeometry>,
@@ -492,7 +492,7 @@ pub enum ProjectorType {
     Scene,
     /// Open a projector of the program pane in studio mode.
     StudioProgram,
-    /// Open a projector in multiview.
+    /// Open a projector in multi-view.
     Multiview,
 }
 
@@ -508,7 +508,7 @@ pub(crate) struct ProjectorInternal<'a> {
     pub ty: Option<ProjectorType>,
     /// Monitor to open the projector on. If -1 or omitted, opens a window.
     pub monitor: Option<i64>,
-    /// Size and position of the projector window (only if monitor is -1). Encoded in Base64 using
+    /// Size and position of the projector window (only if monitor is -1). Encoded in `Base64` using
     /// [Qt's geometry encoding](https://doc.qt.io/qt-5/qwidget.html#saveGeometry). Corresponds to
     /// OBS's saved projectors.
     pub geometry: Option<&'a str>,
@@ -537,13 +537,13 @@ pub struct KeyModifier {
 pub struct CreateSource<'a> {
     /// Source name.
     pub source_name: &'a str,
-    /// Source kind, Eg. `vlc_source`.
+    /// Source kind, for example `vlc_source`.
     pub source_kind: &'a str,
     /// Scene to add the new source to.
     pub scene_name: &'a str,
     /// Source settings data.
     pub source_settings: Option<&'a serde_json::Value>,
-    /// Set the created SceneItem as visible or not. Defaults to true.
+    /// Set the created scene item as visible or not. Defaults to true.
     pub set_visible: Option<bool>,
 }
 
@@ -556,7 +556,7 @@ pub struct Volume<'a> {
     pub source: &'a str,
     /// Desired volume. Must be between `0.0` and `20.0` for mul, and under 26.0 for dB. OBS will
     /// interpret dB values under -100.0 as Inf. Note: The OBS volume sliders only reach a maximum
-    /// of 1.0mul/0.0dB, however OBS actually supports larger values.
+    /// of `1.0 mul / 0.0 dB`, however OBS actually supports larger values.
     pub volume: f64,
     /// Interpret `volume` data as decibels instead of amplitude/mul.
     pub use_decibel: Option<bool>,
@@ -611,9 +611,9 @@ pub struct TextGdiPlusProperties<'a> {
     pub color: Option<u32>,
     /// Extents wrap.
     pub extents: Option<bool>,
-    /// Extents cx.
+    /// Extents `cx`.
     pub extents_cx: Option<i64>,
-    /// Extents cy.
+    /// Extents `cy`.
     pub extents_cy: Option<i64>,
     /// File path name.
     pub file: Option<&'a Path>,
@@ -793,7 +793,7 @@ pub struct SourceScreenshot<'a> {
     /// Note: Since scenes are also sources, you can also provide a scene name. If not provided, the
     /// currently active scene is used.
     pub source_name: Option<&'a str>,
-    /// Format of the Data URI encoded picture. Can be "png", "jpg", "jpeg" or "bmp" (or any other
+    /// Format of the Data URI encoded picture. Can be `png`, `jpg`, `jpeg` or `bmp` (or any other
     /// value supported by Qt's Image module).
     pub embed_picture_format: Option<&'a str>,
     /// Full file path (file extension included) where the captured image is to be saved. Can be in
@@ -805,8 +805,9 @@ pub struct SourceScreenshot<'a> {
     /// response field of [`get_version`](crate::client::General::get_version)). If not specified,
     /// tries to guess based on file extension.
     pub file_format: Option<&'a str>,
-    /// Compression ratio between -1 and 100 to write the image with. -1 is automatic, 1 is smallest
-    /// file/most compression, 100 is largest file/least compression. Varies with image type.
+    /// Compression ratio between -1 and 100 to write the image with. -1 is automatic, 1 is the
+    /// smallest file/most compression, 100 is the largest file/least compression. Varies with image
+    /// type.
     pub compress_quality: Option<i8>,
     /// Screenshot width. Defaults to the source's base width.
     pub width: Option<u32>,
@@ -870,7 +871,7 @@ pub struct SceneItemRender<'a> {
     pub source: &'a str,
     /// Scene Item id.
     pub item: Option<i64>,
-    /// true = shown ; false = hidden.
+    /// true = shown, false = hidden.
     pub render: bool,
 }
 
@@ -882,7 +883,7 @@ pub struct AddSceneItem<'a> {
     pub scene_name: &'a str,
     /// Name of the source to be added.
     pub source_name: &'a str,
-    /// Whether to make the sceneitem visible on creation or not. Default `true`.
+    /// Whether to make the scene item visible on creation. Default `true`.
     pub set_visible: bool,
 }
 
@@ -1054,9 +1055,7 @@ impl From<&crate::common::Crop> for Crop {
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct Bounds {
-    /// The new bounds type of the source. Can be "OBS_BOUNDS_STRETCH", "OBS_BOUNDS_SCALE_INNER",
-    /// "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT",
-    /// "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
+    /// The new bounds type of the source.
     #[serde(rename = "type")]
     pub ty: Option<BoundsType>,
     /// The new alignment of the bounding box. (0-2, 4-6, 8-10).
@@ -1094,15 +1093,15 @@ pub struct SceneItem<'a> {
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct Stream<'a> {
-    /// If specified ensures the type of stream matches the given type (usually 'rtmp_custom' or
-    /// 'rtmp_common'). If the currently configured stream type does not match the given stream
+    /// If specified ensures the type of stream matches the given type (usually `rtmp_custom` or
+    /// `rtmp_common'`. If the currently configured stream type does not match the given stream
     /// type, all settings must be specified in the `settings` object or an error will occur when
     /// starting the stream.
     #[serde(rename = "type")]
     pub ty: Option<StreamType>,
-    /// Adds the given object parameters as encoded query string parameters to the 'key' of the RTMP
-    /// stream. Used to pass data to the RTMP service about the streaming. May be any String,
-    /// Numeric, or Boolean field.
+    /// Adds the given object parameters as encoded query string parameters to the `key` of the
+    /// RTMP stream. Used to pass data to the RTMP service about the streaming. May be any
+    /// String, Numeric, or Boolean field.
     pub metadata: Option<&'a serde_json::Value>,
     /// Settings for the stream.
     pub settings: Option<StreamSettings<'a>>,
@@ -1114,9 +1113,9 @@ pub struct Stream<'a> {
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize)]
 pub struct StreamSettings<'a> {
-    /// The publish URL.
+    /// The publishing URL.
     pub server: Option<&'a str>,
-    /// The publish key of the stream.
+    /// The publishing key of the stream.
     pub key: Option<&'a str>,
     /// Indicates whether authentication should be used when connecting to the streaming server.
     pub use_auth: Option<bool>,
@@ -1163,11 +1162,11 @@ pub struct QtRect {
     pub left: i32,
     /// Top or Y/vertical position of the rectangle.
     pub top: i32,
-    /// The right side of a rectangle counted from the left. For example with left = 100 and right =
-    /// 300 the width would be 200.
+    /// The right side of a rectangle counted from the left. For example with `left = 100` and
+    /// `right = 300` the width would be `200`.
     pub right: i32,
-    /// Bottom side of a rectangle counted from the top. For example with top = 100 and bottom = 300
-    /// the height would be 200.
+    /// Bottom side of a rectangle counted from the top. For example with `top = 100` and
+    //// `bottom = 300` the height would be `200`.
     pub bottom: i32,
 }
 
@@ -1179,7 +1178,7 @@ bitflags! {
         /// Window with maximum size, taking up as much space as possible but still showing
         /// the window frame.
         const MAXIMIZED = 2;
-        /// Show the window in fullscreen mode, taking up the whole display.
+        /// Show the window in full-screen mode, taking up the whole display.
         const FULLSCREEN = 4;
     }
 }
@@ -1205,7 +1204,7 @@ pub struct QtGeometry {
     /// The screen number to display a widget or [`Self::DEFAULT_SCREEN`] to let OBS pick the
     /// default.
     pub screen_number: i32,
-    /// Additional window state like maximized or fullscreen.
+    /// Additional window state like maximized or full-screen.
     pub window_state: QtWindowState,
     /// The width of the screen. Seems to have no specific effect but is used for some internal
     /// calculations in Qt.
@@ -1226,23 +1225,23 @@ impl QtGeometry {
         }
     }
 
-    /// Serialize this instance into a base64 encoded byte array.
+    /// Serialize this instance into a `base64` encoded byte array.
     ///
     /// The exact format can be found in the
     /// [Qt source code](https://code.woboq.org/qt5/qtbase/src/widgets/kernel/qwidget.cpp.html#_ZNK7QWidget12saveGeometryEv).
     ///
-    /// | Length | Content                                            |
-    /// |--------|----------------------------------------------------|
-    /// | 4      | Magic number                                       |
-    /// | 2      | Major format version                               |
-    /// | 2      | Minor format version                               |
-    /// | 16     | Frame rect (lef, top, right, bottom) 4 bytes each  |
-    /// | 16     | Normal rect (lef, top, right, bottom) 4 bytes each |
-    /// | 4      | Screen number                                      |
-    /// | 1      | Window maximized (1 or 0)                          |
-    /// | 1      | Window fullscreen (1 or 0)                         |
-    /// | 4      | Screen width                                       |
-    /// | 16     | Main rect (lef, top, right, bottom) 4 bytes each   |
+    /// | Length | Content                                                  |
+    /// |--------|----------------------------------------------------------|
+    /// | 4      | Magic number                                             |
+    /// | 2      | Major format version                                     |
+    /// | 2      | Minor format version                                     |
+    /// | 16     | Frame rectangle (left, top, right, bottom) 4 bytes each  |
+    /// | 16     | Normal rectangle (left, top, right, bottom) 4 bytes each |
+    /// | 4      | Screen number                                            |
+    /// | 1      | Window maximized (1 or 0)                                |
+    /// | 1      | Window full-screen (1 or 0)                              |
+    /// | 4      | Screen width                                             |
+    /// | 16     | Main rectangle (left, top, right, bottom) 4 bytes each   |
     pub(crate) fn serialize(&self) -> String {
         /// Indicator for serialized Qt geometry data.
         const MAGIC_NUMBER: u32 = 0x1D9D0CB;
@@ -1250,7 +1249,7 @@ impl QtGeometry {
         const MAJOR_VERSION: u16 = 3;
         /// Minor version of this format.
         const MINOR_VERSION: u16 = 0;
-        /// Output data length BEFORE base64 encoding. This allows to reduce allocations in the
+        /// Output data length BEFORE `base64` encoding. This allows to reduce allocations in the
         /// byte buffer and must be updated whenever the format changes.
         const DATA_LENGTH: usize = 66;
 

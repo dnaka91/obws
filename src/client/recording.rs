@@ -39,7 +39,7 @@ impl<'a> Recording<'a> {
         self.client.send_message(RequestType::PauseRecording).await
     }
 
-    /// Resume/unpause the current recording (if paused). Returns an error if recording is not
+    /// Resume/un-pause the current recording (if paused). Returns an error if recording is not
     /// active or not paused.
     pub async fn resume_recording(&self) -> Result<()> {
         self.client.send_message(RequestType::ResumeRecording).await

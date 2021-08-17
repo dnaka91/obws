@@ -25,16 +25,16 @@ impl<'a> General<'a> {
 
     /// Attempt to authenticate the client to the server.
     ///
-    /// - `auth`: Response to the auth challenge.
+    /// - `auth`: Response to the authorization challenge.
     pub async fn authenticate(&self, auth: &str) -> Result<()> {
         self.client
             .send_message(RequestType::Authenticate { auth })
             .await
     }
 
-    /// Set the filename formatting string.
+    /// Set the file name formatting string.
     ///
-    /// - `filename_formatting`: Filename formatting string to set.
+    /// - `filename_formatting`: File name formatting string to set.
     pub async fn set_filename_formatting(&self, filename_formatting: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetFilenameFormatting {
@@ -43,7 +43,7 @@ impl<'a> General<'a> {
             .await
     }
 
-    /// Get the filename formatting string.
+    /// Get the file name formatting string.
     pub async fn get_filename_formatting(&self) -> Result<String> {
         self.client
             .send_message::<responses::FilenameFormatting>(RequestType::GetFilenameFormatting)
@@ -59,9 +59,9 @@ impl<'a> General<'a> {
             .map(|s| s.stats)
     }
 
-    /// Broadcast custom message to all connected WebSocket clients.
+    /// Broadcast custom message to all connected web-socket clients.
     ///
-    /// - `realm`: Identifier to be choosen by the client.
+    /// - `realm`: Identifier to be chosen by the client.
     /// - `data`: User-defined data.
     pub async fn broadcast_custom_message<T>(&self, realm: &str, data: &T) -> Result<()>
     where
@@ -80,7 +80,7 @@ impl<'a> General<'a> {
         self.client.send_message(RequestType::GetVideoInfo).await
     }
 
-    /// Open a projector window or create a projector on a monitor. Requires OBS v24.0.4 or newer.
+    /// Open a projector window or create a projector on a monitor.
     pub async fn open_projector(&self, projector: Projector<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::OpenProjector(ProjectorInternal {
@@ -95,7 +95,7 @@ impl<'a> General<'a> {
     /// Executes hotkey routine, identified by hotkey unique name.
     ///
     /// - `hotkey_name`: Unique name of the hotkey, as defined when registering the hotkey (e.g.
-    ///   "ReplayBuffer.Save").
+    ///   `ReplayBuffer.Save`).
     pub async fn trigger_hotkey_by_name(&self, hotkey_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::TriggerHotkeyByName { hotkey_name })
@@ -107,7 +107,7 @@ impl<'a> General<'a> {
     ///
     /// - `key_id`: Main key identifier (e.g. `OBS_KEY_A` for key "A"). Available identifiers
     ///   [here](https://github.com/obsproject/obs-studio/blob/master/libobs/obs-hotkeys.h)
-    /// - `key_modifiers`: Optional key modifiers object. False entries can be ommitted.
+    /// - `key_modifiers`: Optional key modifiers object. False entries can be omitted.
     pub async fn trigger_hotkey_by_sequence(
         &self,
         key_id: &str,

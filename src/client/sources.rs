@@ -18,7 +18,7 @@ pub struct Sources<'a> {
 }
 
 impl<'a> Sources<'a> {
-    /// List the media state of all media sources (vlc and media source).
+    /// List the media state of all media sources (VLC and media source).
     pub async fn get_media_sources_list(&self) -> Result<Vec<responses::MediaSource>> {
         self.client
             .send_message::<responses::MediaSourcesList>(RequestType::GetMediaSourcesList)
@@ -198,7 +198,7 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// Get the current properties of a Text GDI Plus source.
+    /// Get the current properties of a Text GDI+ source.
     ///
     /// - `source`: Source name.
     pub async fn get_text_gdi_plus_properties(
@@ -210,7 +210,7 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// Set the current properties of a Text GDI Plus source.
+    /// Set the current properties of a Text GDI+ source.
     pub async fn set_text_gdi_plus_properties(
         &self,
         properties: TextGdiPlusProperties<'_>,
@@ -220,7 +220,7 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// Get the current properties of a Text Freetype 2 source.
+    /// Get the current properties of a Text FreeType2 source.
     ///
     /// - `source`: Source name.
     pub async fn get_text_freetype2_properties(
@@ -232,7 +232,7 @@ impl<'a> Sources<'a> {
             .await
     }
 
-    /// Set the current properties of a Text Freetype 2 source.
+    /// Set the current properties of a Text FreeType2 source.
     pub async fn set_text_freetype2_properties(
         &self,
         properties: TextFreetype2Properties<'_>,
@@ -373,7 +373,7 @@ impl<'a> Sources<'a> {
 
     /// Get the default settings for a given source type.
     ///
-    /// - `source_kind`: Source kind. Also called "source id" in libobs terminology.
+    /// - `source_kind`: Source kind. Also called "source id" in _libobs_ terminology.
     pub async fn get_source_default_settings(
         &self,
         source_kind: &str,

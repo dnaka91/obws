@@ -22,19 +22,18 @@ use crate::Error;
 pub struct SceneItem {
     pub cy: f64,
     pub cx: f64,
-    /// The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and
-    /// 4=Top or 8=Bottom, or omit to center on that axis.
+    /// The point on the source that the item is manipulated from. Omit to center on that axis.
     #[serde(deserialize_with = "crate::de::bitflags_u8")]
     pub alignment: Alignment,
     /// The name of this Scene Item.
     pub name: String,
     /// Scene item ID.
     pub id: i64,
-    /// Whether or not this Scene Item is set to "visible".
+    /// Whether this scene item is set to "visible".
     pub render: bool,
-    /// Whether or not this Scene Item is muted.
+    /// Whether this scene item is muted.
     pub muted: bool,
-    /// Whether or not this Scene Item is locked and can't be moved around
+    /// Whether this scene item is locked and can't be moved around
     pub locked: bool,
     pub source_cx: f64,
     pub source_cy: f64,
@@ -98,8 +97,7 @@ pub struct Position {
     pub x: f64,
     /// The y position of the source from the top.
     pub y: f64,
-    /// The point on the source that the item is manipulated from. The sum of 1=Left or 2=Right, and
-    /// 4=Top or 8=Bottom, or omit to center on that axis.
+    /// The point on the source that the item is manipulated from. Omit to center on that axis.
     #[serde(deserialize_with = "crate::de::bitflags_u8")]
     pub alignment: Alignment,
 }
@@ -160,9 +158,7 @@ pub struct Crop {
 /// [`SceneItemProperties`](crate::responses::SceneItemProperties) and [`SceneItemTransform`].
 #[derive(Clone, Debug, Deserialize)]
 pub struct Bounds {
-    /// Type of bounding box. Can be "OBS_BOUNDS_STRETCH", "OBS_BOUNDS_SCALE_INNER",
-    /// "OBS_BOUNDS_SCALE_OUTER", "OBS_BOUNDS_SCALE_TO_WIDTH", "OBS_BOUNDS_SCALE_TO_HEIGHT",
-    /// "OBS_BOUNDS_MAX_ONLY" or "OBS_BOUNDS_NONE".
+    /// Type of bounding box.
     #[serde(rename = "type")]
     pub ty: BoundsType,
     /// Alignment of the bounding box.
@@ -182,7 +178,7 @@ pub enum MonitorType {
     None,
     /// Only monitor but don't output any sounds.
     MonitorOnly,
-    /// Mintor the audio and output it at the same time.
+    /// Monitor the audio and output it at the same time.
     MonitorAndOutput,
 }
 
@@ -221,7 +217,7 @@ pub enum StreamType {
 }
 
 bitflags! {
-    /// Different flags for font display that can be combined together.
+    /// Different flags for font display that can be combined.
     pub struct FontFlags: u8 {
         /// Make the text appear thicker.
         const BOLD = 1;
@@ -252,9 +248,9 @@ bitflags! {
     /// Alignment for different items on the scene that is described in two axis. The default is
     /// center for both axis.
     ///
-    /// For example, only using `LEFT` would arrange the target to the left horzontally and centered
-    /// vertically. To align to the top right, the alignments can be combined to `LEFT | TOP`.
-    /// Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
+    /// For example, only using `LEFT` would arrange the target to the left horizontally and
+    /// centered vertically. To align to the top right, the alignments can be combined to
+    /// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
     pub struct Alignment: u8 {
         /// Align to the left side.
         const LEFT = 1;

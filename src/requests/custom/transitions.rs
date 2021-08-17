@@ -154,27 +154,27 @@ pub struct Wipe {
     pub luma_image: LumaImage,
     /// Invert the animation.
     pub luma_invert: bool,
-    /// Softness of the adges inside the animation where old and new scene "touch".
+    /// Softness of the edges inside the animation where old and new scene "touch".
     pub luma_softness: f64,
 }
 
 /// A luma image that defines the animation of a [`Wipe`].
 #[derive(Serialize)]
 pub enum LumaImage {
-    /// Barndoor animation diagonal from the bottom left.
+    /// Barn door animation diagonal from the bottom left.
     #[serde(rename = "barndoor-botleft.png")]
     BarndoorBottomLeft,
-    /// Horizontal barndoor animation.
+    /// Horizontal barn door animation.
     #[serde(rename = "barndoor-h.png")]
     BarndoorHorizontal,
-    /// Barndoor animation diagonal from the top left.
+    /// Barn door animation diagonal from the top left.
     #[serde(rename = "barndoor-topleft.png")]
     BarndoorTopLeft,
-    /// Vertical barndoor animation.
+    /// Vertical barn door animation.
     #[serde(rename = "barndoor-v.png")]
     BarndoorVertical,
     #[serde(rename = "blinds-h.png")]
-    /// Horzontal blinds animation.
+    /// Horizontal blinds animation.
     BlindsHorizontal,
     /// Box animation from the bottom left.
     #[serde(rename = "box-botleft.png")]
@@ -191,7 +191,7 @@ pub enum LumaImage {
     /// Burst animation.
     #[serde(rename = "burst.png")]
     Burst,
-    /// Small checkboard animation.
+    /// Small checkerboard animation.
     #[serde(rename = "checkerboard-small.png")]
     CheckerboardSmall,
     /// Circles animation.

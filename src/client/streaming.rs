@@ -39,9 +39,9 @@ impl<'a> Streaming<'a> {
     }
 
     /// Sets one or more attributes of the current streaming server settings. Any options not passed
-    /// will remain unchanged. Returns the updated settings in response. If 'type' is different than
+    /// will remain unchanged. Returns the updated settings in response. If 'type' is different from
     /// the current streaming service type, all settings are required. Returns the full settings of
-    /// the stream (the same as GetStreamSettings).
+    /// the stream (the same as `GetStreamSettings`).
     pub async fn set_stream_settings(&self, settings: SetStreamSettings<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetStreamSettings(settings))

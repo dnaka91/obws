@@ -1,4 +1,4 @@
-//! # OBSWS - The obws (obvious) remote control library for OBS
+//! # OBWS - The obws (obvious) remote control library for OBS
 //!
 //! Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 //!
@@ -51,13 +51,13 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 /// Errors that can occur while using this crate.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// An error occured while trying to connect to the websocket.
+    /// An error occurred while trying to connect to the web-socket.
     #[error("failed to connect to the obs-websocket plugin")]
     Connect(#[source] tokio_tungstenite::tungstenite::Error),
-    /// Failed to serialize the message to be send to the websocket.
+    /// Failed to serialize the message to be send to the web-socket.
     #[error("failed to serialize message")]
     SerializeMessage(#[source] serde_json::Error),
-    /// A message could not be send through the websocket.
+    /// A message could not be send through the web-socket.
     #[error("failed to send message to the obs-websocket plugin")]
     Send(#[source] tokio_tungstenite::tungstenite::Error),
     /// Tried to receive data while the send side was already closed.

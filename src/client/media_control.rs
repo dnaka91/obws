@@ -9,7 +9,7 @@ pub struct MediaControl<'a> {
 }
 
 impl<'a> MediaControl<'a> {
-    /// Pause or play a media source. Supports ffmpeg and vlc media sources (as of OBS v25.0.8).
+    /// Pause or play a media source. Supports FFmpeg and VLC media sources (as of OBS v25.0.8).
     ///
     /// - `source_name`: Source name.
     /// - `play_pause`: Whether to pause or play the source. `false` for play, `true` for pause.
@@ -26,7 +26,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Restart a media source. Supports ffmpeg and vlc media sources (as of OBS v25.0.8).
+    /// Restart a media source. Supports FFmpeg and VLC media sources (as of OBS v25.0.8).
     ///
     /// - `source_name`: Source name.
     pub async fn restart_media(&self, source_name: &str) -> Result<()> {
@@ -35,7 +35,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Stop a media source. Supports ffmpeg and vlc media sources (as of OBS v25.0.8).
+    /// Stop a media source. Supports FFmpeg and VLC media sources (as of OBS v25.0.8).
     ///
     /// - `source_name`: Source name.
     pub async fn stop_media(&self, source_name: &str) -> Result<()> {
@@ -44,7 +44,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Skip to the next media item in the playlist. Supports only vlc media source (as of OBS
+    /// Skip to the next media item in the play-list. Supports only VLC media source (as of OBS
     /// v25.0.8).
     ///
     /// - `source_name`: Source name.
@@ -54,7 +54,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Go to the previous media item in the playlist. Supports only vlc media source (as of OBS
+    /// Go to the previous media item in the play-list. Supports only VLC media source (as of OBS
     /// v25.0.8).
     ///
     /// - `source_name`: Source name.
@@ -64,11 +64,11 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Get the length of media in milliseconds. Supports ffmpeg and vlc media sources (as of OBS
+    /// Get the length of media in milliseconds. Supports FFmpeg and VLC media sources (as of OBS
     /// v25.0.8).
     ///
     /// Note: For some reason, for the first 5 or so seconds that the media is playing, the total
-    /// duration can be off by upwards of 50ms.
+    /// duration can be off by upwards of `50ms`.
     ///
     /// - `source_name`: Source name.
     pub async fn get_media_duration(&self, source_name: &str) -> Result<Duration> {
@@ -78,7 +78,7 @@ impl<'a> MediaControl<'a> {
             .map(|md| md.media_duration)
     }
 
-    /// Get the current timestamp of media in milliseconds. Supports ffmpeg and vlc media sources
+    /// Get the current timestamp of media in milliseconds. Supports FFmpeg and VLC media sources
     /// (as of OBS v25.0.8).
     ///
     /// - `source_name`: Source name.
@@ -89,7 +89,7 @@ impl<'a> MediaControl<'a> {
             .map(|mt| mt.timestamp)
     }
 
-    /// Set the timestamp of a media source. Supports ffmpeg and vlc media sources (as of OBS
+    /// Set the timestamp of a media source. Supports FFmpeg and VLC media sources (as of OBS
     /// v25.0.8).
     ///
     /// - `source_name`: Source name.
@@ -103,7 +103,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Scrub media using a supplied offset. Supports ffmpeg and vlc media sources (as of OBS
+    /// Scrub media using a supplied offset. Supports FFmpeg and VLC media sources (as of OBS
     /// v25.0.8).
     ///
     /// Note: Due to processing/network delays, this request is not perfect. The processing rate of
@@ -121,7 +121,7 @@ impl<'a> MediaControl<'a> {
             .await
     }
 
-    /// Get the current playing state of a media source. Supports ffmpeg and vlc media sources (as
+    /// Get the current playing state of a media source. Supports FFmpeg and VLC media sources (as
     /// of OBS v25.0.8).
     ///
     /// - `source_name`: Source name.
