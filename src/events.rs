@@ -221,9 +221,9 @@ pub enum Event {
     // --------------------------------
     // Custom
     // --------------------------------
-    /// WebSocket server is stopping.
+    /// Web-socket server is stopping.
     ServerStopping,
-    /// WebSocket server has stopped.
+    /// Web-socket server has stopped.
     ServerStopped,
     /// Fallback value for any unknown event type.
     #[serde(other)]

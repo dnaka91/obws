@@ -63,7 +63,7 @@ enum InnerError {
 /// functions to remote control an OBS instance as well as to listen to events caused by the user
 /// by interacting with OBS.
 pub struct Client {
-    /// The writer handle to the websocket stream.
+    /// The writer handle to the web-socket stream.
     write: Mutex<MessageWriter>,
     /// Global counter for requests that help to find out what response belongs to what previously
     /// sent request.
@@ -82,7 +82,7 @@ pub struct Client {
     handle: Option<JoinHandle<()>>,
 }
 
-/// Shorthand for the writer side of a websocket stream that has been split into reader and writer.
+/// Shorthand for the writer side of a web-socket stream that has been split into reader and writer.
 type MessageWriter = SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>;
 
 /// Shorthand for the list of ongoing requests that wait for a response.
@@ -98,7 +98,7 @@ where
     H: AsRef<str>,
     P: AsRef<str>,
 {
-    /// The hostname, usually `localhost` unless the OBS instance is on a remote machine.
+    /// The host name, usually `localhost` unless the OBS instance is on a remote machine.
     pub host: H,
     /// Port to connect to.
     pub port: u16,
@@ -426,7 +426,7 @@ impl Drop for Client {
     }
 }
 
-/// Errors that can occur while performaning the initial handshake with obs-websocket.
+/// Errors that can occur while performing the initial handshake with obs-websocket.
 #[derive(Debug, thiserror::Error)]
 pub enum HandshakeError {
     /// The connection to obs-websocket was interrupted while trying to read a message.
@@ -435,7 +435,7 @@ pub enum HandshakeError {
     /// Receiving a message did not succeed.
     #[error("failed reading websocket message")]
     Receive(#[source] tokio_tungstenite::tungstenite::Error),
-    /// The WebSocket message was not convertible to text.
+    /// The web-socket message was not convertible to text.
     #[error("websocket message not convertible to text")]
     IntoText(#[source] tokio_tungstenite::tungstenite::Error),
     /// A message from obs-websocket could not be deserialized.

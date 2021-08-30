@@ -8,12 +8,13 @@ use serde_repr::Deserialize_repr;
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
     /// First message sent from the server immediately on client connection. Contains authentication
-    /// information if auth is required. Also contains RPC version for version negotiation.
+    /// information if it is required. Also contains RPC (remote procedure call) version for
+    /// version negotiation.
     Hello(Hello),
     /// The identify request was received and validated, and the connection is now ready for normal
     /// operation.
     Identified(Identified),
-    /// An event coming from OBS has occurred. Eg scene switched, source muted.
+    /// An event coming from OBS has occurred. For example scene switched, source muted.
     #[cfg(feature = "events")]
     Event(crate::events::Event),
     #[cfg(not(feature = "events"))]
@@ -90,7 +91,7 @@ pub(crate) struct Hello {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Identified {
-    /// The RPC version to be used.
+    /// The RPC (remote procedure call) version to be used.
     pub negotiated_rpc_version: u32,
 }
 
@@ -138,7 +139,7 @@ pub enum StatusCode {
     GenericError = 205,
     /// A required request parameter is missing.
     MissingRequestParameter = 300,
-    /// The request does not have a valid requestData object.
+    /// The request does not have a valid `requestData` object.
     MissingRequestData = 301,
     /// Generic invalid request parameter message.
     InvalidRequestParameter = 400,
@@ -172,54 +173,56 @@ pub enum StatusCode {
     StudioModeActive = 510,
     /// Studio mode is not active and should be.
     StudioModeNotActive = 511,
-    /// Virtualcam is running and cannot be.
+    /// Virtual-cam is running and cannot be.
     VirtualCamRunning = 512,
-    /// Virtualcam is not running and should be.
+    /// Virtual-cam is not running and should be.
     VirtualCamNotRunning = 513,
-    /// The specified source (obs_source_t) was of the invalid type (Eg. input instead of scene).
+    /// The specified source (`obs_source_t`) was of the invalid type (for example input instead of
+    /// scene).
     InvalidSourceType = 600,
-    /// The specified source (obs_source_t) was not found (generic for input, filter, transition,
+    /// The specified source (`obs_source_t`) was not found (generic for input, filter, transition,
     /// scene).
     SourceNotFound = 601,
-    /// The specified source (obs_source_t) already exists. Applicable to inputs, filters,
+    /// The specified source (`obs_source_t`) already exists. Applicable to inputs, filters,
     /// transitions, scenes.
     SourceAlreadyExists = 602,
-    /// The specified input (obs_source_t-OBS_SOURCE_TYPE_FILTER) was not found.
+    /// The specified input (`obs_source_t-OBS_SOURCE_TYPE_FILTER`) was not found.
     InputNotFound = 603,
-    /// The specified input (obs_source_t-OBS_SOURCE_TYPE_INPUT) had the wrong kind.
+    /// The specified input (`obs_source_t-OBS_SOURCE_TYPE_INPUT`) had the wrong kind.
     InvalidInputKind = 604,
-    /// The specified filter (obs_source_t-OBS_SOURCE_TYPE_FILTER) was not found.
+    /// The specified filter (`obs_source_t-OBS_SOURCE_TYPE_FILTER`) was not found.
     FilterNotFound = 605,
-    /// The specified transition (obs_source_t-OBS_SOURCE_TYPE_TRANSITION) was not found.
+    /// The specified transition (`obs_source_t-OBS_SOURCE_TYPE_TRANSITION`) was not found.
     TransitionNotFound = 606,
-    /// The specified transition (obs_source_t-OBS_SOURCE_TYPE_TRANSITION) does not support setting
-    /// its position (transition is of fixed type).
+    /// The specified transition (`obs_source_t-OBS_SOURCE_TYPE_TRANSITION`) does not support
+    /// setting its position (transition is of fixed type).
     TransitionDurationFixed = 607,
-    /// The specified scene (obs_source_t-OBS_SOURCE_TYPE_SCENE), (obs_scene_t) was not found.
+    /// The specified scene (`obs_source_t-OBS_SOURCE_TYPE_SCENE`), (`obs_scene_t`) was not found.
     SceneNotFound = 608,
-    /// The specified scene item (obs_sceneitem_t) was not found.
+    /// The specified scene item (`obs_sceneitem_t`) was not found.
     SceneItemNotFound = 609,
     /// The specified scene collection was not found.
     SceneCollectionNotFound = 610,
     /// The specified profile was not found.
     ProfileNotFound = 611,
-    /// The specified output (obs_output_t) was not found.
+    /// The specified output (`obs_output_t`) was not found.
     OutputNotFound = 612,
-    /// The specified encoder (obs_encoder_t) was not found.
+    /// The specified encoder (`obs_encoder_t`) was not found.
     EncoderNotFound = 613,
-    /// The specified service (obs_service_t) was not found.
+    /// The specified service (`obs_service_t`) was not found.
     ServiceNotFound = 614,
     /// The specified hotkey was not found.
     HotkeyNotFound = 615,
     /// The specified directory was not found.
     DirectoryNotFound = 616,
-    /// The specified config item (config_t) was not found. Could be section or parameter name.
+    /// The specified configuration item (`config_t`) was not found. Could be section or parameter
+    /// name.
     ConfigParameterNotFound = 617,
-    /// The specified property (obs_properties_t) was not found.
+    /// The specified property (`obs_properties_t`) was not found.
     PropertyNotFound = 618,
-    /// The specififed key (OBS_KEY_*) was not found.
+    /// The specified key (`OBS_KEY_*`) was not found.
     KeyNotFound = 619,
-    /// The specified data realm (OBS_WEBSOCKET_DATA_REALM_*) was not found.
+    /// The specified data realm (`OBS_WEBSOCKET_DATA_REALM_*`) was not found.
     DataRealmNotFound = 620,
     /// The scene collection already exists.
     SceneCollectionAlreadyExists = 621,
