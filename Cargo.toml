@@ -3,6 +3,7 @@ name = "obws"
 version = "0.8.0"
 authors = ["Dominik Nakamura <dnaka91@gmail.com>"]
 edition = "2018"
+resolver = "2"
 license = "MIT"
 readme = "README.md"
 description = "The obws (obvious) remote control library for OBS."
@@ -10,7 +11,7 @@ homepage = "https://github.com/dnaka91/obws"
 repository = "https://github.com/dnaka91/obws"
 categories = ["api-bindings", "web-programming"]
 keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
-resolver = "2"
+include = ["examples/**/*", "tests/**/*", "src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
 
 [package.metadata.docs.rs]
 features = ["events", "tls"]
