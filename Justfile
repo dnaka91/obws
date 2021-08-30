@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 nightly := "nightly-2021-06-01"
 
 # list available recipes
@@ -7,7 +9,7 @@ default:
 # run integration tests with coverage
 coverage:
     cargo install grcov --git https://github.com/mozilla/grcov.git --rev c7a9b20d246a0cda812db509f206b38b3116cba4
-    rustup component add --toolchain {{nightly}} llvm-tools-preview
+    rustup toolchain install {{nightly}} --component llvm-tools-preview
 
     rm -rf *.profraw ./target/debug/coverage
 
