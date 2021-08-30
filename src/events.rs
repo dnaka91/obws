@@ -34,6 +34,7 @@ pub enum Event {
     // --------------------------------
     // General
     // --------------------------------
+    CustomEvent(serde_json::Value),
     ExitStarted,
     #[serde(rename_all = "camelCase")]
     StudioModeStateChanged {
@@ -276,6 +277,5 @@ pub struct BasicSceneItem {
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
     scene_name: String,
-    scene_index: u32,
     is_group: bool,
 }

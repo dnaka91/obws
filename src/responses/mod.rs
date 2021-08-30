@@ -2,46 +2,112 @@
 
 use chrono::Duration;
 pub use semver::Version as SemVerVersion;
-use serde::Deserialize;
+use serde::{de, Deserialize, Deserializer};
 use serde_repr::Deserialize_repr;
 
-#[derive(Debug, Deserialize)]
-#[serde(tag = "messageType")]
+#[derive(Debug)]
 pub(crate) enum ServerMessage {
     /// First message sent from the server immediately on client connection. Contains authentication
     /// information if auth is required. Also contains RPC version for version negotiation.
-    #[serde(rename_all = "camelCase")]
-    Hello {
-        obs_web_socket_version: SemVerVersion,
-        /// Version number which gets incremented on each **breaking change** to the obs-websocket
-        /// protocol.
-        rpc_version: u32,
-        authentication: Option<Authentication>,
-    },
+    Hello(Hello),
     /// The identify request was received and validated, and the connection is now ready for normal
     /// operation.
-    #[serde(rename_all = "camelCase")]
-    Identified {
-        /// The RPC version to be used.
-        negotiated_rpc_version: u32,
-    },
+    Identified(Identified),
     /// An event coming from OBS has occurred. Eg scene switched, source muted.
     #[cfg(feature = "events")]
-    #[serde(rename_all = "camelCase")]
     Event(crate::events::Event),
+    #[cfg(not(feature = "events"))]
+    Event,
     /// `obs-websocket` is responding to a request coming from a client.
-    #[serde(rename_all = "camelCase")]
-    RequestResponse {
-        request_id: String,
-        request_status: Status,
-        #[serde(default)]
-        response_data: serde_json::Value,
-    },
-    #[serde(rename_all = "camelCase")]
-    RequestBatchResponse {
-        request_id: String,
-        results: Vec<serde_json::Value>,
-    },
+    RequestResponse(RequestResponse),
+    RequestBatchResponse(RequestBatchResponse),
+}
+
+impl<'de> Deserialize<'de> for ServerMessage {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct RawServerMessage {
+            #[serde(rename = "op")]
+            op_code: OpCode,
+            #[serde(rename = "d")]
+            data: serde_json::Value,
+        }
+
+        #[derive(Deserialize_repr)]
+        #[repr(u8)]
+        enum OpCode {
+            Hello = 0,
+            Identified = 2,
+            Event = 5,
+            RequestResponse = 7,
+            RequestBatchResponse = 9,
+        }
+
+        let raw = RawServerMessage::deserialize(deserializer)?;
+
+        Ok(match raw.op_code {
+            OpCode::Hello => {
+                ServerMessage::Hello(serde_json::from_value(raw.data).map_err(de::Error::custom)?)
+            }
+            OpCode::Identified => ServerMessage::Identified(
+                serde_json::from_value(raw.data).map_err(de::Error::custom)?,
+            ),
+            OpCode::Event => {
+                #[cfg(feature = "events")]
+                {
+                    ServerMessage::Event(
+                        serde_json::from_value(raw.data).map_err(de::Error::custom)?,
+                    )
+                }
+                #[cfg(not(feature = "events"))]
+                {
+                    ServerMessage::Event
+                }
+            }
+            OpCode::RequestResponse => ServerMessage::RequestResponse(
+                serde_json::from_value(raw.data).map_err(de::Error::custom)?,
+            ),
+            OpCode::RequestBatchResponse => ServerMessage::RequestBatchResponse(
+                serde_json::from_value(raw.data).map_err(de::Error::custom)?,
+            ),
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Hello {
+    pub obs_web_socket_version: SemVerVersion,
+    /// Version number which gets incremented on each **breaking change** to the obs-websocket
+    /// protocol.
+    pub rpc_version: u32,
+    pub authentication: Option<Authentication>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Identified {
+    /// The RPC version to be used.
+    pub negotiated_rpc_version: u32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RequestResponse {
+    pub request_id: String,
+    pub request_status: Status,
+    #[serde(default)]
+    pub response_data: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RequestBatchResponse {
+    pub request_id: String,
+    pub results: Vec<serde_json::Value>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -153,6 +219,18 @@ pub enum StatusCode {
     PropertyNotFound = 618,
     /// The specififed key (OBS_KEY_*) was not found.
     KeyNotFound = 619,
+    /// The specified data realm (OBS_WEBSOCKET_DATA_REALM_*) was not found.
+    DataRealmNotFound = 620,
+    /// The scene collection already exists.
+    SceneCollectionAlreadyExists = 621,
+    /// There are not enough scene collections to perform the action.
+    NotEnoughSceneCollections = 622,
+    /// The profile already exists.
+    ProfileAlreadyExists = 623,
+    /// There are not enough profiles to perform the action.
+    NotEnoughProfiles = 624,
+    /// There are not enough scenes to perform the action.
+    NotEnoughScenes = 625,
     /// Processing the request failed unexpectedly.
     RequestProcessingFailed = 700,
     /// Starting the Output failed.
@@ -220,6 +298,13 @@ pub struct Version {
     pub rpc_version: u32,
     pub available_requests: Vec<String>,
     pub supported_image_formats: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Stats {
+    pub web_socket_session_incoming_messages: u64,
+    pub web_socket_session_outgoing_messages: u64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -298,7 +383,6 @@ pub struct Scenes {
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
     pub scene_name: String,
-    pub scene_index: u64,
     pub is_group: bool,
 }
 
@@ -331,8 +415,12 @@ pub(crate) struct ImageData {
 #[serde(rename_all = "camelCase")]
 pub struct StreamStatus {
     pub output_active: bool,
+    pub output_reconnecting: bool,
     #[serde(deserialize_with = "crate::de::duration_timecode")]
     pub output_timecode: Duration,
     #[serde(deserialize_with = "crate::de::duration_nanos")]
     pub output_duration: Duration,
+    pub output_bytes: u64,
+    pub output_skipped_frames: u32,
+    pub output_total_frames: u32,
 }

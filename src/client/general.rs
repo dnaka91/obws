@@ -27,6 +27,10 @@ impl<'a> General<'a> {
             .await
     }
 
+    pub async fn get_stats(&self) -> Result<responses::Stats> {
+        self.client.send_message(RequestType::GetStats).await
+    }
+
     pub async fn get_hotkey_list(&self) -> Result<Vec<String>> {
         self.client
             .send_message::<responses::Hotkeys>(RequestType::GetHotkeyList)

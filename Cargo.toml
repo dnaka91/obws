@@ -48,3 +48,7 @@ tls = ["tokio-tungstenite/rustls-tls"]
 [[example]]
 name = "events"
 required-features = ["events"]
+
+[[test]]
+name = "general"
+required-features = ["events"]

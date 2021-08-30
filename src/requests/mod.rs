@@ -2,39 +2,75 @@
 
 use std::path::Path;
 
-use serde::Serialize;
+use serde::{ser::SerializeStruct, Serialize};
 use serde_with::skip_serializing_none;
+
+pub(crate) enum ClientRequest<'a> {
+    Identify(Identify),
+    Reidentify(Reidentify),
+    Request(Request<'a>),
+    RequestBatch(RequestBatch<'a>),
+}
+
+impl<'a> Serialize for ClientRequest<'a> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        fn write_state<S>(serializer: S, op: u8, d: &impl Serialize) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer,
+        {
+            let mut state = serializer.serialize_struct("ClientRequest", 2)?;
+            state.serialize_field("op", &op)?;
+            state.serialize_field("d", d)?;
+            state.end()
+        }
+
+        match self {
+            Self::Identify(value) => write_state(serializer, 1, value),
+            Self::Reidentify(value) => write_state(serializer, 3, value),
+            Self::Request(value) => write_state(serializer, 6, value),
+            Self::RequestBatch(value) => write_state(serializer, 8, value),
+        }
+    }
+}
 
 #[skip_serializing_none]
 #[derive(Serialize)]
-#[serde(tag = "messageType")]
-pub(crate) enum ClientRequest<'a> {
-    #[serde(rename_all = "camelCase")]
-    Identify {
-        rpc_version: u32,
-        authentication: Option<String>,
-        ignore_invalid_messages: bool,
-        ignore_non_fatal_request_checks: bool,
-        event_subscriptions: Option<u32>,
-    },
-    #[serde(rename_all = "camelCase")]
-    Reidentify {
-        ignore_invalid_messages: bool,
-        ignore_non_fatal_request_checks: bool,
-        event_subscriptions: Option<u32>,
-    },
-    #[serde(rename_all = "camelCase")]
-    Request {
-        request_id: &'a str,
-        #[serde(flatten)]
-        ty: RequestType<'a>,
-    },
-    #[serde(rename_all = "camelCase")]
-    RequestBatch {
-        request_id: &'a str,
-        halt_on_failure: Option<bool>,
-        requests: &'a [RequestType<'a>],
-    },
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Identify {
+    pub rpc_version: u32,
+    pub authentication: Option<String>,
+    pub ignore_invalid_messages: bool,
+    pub ignore_non_fatal_request_checks: bool,
+    pub event_subscriptions: Option<u32>,
+}
+
+#[skip_serializing_none]
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Reidentify {
+    pub ignore_invalid_messages: bool,
+    pub ignore_non_fatal_request_checks: bool,
+    pub event_subscriptions: Option<u32>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct Request<'a> {
+    pub request_id: &'a str,
+    #[serde(flatten)]
+    pub ty: RequestType<'a>,
+}
+
+#[skip_serializing_none]
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RequestBatch<'a> {
+    pub request_id: &'a str,
+    pub halt_on_failure: Option<bool>,
+    pub requests: &'a [RequestType<'a>],
 }
 
 #[derive(Serialize)]
@@ -43,14 +79,32 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     // Config
     // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    GetPersistentData {
+        realm: Realm,
+        slot_name: &'a str,
+    },
+    SetPersistentData(SetPersistentData<'a>),
     GetSceneCollectionList,
     #[serde(rename_all = "camelCase")]
     SetCurrentSceneCollection {
         scene_collection_name: &'a str,
     },
+    #[serde(rename_all = "camelCase")]
+    CreateSceneCollection {
+        scene_collection_name: &'a str,
+    },
     GetProfileList,
     #[serde(rename_all = "camelCase")]
     SetCurrentProfile {
+        profile_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    CreateProfile {
+        profile_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    RemoveProfile {
         profile_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
@@ -75,6 +129,7 @@ pub(crate) enum RequestType<'a> {
     BroadcastCustomEvent {
         event_data: serde_json::Value,
     },
+    GetStats,
     GetHotkeyList,
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByName {
@@ -181,6 +236,22 @@ pub(crate) enum RequestType<'a> {
     GetStreamStatus,
     StartStream,
     StopStream,
+}
+
+#[derive(Clone, Copy, Serialize)]
+pub enum Realm {
+    #[serde(rename = "OBS_WEBSOCKET_DATA_REALM_GLOBAL")]
+    Global,
+    #[serde(rename = "OBS_WEBSOCKET_DATA_REALM_PROFILE")]
+    Profile,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetPersistentData<'a> {
+    pub realm: Realm,
+    pub slot_name: &'a str,
+    pub slot_value: &'a serde_json::Value,
 }
 
 #[derive(Default, Serialize)]

@@ -2,7 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::{RequestType, SetProfileParameter, SetVideoSettings},
+    requests::{Realm, RequestType, SetPersistentData, SetProfileParameter, SetVideoSettings},
     responses, Error, Result,
 };
 
@@ -12,6 +12,22 @@ pub struct Config<'a> {
 }
 
 impl<'a> Config<'a> {
+    pub async fn get_persistent_data(
+        &self,
+        realm: Realm,
+        slot_name: &str,
+    ) -> Result<serde_json::Value> {
+        self.client
+            .send_message(RequestType::GetPersistentData { realm, slot_name })
+            .await
+    }
+
+    pub async fn set_persistent_data(&self, data: SetPersistentData<'_>) -> Result<()> {
+        self.client
+            .send_message(RequestType::SetPersistentData(data))
+            .await
+    }
+
     pub async fn get_scene_collection_list(&self) -> Result<responses::SceneCollections> {
         self.client
             .send_message(RequestType::GetSceneCollectionList)
@@ -26,6 +42,14 @@ impl<'a> Config<'a> {
             .await
     }
 
+    pub async fn create_scene_collection(&self, scene_collection_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::CreateSceneCollection {
+                scene_collection_name,
+            })
+            .await
+    }
+
     pub async fn get_profile_list(&self) -> Result<responses::Profiles> {
         self.client.send_message(RequestType::GetProfileList).await
     }
@@ -33,6 +57,18 @@ impl<'a> Config<'a> {
     pub async fn set_current_profile(&self, profile_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::SetCurrentProfile { profile_name })
+            .await
+    }
+
+    pub async fn create_profile(&self, profile_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::CreateProfile { profile_name })
+            .await
+    }
+
+    pub async fn remove_profile(&self, profile_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::RemoveProfile { profile_name })
             .await
     }
 

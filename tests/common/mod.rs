@@ -29,7 +29,10 @@ pub async fn new_client() -> Result<Client> {
     });
 
     let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
-    let client = Client::connect(host, 4444, env::var("OBS_PASSWORD").ok()).await?;
+    let port = env::var("OBS_PORT")
+        .map(|p| p.parse())
+        .unwrap_or(Ok(4444))?;
+    let client = Client::connect(host, port, env::var("OBS_PASSWORD").ok()).await?;
 
     ensure_obs_setup(&client).await?;
 
@@ -159,11 +162,13 @@ fn is_required_profile(profile: &str) -> bool {
     profile == TEST_PROFILE
 }
 
-#[allow(unused_macros)]
+#[macro_export]
 macro_rules! wait_for {
     ($expression:expr, $pattern:pat) => {
-        while let Some(Event { ty, .. }) = $expression.next().await {
-            if matches!(ty, $pattern) {
+        use futures_util::stream::StreamExt;
+
+        while let Some(event) = $expression.next().await {
+            if matches!(event, $pattern) {
                 break;
             }
         }

@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use anyhow::Result;
 use obws::{
-    requests::SetProfileParameter,
+    requests::{Realm, SetPersistentData, SetProfileParameter},
     responses::{Profiles, SceneCollections},
 };
 use tokio::time;
@@ -16,6 +16,17 @@ async fn main() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.config();
 
+    client
+        .set_persistent_data(SetPersistentData {
+            realm: Realm::Profile,
+            slot_name: "obws-test",
+            slot_value: &true.into(),
+        })
+        .await?;
+    client
+        .get_persistent_data(Realm::Profile, "obws-test")
+        .await?;
+
     let SceneCollections {
         current_scene_collection_name,
         scene_collections,
@@ -24,7 +35,7 @@ async fn main() -> Result<()> {
         .iter()
         .find(|sc| *sc != &current_scene_collection_name)
         .unwrap();
-    client.set_current_scene_collection(&other).await?;
+    client.set_current_scene_collection(other).await?;
     time::sleep(Duration::from_secs(1)).await;
     client
         .set_current_scene_collection(&current_scene_collection_name)
@@ -39,10 +50,12 @@ async fn main() -> Result<()> {
         .iter()
         .find(|p| *p != &current_profile_name)
         .unwrap();
-    client.set_current_profile(&other).await?;
+    client.set_current_profile(other).await?;
     time::sleep(Duration::from_secs(1)).await;
     client.set_current_profile(&current_profile_name).await?;
     time::sleep(Duration::from_secs(1)).await;
+    client.create_profile("OBWS-TEST-New-Profile").await?;
+    client.remove_profile("OBWS-TEST-New-Profile").await?;
 
     // Currently broken in obs-websocket
     // client.get_profile_parameter("General", "Name").await?;

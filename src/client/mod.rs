@@ -35,8 +35,8 @@ pub use self::{
 #[cfg(feature = "events")]
 use crate::events::Event;
 use crate::{
-    requests::{ClientRequest, RequestType},
-    responses::{ServerMessage, Status},
+    requests::{ClientRequest, Identify, Request, RequestType},
+    responses::{Hello, Identified, RequestResponse, ServerMessage, Status},
     Error, Result,
 };
 
@@ -217,11 +217,11 @@ impl Client {
                         .map_err(InnerError::DeserializeMessage)?;
 
                     match message {
-                        ServerMessage::RequestResponse {
+                        ServerMessage::RequestResponse(RequestResponse {
                             request_id,
                             request_status,
                             response_data,
-                        } => {
+                        }) => {
                             let request_id = request_id
                                 .parse()
                                 .map_err(|e| InnerError::InvalidRequestId(e, request_id))?;
@@ -304,10 +304,11 @@ impl Client {
         T: DeserializeOwned,
     {
         let id = self.id_counter.fetch_add(1, Ordering::SeqCst);
-        let req = ClientRequest::Request {
-            request_id: &id.to_string(),
+        let id_str = id.to_string();
+        let req = ClientRequest::Request(Request {
+            request_id: &id_str,
             ty: req,
-        };
+        });
         let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
 
         let (tx, rx) = oneshot::channel();
@@ -474,22 +475,22 @@ async fn handshake(
     }
 
     match read_message(read).await? {
-        ServerMessage::Hello {
+        ServerMessage::Hello(Hello {
             obs_web_socket_version: _,
             rpc_version,
             authentication,
-        } => {
+        }) => {
             let authentication = authentication.zip(password).map(|(auth, password)| {
                 create_auth_response(&auth.challenge, &auth.salt, password)
             });
 
-            let req = serde_json::to_string(&ClientRequest::Identify {
+            let req = serde_json::to_string(&ClientRequest::Identify(Identify {
                 rpc_version,
                 authentication,
                 ignore_invalid_messages: false,
                 ignore_non_fatal_request_checks: false,
                 event_subscriptions: None,
-            })
+            }))
             .map_err(HandshakeError::SerializeMessage)?;
 
             write
@@ -501,9 +502,9 @@ async fn handshake(
     }
 
     match read_message(read).await? {
-        ServerMessage::Identified {
+        ServerMessage::Identified(Identified {
             negotiated_rpc_version,
-        } => {
+        }) => {
             debug!("identified with RPC version {}", negotiated_rpc_version);
         }
         _ => return Err(HandshakeError::NoIdentified),
