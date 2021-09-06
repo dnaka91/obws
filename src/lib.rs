@@ -97,3 +97,13 @@ pub enum Error {
     #[error("RPC version {requested} request but server negotiated version {negotiated}")]
     RpcVersion { requested: u32, negotiated: u32 },
 }
+
+#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+pub enum MonitorType {
+    #[serde(rename = "OBS_MONITORING_TYPE_NONE")]
+    None,
+    #[serde(rename = "OBS_MONITORING_TYPE_MONITOR_ONLY")]
+    MonitorOnly,
+    #[serde(rename = "OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT")]
+    MonitorAndOutput,
+}

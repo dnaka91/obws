@@ -2,8 +2,13 @@
 
 use std::path::Path;
 
+use chrono::Duration;
 use serde::{ser::SerializeStruct, Serialize};
 use serde_with::skip_serializing_none;
+
+use crate::MonitorType;
+
+mod ser;
 
 pub(crate) enum ClientRequest<'a> {
     Identify(Identify),
@@ -43,7 +48,6 @@ pub(crate) struct Identify {
     pub rpc_version: u32,
     pub authentication: Option<String>,
     pub ignore_invalid_messages: bool,
-    pub ignore_non_fatal_request_checks: bool,
     pub event_subscriptions: Option<u32>,
 }
 
@@ -52,7 +56,6 @@ pub(crate) struct Identify {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Reidentify {
     pub ignore_invalid_messages: bool,
-    pub ignore_non_fatal_request_checks: bool,
     pub event_subscriptions: Option<u32>,
 }
 
@@ -194,6 +197,76 @@ pub(crate) enum RequestType<'a> {
         new_input_name: &'a str,
     },
     CreateInput(CreateInputInternal<'a>),
+    #[serde(rename_all = "camelCase")]
+    GetInputAudioSyncOffset {
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetInputAudioSyncOffset {
+        input_name: &'a str,
+        #[serde(serialize_with = "ser::duration_nanos")]
+        input_audio_sync_offset: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetInputAudioMonitorType {
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetInputAudioMonitorType {
+        input_name: &'a str,
+        monitor_type: MonitorType,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetInputPropertiesListPropertyItems {
+        input_name: &'a str,
+        property_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    PressInputPropertiesButton {
+        input_name: &'a str,
+        property_name: &'a str,
+    },
+    // --------------------------------
+    // Scene items
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemList {
+        scene_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetGroupSceneItemList {
+        scene_name: &'a str,
+    },
+    CreateSceneItem(CreateSceneItem<'a>),
+    #[serde(rename_all = "camelCase")]
+    RemoveSceneItem {
+        scene_name: &'a str,
+        scene_item_id: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemTransform {
+        scene_name: &'a str,
+        scene_item_id: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemEnabled {
+        scene_name: &'a str,
+        scene_item_id: i64,
+    },
+    SetSceneItemEnabled(SetSceneItemEnabled<'a>),
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemLocked {
+        scene_name: &'a str,
+        scene_item_id: i64,
+    },
+    SetSceneItemLocked(SetSceneItemLocked<'a>),
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemIndex {
+        scene_name: &'a str,
+        scene_item_id: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetSceneItemIndex(SetSceneItemIndex<'a>),
     // --------------------------------
     // Scenes
     // --------------------------------
@@ -234,6 +307,7 @@ pub(crate) enum RequestType<'a> {
     // Streaming
     // --------------------------------
     GetStreamStatus,
+    ToggleStream,
     StartStream,
     StopStream,
 }
@@ -332,6 +406,38 @@ pub(crate) struct CreateInputInternal<'a> {
     pub input_kind: &'a str,
     pub input_settings: Option<serde_json::Value>,
     pub scene_item_enabled: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateSceneItem<'a> {
+    pub scene_name: &'a str,
+    pub source_name: &'a str,
+    pub scene_item_enabled: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSceneItemEnabled<'a> {
+   pub scene_name: &'a str,
+   pub scene_item_id: i64,
+   pub scene_item_enabled: bool,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSceneItemLocked<'a> {
+   pub scene_name: &'a str,
+   pub scene_item_id: i64,
+   pub scene_item_locked: bool,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSceneItemIndex<'a> {
+   pub scene_name: &'a str,
+   pub scene_item_id: i64,
+   pub scene_item_index: u32,
 }
 
 #[derive(Default, Serialize)]

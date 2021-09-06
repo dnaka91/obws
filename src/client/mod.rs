@@ -29,8 +29,8 @@ use tokio::{
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 pub use self::{
-    config::Config, general::General, inputs::Inputs, scenes::Scenes, sources::Sources,
-    streaming::Streaming,
+    config::Config, general::General, inputs::Inputs, scene_items::SceneItems, scenes::Scenes,
+    sources::Sources, streaming::Streaming,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -43,6 +43,7 @@ use crate::{
 mod config;
 mod general;
 mod inputs;
+mod scene_items;
 mod scenes;
 mod sources;
 mod streaming;
@@ -402,6 +403,11 @@ impl Client {
         Inputs { client: self }
     }
 
+    /// Access API functions related to scene items.
+    pub fn scene_items(&self) -> SceneItems<'_> {
+        SceneItems { client: self }
+    }
+
     /// Access API functions related to scenes.
     pub fn scenes(&self) -> Scenes<'_> {
         Scenes { client: self }
@@ -488,7 +494,6 @@ async fn handshake(
                 rpc_version,
                 authentication,
                 ignore_invalid_messages: false,
-                ignore_non_fatal_request_checks: false,
                 event_subscriptions: None,
             }))
             .map_err(HandshakeError::SerializeMessage)?;

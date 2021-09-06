@@ -5,6 +5,8 @@ use std::{collections::BTreeMap, path::PathBuf};
 use chrono::Duration;
 use serde::Deserialize;
 
+use crate::{responses::SceneItemTransform, MonitorType};
+
 /// All possible event types that can occur while the user interacts with OBS.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(tag = "eventType", content = "eventData")]
@@ -92,6 +94,11 @@ pub enum Event {
         input_name: String,
         input_audio_tracks: BTreeMap<String, bool>,
     },
+    #[serde(rename_all = "camelCase")]
+    InputAudioMonitorTypeChanged {
+        input_name: String,
+        monitor_type: MonitorType,
+    },
     // --------------------------------
     // Media Inputs
     // --------------------------------
@@ -169,7 +176,12 @@ pub enum Event {
         scene_item_id: u64,
         scene_item_locked: bool,
     },
-    SceneItemTransformChanged,
+    #[serde(rename_all = "camelCase")]
+    SceneItemTransformChanged {
+        scene_name: String,
+        scene_item_id: u64,
+        scene_item_transform: SceneItemTransform,
+    },
     // --------------------------------
     // Scenes
     // --------------------------------

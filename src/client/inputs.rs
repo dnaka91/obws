@@ -1,3 +1,4 @@
+use chrono::Duration;
 use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
@@ -6,7 +7,7 @@ use crate::{
         CreateInput, CreateInputInternal, RequestType, SetInputSettings, SetInputSettingsInternal,
         Volume,
     },
-    responses, Error, Result,
+    responses, Error, MonitorType, Result,
 };
 
 /// API functions related to inputs.
@@ -133,5 +134,78 @@ impl<'a> Inputs<'a> {
             }))
             .await
             .map(|sii| sii.scene_item_id)
+    }
+
+    pub async fn get_input_audio_sync_offset(&self, input_name: &str) -> Result<Duration> {
+        self.client
+            .send_message::<responses::AudioSyncOffset>(RequestType::GetInputAudioSyncOffset {
+                input_name,
+            })
+            .await
+            .map(|aso| aso.input_audio_sync_offset)
+    }
+
+    pub async fn set_input_audio_sync_offset(
+        &self,
+        input_name: &str,
+        input_audio_sync_offset: Duration,
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::SetInputAudioSyncOffset {
+                input_name,
+                input_audio_sync_offset,
+            })
+            .await
+    }
+
+    pub async fn get_input_audio_monitor_type(&self, input_name: &str) -> Result<MonitorType> {
+        self.client
+            .send_message::<responses::AudioMonitorType>(RequestType::GetInputAudioMonitorType {
+                input_name,
+            })
+            .await
+            .map(|amt| amt.monitor_type)
+    }
+
+    pub async fn set_input_audio_monitor_type(
+        &self,
+        input_name: &str,
+        monitor_type: MonitorType,
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::SetInputAudioMonitorType {
+                input_name,
+                monitor_type,
+            })
+            .await
+    }
+
+    pub async fn get_input_properties_list_property_items(
+        &self,
+        input_name: &str,
+        property_name: &str,
+    ) -> Result<Vec<responses::ListPropertyItem>> {
+        self.client
+            .send_message::<responses::ListPropertyItems>(
+                RequestType::GetInputPropertiesListPropertyItems {
+                    input_name,
+                    property_name,
+                },
+            )
+            .await
+            .map(|lpi| lpi.property_items)
+    }
+
+    pub async fn press_input_properties_button(
+        &self,
+        input_name: &str,
+        property_name: &str,
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::PressInputPropertiesButton {
+                input_name,
+                property_name,
+            })
+            .await
     }
 }

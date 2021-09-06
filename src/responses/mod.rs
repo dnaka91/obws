@@ -1,9 +1,12 @@
 //! All responses that can be received from the API.
 
+use bitflags::bitflags;
 use chrono::Duration;
 pub use semver::Version as SemVerVersion;
 use serde::{de, Deserialize, Deserializer};
 use serde_repr::Deserialize_repr;
+
+use crate::MonitorType;
 
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
@@ -133,125 +136,58 @@ pub enum StatusCode {
     Success = 100,
     /// The `requestType` field is missing from the request data.
     MissingRequestType = 203,
-    /// The request type is invalid (does not exist).
+    /// The request type is invalid or does not exist.
     UnknownRequestType = 204,
-    /// Generic error code (comment is expected to be provided).
+    /// Generic error code (comment required).
     GenericError = 205,
     /// A required request parameter is missing.
     MissingRequestParameter = 300,
     /// The request does not have a valid `requestData` object.
     MissingRequestData = 301,
-    /// Generic invalid request parameter message.
+    /// Generic invalid request parameter message (comment required).
     InvalidRequestParameter = 400,
     /// A request parameter has the wrong data type.
-    InvalidRequestParameterDataType = 401,
+    InvalidRequestParameterType = 401,
     /// A request parameter (float or int) is out of valid range.
     RequestParameterOutOfRange = 402,
     /// A request parameter (string or array) is empty and cannot be.
     RequestParameterEmpty = 403,
+    /// There are too many request parameters (for example a request takes two optional values,
+    /// where only one is allowed at a time).
+    TooManyRequestParameters = 404,
     /// An output is running and cannot be in order to perform the request (generic).
     OutputRunning = 500,
     /// An output is not running and should be.
     OutputNotRunning = 501,
-    /// Stream is running and cannot be.
-    StreamRunning = 502,
-    /// Stream is not running and should be.
-    StreamNotRunning = 503,
-    /// Record is running and cannot be.
-    RecordRunning = 504,
-    /// Record is not running and should be.
-    RecordNotRunning = 505,
-    /// Record is paused and cannot be.
-    RecordPaused = 506,
-    /// Replay buffer is running and cannot be.
-    ReplayBufferRunning = 507,
-    /// Replay buffer is not running and should be.
-    ReplayBufferNotRunning = 508,
-    /// Replay buffer is disabled and cannot be.
-    ReplayBufferDisabled = 509,
+    /// An output is paused and should not be.
+    OutputPaused = 502,
+    /// An output is disabled and should not be.
+    OutputDisabled = 503,
     /// Studio mode is active and cannot be.
-    StudioModeActive = 510,
+    StudioModeActive = 504,
     /// Studio mode is not active and should be.
-    StudioModeNotActive = 511,
-    /// Virtual-cam is running and cannot be.
-    VirtualCamRunning = 512,
-    /// Virtual-cam is not running and should be.
-    VirtualCamNotRunning = 513,
-    /// The specified source (`obs_source_t`) was of the invalid type (for example input instead of
-    /// scene).
-    InvalidSourceType = 600,
-    /// The specified source (`obs_source_t`) was not found (generic for input, filter, transition,
-    /// scene).
-    SourceNotFound = 601,
-    /// The specified source (`obs_source_t`) already exists. Applicable to inputs, filters,
-    /// transitions, scenes.
-    SourceAlreadyExists = 602,
-    /// The specified input (`obs_source_t-OBS_SOURCE_TYPE_FILTER`) was not found.
-    InputNotFound = 603,
-    /// The specified input (`obs_source_t-OBS_SOURCE_TYPE_INPUT`) had the wrong kind.
-    InvalidInputKind = 604,
-    /// The specified filter (`obs_source_t-OBS_SOURCE_TYPE_FILTER`) was not found.
-    FilterNotFound = 605,
-    /// The specified transition (`obs_source_t-OBS_SOURCE_TYPE_TRANSITION`) was not found.
-    TransitionNotFound = 606,
-    /// The specified transition (`obs_source_t-OBS_SOURCE_TYPE_TRANSITION`) does not support
-    /// setting its position (transition is of fixed type).
-    TransitionDurationFixed = 607,
-    /// The specified scene (`obs_source_t-OBS_SOURCE_TYPE_SCENE`), (`obs_scene_t`) was not found.
-    SceneNotFound = 608,
-    /// The specified scene item (`obs_sceneitem_t`) was not found.
-    SceneItemNotFound = 609,
-    /// The specified scene collection was not found.
-    SceneCollectionNotFound = 610,
-    /// The specified profile was not found.
-    ProfileNotFound = 611,
-    /// The specified output (`obs_output_t`) was not found.
-    OutputNotFound = 612,
-    /// The specified encoder (`obs_encoder_t`) was not found.
-    EncoderNotFound = 613,
-    /// The specified service (`obs_service_t`) was not found.
-    ServiceNotFound = 614,
-    /// The specified hotkey was not found.
-    HotkeyNotFound = 615,
-    /// The specified directory was not found.
-    DirectoryNotFound = 616,
-    /// The specified configuration item (`config_t`) was not found. Could be section or parameter
-    /// name.
-    ConfigParameterNotFound = 617,
-    /// The specified property (`obs_properties_t`) was not found.
-    PropertyNotFound = 618,
-    /// The specified key (`OBS_KEY_*`) was not found.
-    KeyNotFound = 619,
-    /// The specified data realm (`OBS_WEBSOCKET_DATA_REALM_*`) was not found.
-    DataRealmNotFound = 620,
-    /// The scene collection already exists.
-    SceneCollectionAlreadyExists = 621,
-    /// There are not enough scene collections to perform the action.
-    NotEnoughSceneCollections = 622,
-    /// The profile already exists.
-    ProfileAlreadyExists = 623,
-    /// There are not enough profiles to perform the action.
-    NotEnoughProfiles = 624,
-    /// There are not enough scenes to perform the action.
-    NotEnoughScenes = 625,
-    /// Processing the request failed unexpectedly.
-    RequestProcessingFailed = 700,
-    /// Starting the Output failed.
-    OutputStartFailed = 701,
-    /// Duplicating the scene item failed.
-    SceneItemDuplicationFailed = 702,
-    /// Rendering the screenshot failed.
-    ScreenshotRenderFailed = 703,
-    /// Encoding the screenshot failed.
-    ScreenshotEncodeFailed = 704,
-    /// Saving the screenshot failed.
-    ScreenshotSaveFailed = 705,
-    /// Creating the directory failed.
-    DirectoryCreationFailed = 706,
+    StudioModeNotActive = 505,
+    /// The resource was not found.
+    ResourceNotFound = 600,
+    /// The resource already exists.
+    ResourceAlreadyExists = 601,
+    /// The type of resource found is invalid.
+    InvalidResourceType = 602,
+    /// There are not enough instances of the resource in order to perform the request.
+    NotEnoughResources = 603,
+    /// The state of the resource is invalid. For example, if the resource is blocked from being
+    /// accessed.
+    InvalidResourceState = 604,
+    /// The specified input (obs_source_t-OBS_SOURCE_TYPE_INPUT) had the wrong kind.
+    InvalidInputKind = 605,
+    /// Creating the resource failed.
+    ResourceCreationFailed = 700,
+    /// Performing an action on the resource failed.
+    ResourceActionFailed = 701,
+    /// Processing the request failed unexpectedly (comment required).
+    RequestProcessingFailed = 702,
     /// The combination of request parameters cannot be used to perform an action.
-    CannotAct = 707,
-    /// Creation of a new stream service failed.
-    StreamServiceCreationFailed = 708,
+    CannotAct = 703,
 }
 
 #[derive(Debug, Deserialize)]
@@ -374,6 +310,112 @@ pub(crate) struct SceneItemId {
     pub scene_item_id: i64,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItemTransform {
+    pub source_width: u32,
+    pub source_height: u32,
+    pub position_x: i32,
+    pub position_y: i32,
+    pub rotation: f32,
+    pub width: u32,
+    pub height: u32,
+    pub alignment: Alignment,
+    pub bounds_type: BoundsType,
+    pub bounds_alignment: Alignment,
+    pub bounds_width: u32,
+    pub bounds_height: u32,
+    pub crop_left: u32,
+    pub crop_right: u32,
+    pub crop_top: u32,
+    pub crop_bottom: u32,
+}
+
+bitflags! {
+    #[derive(Deserialize)]
+    #[serde(transparent)]
+    pub struct Alignment: u32 {
+        const CENTER = 0;
+        const LEFT = 1 << 0;
+        const RIGHT = 1 << 1;
+        const TOP = 1 << 2;
+        const BOTTOM = 1 << 3;
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum BoundsType {
+    #[serde(rename = "OBS_BOUNDS_NONE")]
+    None,
+    #[serde(rename = "OBS_BOUNDS_STRETCH")]
+    Stretch,
+    #[serde(rename = "OBS_BOUNDS_SCALE_INNER")]
+    ScaleInner,
+    #[serde(rename = "OBS_BOUNDS_SCALE_OUTER")]
+    ScaleOuter,
+    #[serde(rename = "OBS_BOUNDS_SCALE_TO_WIDTH")]
+    ScaleToWidth,
+    #[serde(rename = "OBS_BOUNDS_SCALE_TO_HEIGHT")]
+    ScaleToHeight,
+    #[serde(rename = "OBS_BOUNDS_MAX_ONLY")]
+    MaxOnly,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemEnabled {
+    pub scene_item_enabled: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemLocked {
+    pub scene_item_locked: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemIndex {
+    pub scene_item_index: u32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AudioSyncOffset {
+    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    pub input_audio_sync_offset: Duration,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct AudioMonitorType {
+    pub monitor_type: MonitorType,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ListPropertyItems {
+    pub property_items: Vec<ListPropertyItem>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ListPropertyItem {
+    pub item_name: String,
+    pub item_enabled: bool,
+    pub item_value: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemList {
+    pub scene_items: Vec<SceneItem>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItem {}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scenes {
@@ -426,4 +468,10 @@ pub struct StreamStatus {
     pub output_bytes: u64,
     pub output_skipped_frames: u32,
     pub output_total_frames: u32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct ToggleStream {
+    pub output_active: bool,
 }
