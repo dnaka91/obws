@@ -15,7 +15,7 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - name: Setup cache
+      - name: Configure cache
         uses: Swatinem/rust-cache@v1
       - name: Install cargo-hack
         uses: actions-rs/cargo@v1
@@ -42,7 +42,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - name: Setup cache
+      - name: Configure cache
         uses: Swatinem/rust-cache@v1
       - name: Test
         uses: actions-rs/cargo@v1
@@ -70,7 +70,7 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - name: Setup cache
+      - name: Configure cache
         uses: Swatinem/rust-cache@v1
       - name: Run clippy
         uses: actions-rs/cargo@v1
