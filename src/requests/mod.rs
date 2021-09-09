@@ -419,25 +419,25 @@ pub struct CreateSceneItem<'a> {
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemEnabled<'a> {
-   pub scene_name: &'a str,
-   pub scene_item_id: i64,
-   pub scene_item_enabled: bool,
+    pub scene_name: &'a str,
+    pub scene_item_id: i64,
+    pub scene_item_enabled: bool,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemLocked<'a> {
-   pub scene_name: &'a str,
-   pub scene_item_id: i64,
-   pub scene_item_locked: bool,
+    pub scene_name: &'a str,
+    pub scene_item_id: i64,
+    pub scene_item_locked: bool,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemIndex<'a> {
-   pub scene_name: &'a str,
-   pub scene_item_id: i64,
-   pub scene_item_index: u32,
+    pub scene_name: &'a str,
+    pub scene_item_id: i64,
+    pub scene_item_index: u32,
 }
 
 #[derive(Default, Serialize)]
