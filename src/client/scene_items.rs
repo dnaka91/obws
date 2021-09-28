@@ -31,6 +31,16 @@ impl<'a> SceneItems<'a> {
             .map(|sil| sil.scene_items)
     }
 
+    pub async fn get_scene_item_id(&self, scene_name: &str, source_name: &str) -> Result<i64> {
+        self.client
+            .send_message::<responses::SceneItemId>(RequestType::GetSceneItemId {
+                scene_name,
+                source_name,
+            })
+            .await
+            .map(|sii| sii.scene_item_id)
+    }
+
     pub async fn create_scene_item(&self, create: CreateSceneItem<'_>) -> Result<i64> {
         self.client
             .send_message::<responses::SceneItemId>(RequestType::CreateSceneItem(create))

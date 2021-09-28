@@ -73,8 +73,8 @@ pub(crate) struct Request<'a> {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RequestBatch<'a> {
     pub request_id: &'a str,
-    pub halt_on_failure: Option<bool>,
     pub requests: &'a [RequestType<'a>],
+    pub execution_type: Option<ExecutionType>,
 }
 
 bitflags! {
@@ -111,13 +111,23 @@ bitflags! {
             | Self::OUTPUTS.bits
             | Self::SCENE_ITEMS.bits
             | Self::MEDIA_INPUTS.bits;
-        ///  InputVolumeMeters event (high-volume).
+        /// `InputVolumeMeters` event (high-volume).
         const INPUT_VOLUME_METERS = 1 << 9;
-        /// InputActiveStateChanged event (high-volume).
+        /// `InputActiveStateChanged` event (high-volume).
         const INPUT_ACTIVE_STATE_CHANGED = 1 << 10;
-        /// InputShowStateChanged event (high-volume).
+        /// `InputShowStateChanged` event (high-volume).
         const INPUT_SHOW_STATE_CHANGED = 1 << 11;
     }
+}
+
+#[derive(Serialize)]
+pub(crate) enum ExecutionType {
+    #[serde(rename = "OBS_WEBSOCKET_REQUEST_BATCH_EXECUTION_TYPE_SERIAL_REALTIME")]
+    SerialRealtime,
+    #[serde(rename = "OBS_WEBSOCKET_REQUEST_BATCH_EXECUTION_TYPE_SERIAL_FRAME")]
+    SerialFrame,
+    #[serde(rename = "OBS_WEBSOCKET_REQUEST_BATCH_EXECUTION_TYPE_PARALLEL")]
+    Parallel,
 }
 
 #[derive(Serialize)]
@@ -242,6 +252,10 @@ pub(crate) enum RequestType<'a> {
     },
     CreateInput(CreateInputInternal<'a>),
     #[serde(rename_all = "camelCase")]
+    RemoveInput {
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
     GetInputAudioSyncOffset {
         input_name: &'a str,
     },
@@ -280,6 +294,11 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     GetGroupSceneItemList {
         scene_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemId {
+        scene_name: &'a str,
+        source_name: &'a str,
     },
     CreateSceneItem(CreateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]

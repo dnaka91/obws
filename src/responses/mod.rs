@@ -140,6 +140,8 @@ pub enum StatusCode {
     UnknownRequestType = 204,
     /// Generic error code (comment required).
     GenericError = 205,
+    /// The request batch execution type is not supported.
+    UnsupportedRequestBatchExecutionType = 206,
     /// A required request parameter is missing.
     MissingRequestParameter = 300,
     /// The request does not have a valid `requestData` object.

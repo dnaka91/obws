@@ -136,6 +136,14 @@ impl<'a> Inputs<'a> {
             .map(|sii| sii.scene_item_id)
     }
 
+    // Currently disabled in obs-websocket and will always fail.
+    #[doc(hidden)]
+    pub async fn remove_input(&self, input_name: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::RemoveInput { input_name })
+            .await
+    }
+
     pub async fn get_input_audio_sync_offset(&self, input_name: &str) -> Result<Duration> {
         self.client
             .send_message::<responses::AudioSyncOffset>(RequestType::GetInputAudioSyncOffset {
