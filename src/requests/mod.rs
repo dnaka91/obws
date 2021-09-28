@@ -2,6 +2,7 @@
 
 use std::path::Path;
 
+use bitflags::bitflags;
 use chrono::Duration;
 use serde::{ser::SerializeStruct, Serialize};
 use serde_with::skip_serializing_none;
@@ -48,7 +49,7 @@ pub(crate) struct Identify {
     pub rpc_version: u32,
     pub authentication: Option<String>,
     pub ignore_invalid_messages: bool,
-    pub event_subscriptions: Option<u32>,
+    pub event_subscriptions: Option<EventSubscription>,
 }
 
 #[skip_serializing_none]
@@ -56,7 +57,7 @@ pub(crate) struct Identify {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Reidentify {
     pub ignore_invalid_messages: bool,
-    pub event_subscriptions: Option<u32>,
+    pub event_subscriptions: Option<EventSubscription>,
 }
 
 #[derive(Serialize)]
@@ -74,6 +75,49 @@ pub(crate) struct RequestBatch<'a> {
     pub request_id: &'a str,
     pub halt_on_failure: Option<bool>,
     pub requests: &'a [RequestType<'a>],
+}
+
+bitflags! {
+    #[derive(Serialize)]
+    #[serde(transparent)]
+    pub struct EventSubscription: u32 {
+        /// Set subscriptions to 0 to disable all events.
+        const NONE = 0;
+        /// Receive events in the `General` category.
+        const GENERAL = 1 << 0;
+        /// Receive events in the `Config` category.
+        const CONFIG = 1 << 1;
+        /// Receive events in the `Scenes` category.
+        const SCENES = 1 << 2;
+        /// Receive events in the `Inputs` category.
+        const INPUTS = 1 << 3;
+        /// Receive events in the `Transitions` category.
+        const TRANSITIONS = 1 << 4;
+        /// Receive events in the `Filters` category.
+        const FILTERS = 1 << 5;
+        /// Receive events in the `Outputs` category.
+        const OUTPUTS = 1 << 6;
+        /// Receive events in the `Scene Items` category.
+        const SCENE_ITEMS = 1 << 7;
+        /// Receive events in the `MediaInputs` category.
+        const MEDIA_INPUTS = 1 << 8;
+        /// Receive all event categories.
+        const ALL = Self::GENERAL.bits
+            | Self::CONFIG.bits
+            | Self::SCENES.bits
+            | Self::INPUTS.bits
+            | Self::TRANSITIONS.bits
+            | Self::FILTERS.bits
+            | Self::OUTPUTS.bits
+            | Self::SCENE_ITEMS.bits
+            | Self::MEDIA_INPUTS.bits;
+        ///  InputVolumeMeters event (high-volume).
+        const INPUT_VOLUME_METERS = 1 << 9;
+        /// InputActiveStateChanged event (high-volume).
+        const INPUT_ACTIVE_STATE_CHANGED = 1 << 10;
+        /// InputShowStateChanged event (high-volume).
+        const INPUT_SHOW_STATE_CHANGED = 1 << 11;
+    }
 }
 
 #[derive(Serialize)]

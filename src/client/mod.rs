@@ -35,7 +35,7 @@ pub use self::{
 #[cfg(feature = "events")]
 use crate::events::Event;
 use crate::{
-    requests::{ClientRequest, Identify, Request, RequestType},
+    requests::{ClientRequest, EventSubscription, Identify, Request, RequestType},
     responses::{Hello, Identified, RequestResponse, ServerMessage, Status},
     Error, Result,
 };
@@ -104,6 +104,7 @@ where
     /// Port to connect to.
     pub port: u16,
     pub password: Option<P>,
+    pub event_subscriptions: Option<EventSubscription>,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
     #[cfg(feature = "tls")]
     pub tls: bool,
@@ -158,6 +159,7 @@ impl Client {
             host,
             port,
             password,
+            event_subscriptions: None,
             #[cfg(feature = "tls")]
             tls: false,
             broadcast_capacity: None,
@@ -195,6 +197,7 @@ impl Client {
             &mut write,
             &mut read,
             config.password.as_ref().map(AsRef::as_ref),
+            config.event_subscriptions,
         )
         .await?;
 
@@ -465,6 +468,7 @@ async fn handshake(
     write: &mut (impl Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Unpin),
     read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
     password: Option<&str>,
+    event_subscriptions: Option<EventSubscription>,
 ) -> Result<(), HandshakeError> {
     async fn read_message(
         read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
@@ -494,7 +498,7 @@ async fn handshake(
                 rpc_version,
                 authentication,
                 ignore_invalid_messages: false,
-                event_subscriptions: None,
+                event_subscriptions,
             }))
             .map_err(HandshakeError::SerializeMessage)?;
 
