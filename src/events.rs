@@ -2,8 +2,8 @@
 
 use std::{collections::BTreeMap, path::PathBuf};
 
-use chrono::Duration;
 use serde::Deserialize;
+use time::Duration;
 
 use crate::{responses::SceneItemTransform, MonitorType};
 

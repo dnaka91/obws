@@ -3,8 +3,8 @@
 
 use std::{convert::TryFrom, fmt};
 
-use chrono::Duration;
 use serde::de::{self, Deserializer, Visitor};
+use time::Duration;
 
 #[derive(Debug, thiserror::Error)]
 enum Error {

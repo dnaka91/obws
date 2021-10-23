@@ -1,10 +1,10 @@
 //! All responses that can be received from the API.
 
 use bitflags::bitflags;
-use chrono::Duration;
 pub use semver::Version as SemVerVersion;
 use serde::{de, Deserialize, Deserializer};
 use serde_repr::Deserialize_repr;
+use time::Duration;
 
 use crate::MonitorType;
 

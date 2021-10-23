@@ -3,9 +3,9 @@
 use std::path::Path;
 
 use bitflags::bitflags;
-use chrono::Duration;
 use serde::{ser::SerializeStruct, Serialize};
 use serde_with::skip_serializing_none;
+use time::Duration;
 
 use crate::MonitorType;
 
