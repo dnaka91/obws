@@ -15,12 +15,20 @@ pub enum Event {
     // Config
     // --------------------------------
     #[serde(rename_all = "camelCase")]
+    CurrentSceneCollectionChanging {
+        scene_collection_name: String,
+    },
+    #[serde(rename_all = "camelCase")]
     CurrentSceneCollectionChanged {
         scene_collection_name: String,
     },
     #[serde(rename_all = "camelCase")]
     SceneCollectionListChanged {
         scene_collections: Vec<String>,
+    },
+    #[serde(rename_all = "camelCase")]
+    CurrentProfileChanging {
+        profile_name: String,
     },
     #[serde(rename_all = "camelCase")]
     CurrentProfileChanged {

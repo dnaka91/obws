@@ -421,7 +421,7 @@ pub struct SceneItem {}
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scenes {
-    pub current_program_scene_name: String,
+    pub current_program_scene_name: Option<String>,
     pub current_preview_scene_name: Option<String>,
     pub scenes: Vec<Scene>,
 }
