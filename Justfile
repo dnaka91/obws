@@ -1,6 +1,6 @@
 set dotenv-load := true
 
-nightly := "nightly-2021-06-01"
+nightly := "nightly-2021-10-23"
 
 # list available recipes
 default:
