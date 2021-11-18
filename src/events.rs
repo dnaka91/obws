@@ -5,7 +5,7 @@ use std::{collections::BTreeMap, path::PathBuf};
 use serde::Deserialize;
 use time::Duration;
 
-use crate::{responses::SceneItemTransform, MonitorType};
+use crate::{common::MediaAction, responses::SceneItemTransform, MonitorType};
 
 /// All possible event types that can occur while the user interacts with OBS.
 #[derive(Clone, Debug, Deserialize)]
@@ -168,7 +168,7 @@ pub enum Event {
         scene_item_index: u32,
     },
     #[serde(rename_all = "camelCase")]
-    SceneItemReindexed {
+    SceneItemListReindexed {
         scene_name: String,
         scene_items: Vec<BasicSceneItem>,
     },
@@ -246,24 +246,6 @@ pub enum Event {
     /// Web-socket server has stopped.
     ServerStopped,
     /// Fallback value for any unknown event type.
-    #[serde(other)]
-    Unknown,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize)]
-pub enum MediaAction {
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE")]
-    Pause,
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY")]
-    Play,
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART")]
-    Restart,
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_STOP")]
-    Stop,
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NEXT")]
-    Next,
-    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PREVIOUS")]
-    Previous,
     #[serde(other)]
     Unknown,
 }

@@ -1,7 +1,11 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-use obws::requests::{SetInputSettings, Volume};
+use obws::{
+    requests::{SetInputSettings, Volume},
+    MonitorType,
+};
+use time::Duration;
 
 use crate::common::{INPUT_KIND_BROWSER, TEST_BROWSER, TEST_BROWSER_RENAME, TEST_MEDIA};
 
@@ -46,6 +50,22 @@ async fn main() -> Result<()> {
         .await?;
     client
         .set_input_name(TEST_BROWSER_RENAME, TEST_BROWSER)
+        .await?;
+
+    let offset = client.get_input_audio_sync_offset(TEST_MEDIA).await?;
+    client
+        .set_input_audio_sync_offset(TEST_MEDIA, Duration::milliseconds(500))
+        .await?;
+    client
+        .set_input_audio_sync_offset(TEST_MEDIA, offset)
+        .await?;
+
+    let monitor_type = client.get_input_audio_monitor_type(TEST_MEDIA).await?;
+    client
+        .set_input_audio_monitor_type(TEST_MEDIA, MonitorType::MonitorAndOutput)
+        .await?;
+    client
+        .set_input_audio_monitor_type(TEST_MEDIA, monitor_type)
         .await?;
 
     Ok(())

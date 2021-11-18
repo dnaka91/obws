@@ -53,3 +53,7 @@ required-features = ["events"]
 [[test]]
 name = "general"
 required-features = ["events"]
+
+[[test]]
+name = "recording"
+required-features = ["events"]

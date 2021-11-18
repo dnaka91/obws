@@ -102,6 +102,12 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         "studio mode enabled, required to be disabled for studio mode tests"
     );
 
+    let recording_active = client.recording().get_record_status().await?.output_active;
+    ensure!(
+        !recording_active,
+        "recording active, required to be stopped for recording tests"
+    );
+
     client
         .scenes()
         .set_current_program_scene(TEST_SCENE)
@@ -164,7 +170,7 @@ fn is_required_profile(profile: &str) -> bool {
 
 #[macro_export]
 macro_rules! wait_for {
-    ($expression:expr, $pattern:pat) => {
+    ($expression:expr, $pattern:pat) => {{
         use futures_util::stream::StreamExt;
 
         while let Some(event) = $expression.next().await {
@@ -172,5 +178,5 @@ macro_rules! wait_for {
                 break;
             }
         }
-    };
+    }};
 }

@@ -96,6 +96,39 @@ impl<'de> Visitor<'de> for DurationMillisVisitor {
     }
 }
 
+pub fn duration_millis_opt<'de, D>(deserializer: D) -> Result<Option<Duration>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    deserializer.deserialize_option(DurationMillisOptVisitor)
+}
+
+struct DurationMillisOptVisitor;
+
+impl<'de> Visitor<'de> for DurationMillisOptVisitor {
+    type Value = Option<Duration>;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("a duration in milliseconds")
+    }
+
+    fn visit_none<E>(self) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(None)
+    }
+
+    fn visit_some<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer
+            .deserialize_i64(DurationMillisVisitor)
+            .map(Some)
+    }
+}
+
 pub fn duration_nanos<'de, D>(deserializer: D) -> Result<Duration, D::Error>
 where
     D: Deserializer<'de>,
@@ -214,6 +247,55 @@ mod tests {
             ],
             "value 18446744073709551615 is too large for an i64: \
             out of range integral type conversion attempted",
+        );
+    }
+
+    #[test]
+    fn deser_duration_millis_opt() {
+        #[derive(Debug, PartialEq, Eq, Deserialize)]
+        struct SimpleDuration {
+            #[serde(deserialize_with = "duration_millis_opt")]
+            value: Option<Duration>,
+        }
+
+        assert_de_tokens(
+            &SimpleDuration { value: None },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::None,
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: Some(Duration::milliseconds(150)),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::Some,
+                Token::I64(150),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens_error::<SimpleDuration>(
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 0,
+                },
+                Token::StructEnd,
+            ],
+            "missing field `value`",
         );
     }
 

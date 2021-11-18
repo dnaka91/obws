@@ -13,7 +13,7 @@ impl<'a> Streaming<'a> {
 
     pub async fn toggle_stream(&self) -> Result<bool> {
         self.client
-            .send_message::<responses::ToggleStream>(RequestType::ToggleStream)
+            .send_message::<responses::OutputActive>(RequestType::ToggleStream)
             .await
             .map(|ts| ts.output_active)
     }

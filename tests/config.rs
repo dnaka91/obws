@@ -57,8 +57,7 @@ async fn main() -> Result<()> {
     client.create_profile("OBWS-TEST-New-Profile").await?;
     client.remove_profile("OBWS-TEST-New-Profile").await?;
 
-    // Currently broken in obs-websocket
-    // client.get_profile_parameter("General", "Name").await?;
+    client.get_profile_parameter("General", "Name").await?;
     client
         .set_profile_parameter(SetProfileParameter {
             parameter_category: "OBWS",

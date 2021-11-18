@@ -1,12 +1,14 @@
 //! All responses that can be received from the API.
 
-use bitflags::bitflags;
 pub use semver::Version as SemVerVersion;
 use serde::{de, Deserialize, Deserializer};
 use serde_repr::Deserialize_repr;
 use time::Duration;
 
-use crate::MonitorType;
+use crate::{
+    common::{Alignment, BoundsType},
+    MonitorType,
+};
 
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
@@ -169,6 +171,8 @@ pub enum StatusCode {
     StudioModeActive = 504,
     /// Studio mode is not active and should be.
     StudioModeNotActive = 505,
+    /// An output is not paused and should be
+    OutputNotPaused = 506,
     /// The resource was not found.
     ResourceNotFound = 600,
     /// The resource already exists.
@@ -308,6 +312,66 @@ pub struct InputVolume {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct MediaStatus {
+    pub media_state: MediaState,
+    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    pub media_duration: Option<Duration>,
+    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    pub media_cursor: Option<Duration>,
+}
+
+#[derive(Copy, Clone, Debug, Deserialize)]
+pub enum MediaState {
+    #[serde(rename = "OBS_MEDIA_STATE_NONE")]
+    None,
+    #[serde(rename = "OBS_MEDIA_STATE_PLAYING")]
+    Playing,
+    #[serde(rename = "OBS_MEDIA_STATE_OPENING")]
+    Opening,
+    #[serde(rename = "OBS_MEDIA_STATE_BUFFERING")]
+    Buffering,
+    #[serde(rename = "OBS_MEDIA_STATE_PAUSED")]
+    Paused,
+    #[serde(rename = "OBS_MEDIA_STATE_STOPPED")]
+    Stopped,
+    #[serde(rename = "OBS_MEDIA_STATE_ENDED")]
+    Ended,
+    #[serde(rename = "OBS_MEDIA_STATE_ERROR")]
+    Error,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecordStatus {
+    pub output_active: bool,
+    pub output_paused: bool,
+    #[serde(deserialize_with = "crate::de::duration_timecode")]
+    pub output_timecode: Duration,
+    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    pub output_duration: Duration,
+    pub output_bytes: u64,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct OutputActive {
+    pub output_active: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct OutputPaused {
+    pub output_paused: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct RecordDirectory {
+    pub record_directory: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemId {
     pub scene_item_id: i64,
 }
@@ -320,6 +384,8 @@ pub struct SceneItemTransform {
     pub position_x: i32,
     pub position_y: i32,
     pub rotation: f32,
+    pub scale_x: f32,
+    pub scale_y: f32,
     pub width: u32,
     pub height: u32,
     pub alignment: Alignment,
@@ -331,36 +397,6 @@ pub struct SceneItemTransform {
     pub crop_right: u32,
     pub crop_top: u32,
     pub crop_bottom: u32,
-}
-
-bitflags! {
-    #[derive(Deserialize)]
-    #[serde(transparent)]
-    pub struct Alignment: u32 {
-        const CENTER = 0;
-        const LEFT = 1 << 0;
-        const RIGHT = 1 << 1;
-        const TOP = 1 << 2;
-        const BOTTOM = 1 << 3;
-    }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize)]
-pub enum BoundsType {
-    #[serde(rename = "OBS_BOUNDS_NONE")]
-    None,
-    #[serde(rename = "OBS_BOUNDS_STRETCH")]
-    Stretch,
-    #[serde(rename = "OBS_BOUNDS_SCALE_INNER")]
-    ScaleInner,
-    #[serde(rename = "OBS_BOUNDS_SCALE_OUTER")]
-    ScaleOuter,
-    #[serde(rename = "OBS_BOUNDS_SCALE_TO_WIDTH")]
-    ScaleToWidth,
-    #[serde(rename = "OBS_BOUNDS_SCALE_TO_HEIGHT")]
-    ScaleToHeight,
-    #[serde(rename = "OBS_BOUNDS_MAX_ONLY")]
-    MaxOnly,
 }
 
 #[derive(Debug, Deserialize)]
@@ -416,7 +452,26 @@ pub(crate) struct SceneItemList {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SceneItem {}
+pub struct SceneItem {
+    scene_item_id: i64,
+    scene_item_index: u32,
+    source_name: String,
+    source_type: SourceType,
+    input_kind: Option<String>,
+    is_group: Option<bool>,
+}
+
+#[derive(Copy, Clone, Debug, Deserialize)]
+pub enum SourceType {
+    #[serde(rename = "OBS_SOURCE_TYPE_INPUT")]
+    Input,
+    #[serde(rename = "OBS_SOURCE_TYPE_FILTER")]
+    Filter,
+    #[serde(rename = "OBS_SOURCE_TYPE_TRANSITION")]
+    Transition,
+    #[serde(rename = "OBS_SOURCE_TYPE_SCENE")]
+    Scene,
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -470,10 +525,4 @@ pub struct StreamStatus {
     pub output_bytes: u64,
     pub output_skipped_frames: u32,
     pub output_total_frames: u32,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub(crate) struct ToggleStream {
-    pub output_active: bool,
 }

@@ -7,7 +7,10 @@ use serde::{ser::SerializeStruct, Serialize};
 use serde_with::skip_serializing_none;
 use time::Duration;
 
-use crate::MonitorType;
+use crate::{
+    common::{Alignment, BoundsType, MediaAction},
+    MonitorType,
+};
 
 mod ser;
 
@@ -262,7 +265,7 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     SetInputAudioSyncOffset {
         input_name: &'a str,
-        #[serde(serialize_with = "ser::duration_nanos")]
+        #[serde(serialize_with = "ser::duration_millis")]
         input_audio_sync_offset: Duration,
     },
     #[serde(rename_all = "camelCase")]
@@ -285,6 +288,41 @@ pub(crate) enum RequestType<'a> {
         property_name: &'a str,
     },
     // --------------------------------
+    // Media inputs
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    GetMediaInputStatus {
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetMediaInputCursor {
+        input_name: &'a str,
+        #[serde(serialize_with = "ser::duration_millis")]
+        media_cursor: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    OffsetMediaInputCursor {
+        input_name: &'a str,
+        #[serde(serialize_with = "ser::duration_millis")]
+        media_cursor_offset: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    TriggerMediaInputAction {
+        input_name: &'a str,
+        media_action: MediaAction,
+    },
+    // --------------------------------
+    // Recording
+    // --------------------------------
+    GetRecordStatus,
+    ToggleRecord,
+    StartRecord,
+    StopRecord,
+    ToggleRecordPause,
+    PauseRecord,
+    ResumeRecord,
+    GetRecordDirectory,
+    // --------------------------------
     // Scene items
     // --------------------------------
     #[serde(rename_all = "camelCase")]
@@ -306,11 +344,13 @@ pub(crate) enum RequestType<'a> {
         scene_name: &'a str,
         scene_item_id: i64,
     },
+    DuplicateSceneItem(DuplicateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemTransform {
         scene_name: &'a str,
         scene_item_id: i64,
     },
+    SetSceneItemTransform(SetSceneItemTransform<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemEnabled {
         scene_name: &'a str,
@@ -477,6 +517,41 @@ pub struct CreateSceneItem<'a> {
     pub scene_name: &'a str,
     pub source_name: &'a str,
     pub scene_item_enabled: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DuplicateSceneItem<'a> {
+    pub scene_name: &'a str,
+    pub scene_item_id: i64,
+    pub destination_scene_name: Option<&'a str>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSceneItemTransform<'a> {
+    pub scene_name: &'a str,
+    pub scene_item_id: i64,
+    pub scene_item_transform: SceneItemTransform,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneItemTransform {
+    pub position_x: Option<i32>,
+    pub position_y: Option<i32>,
+    pub rotation: Option<f32>,
+    pub scale_x: Option<f32>,
+    pub scale_y: Option<f32>,
+    pub alignment: Option<Alignment>,
+    pub bounds_type: Option<BoundsType>,
+    pub bounds_alignment: Option<Alignment>,
+    pub bounds_width: Option<u32>,
+    pub bounds_height: Option<u32>,
+    pub crop_left: Option<u32>,
+    pub crop_right: Option<u32>,
+    pub crop_top: Option<u32>,
+    pub crop_bottom: Option<u32>,
 }
 
 #[derive(Default, Serialize)]

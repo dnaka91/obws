@@ -29,8 +29,9 @@ use tokio::{
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 pub use self::{
-    config::Config, general::General, inputs::Inputs, scene_items::SceneItems, scenes::Scenes,
-    sources::Sources, streaming::Streaming,
+    config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs,
+    recording::Recording, scene_items::SceneItems, scenes::Scenes, sources::Sources,
+    streaming::Streaming,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -43,6 +44,8 @@ use crate::{
 mod config;
 mod general;
 mod inputs;
+mod media_inputs;
+mod recording;
 mod scene_items;
 mod scenes;
 mod sources;
@@ -404,6 +407,16 @@ impl Client {
     /// Access API functions related to inputs.
     pub fn inputs(&self) -> Inputs<'_> {
         Inputs { client: self }
+    }
+
+    /// Access API functions related to media inputs.
+    pub fn media_inputs(&self) -> MediaInputs<'_> {
+        MediaInputs { client: self }
+    }
+
+    /// Access API functions related to recording.
+    pub fn recording(&self) -> Recording<'_> {
+        Recording { client: self }
     }
 
     /// Access API functions related to scene items.

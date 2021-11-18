@@ -36,6 +36,7 @@ pub use semver::{Comparator, Version};
 pub use self::client::Client;
 
 pub mod client;
+pub mod common;
 #[cfg(feature = "events")]
 pub mod events;
 pub mod requests;

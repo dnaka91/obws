@@ -1,7 +1,8 @@
 use super::Client;
 use crate::{
     requests::{
-        CreateSceneItem, RequestType, SetSceneItemEnabled, SetSceneItemIndex, SetSceneItemLocked,
+        CreateSceneItem, DuplicateSceneItem, RequestType, SetSceneItemEnabled, SetSceneItemIndex,
+        SetSceneItemLocked, SetSceneItemTransform,
     },
     responses, Result,
 };
@@ -48,13 +49,20 @@ impl<'a> SceneItems<'a> {
             .map(|sii| sii.scene_item_id)
     }
 
-    pub async fn remote_scene_item(&self, scene_name: &str, scene_item_id: i64) -> Result<()> {
+    pub async fn remove_scene_item(&self, scene_name: &str, scene_item_id: i64) -> Result<()> {
         self.client
             .send_message(RequestType::RemoveSceneItem {
                 scene_name,
                 scene_item_id,
             })
             .await
+    }
+
+    pub async fn duplicate_scene_item(&self, duplicate: DuplicateSceneItem<'_>) -> Result<i64> {
+        self.client
+            .send_message::<responses::SceneItemId>(RequestType::DuplicateSceneItem(duplicate))
+            .await
+            .map(|sii| sii.scene_item_id)
     }
 
     pub async fn get_scene_item_transform(
@@ -67,6 +75,15 @@ impl<'a> SceneItems<'a> {
                 scene_name,
                 scene_item_id,
             })
+            .await
+    }
+
+    pub async fn set_scene_item_transform(
+        &self,
+        transform: SetSceneItemTransform<'_>,
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::SetSceneItemTransform(transform))
             .await
     }
 
