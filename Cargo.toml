@@ -24,27 +24,27 @@ futures-util = { version = "0.3.17", features = ["sink"] }
 log = "0.4.14"
 semver = { version = "1.0.4", features = ["serde"] }
 serde = { version = "1.0.130", features = ["derive"] }
-serde_json = "1.0.67"
+serde_json = "1.0.71"
 serde_repr = "0.1.7"
-serde_with = "1.10.0"
-sha2 = "0.9.6"
-thiserror = "1.0.29"
-time = "0.3.3"
-tokio = { version = "1.11.0", features = ["net", "rt", "sync"] }
-tokio-tungstenite = "0.14.0"
+serde_with = "1.11.0"
+sha2 = "0.9.8"
+thiserror = "1.0.30"
+time = "0.3.5"
+tokio = { version = "1.14.0", features = ["net", "rt", "sync"] }
+tokio-tungstenite = "0.16.0"
 
 [dev-dependencies]
-anyhow = "1.0.43"
+anyhow = "1.0.45"
 dotenv = "0.15.0"
 pretty_env_logger = "0.4.0"
 serde_test = "1.0.130"
-tokio = { version = "1.11.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tokio = { version = "1.14.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
 
 [features]
 default = []
 test-integration = []
 events = ["async-stream"]
-tls = ["tokio-tungstenite/rustls-tls"]
+tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
 
 [[example]]
 name = "events"
