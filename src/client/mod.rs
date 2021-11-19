@@ -16,7 +16,7 @@ use futures_util::{
     stream::{SplitSink, Stream, StreamExt},
     Sink,
 };
-use log::{debug, error, trace};
+use tracing::{debug, error, trace};
 use semver::{Comparator, Op, Prerelease};
 use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]

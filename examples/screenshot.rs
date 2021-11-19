@@ -9,7 +9,7 @@ async fn main() -> Result<()> {
     dotenv::dotenv().ok();
 
     env::set_var("RUST_LOG", "obws=debug");
-    pretty_env_logger::init();
+    tracing_subscriber::fmt::init();
 
     let client = Client::connect("localhost", 4444, env::var("OBS_PASSWORD").ok()).await?;
 

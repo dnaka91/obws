@@ -25,7 +25,7 @@ static INIT: Once = Once::new();
 pub async fn new_client() -> Result<Client> {
     INIT.call_once(|| {
         dotenv::dotenv().ok();
-        pretty_env_logger::init();
+        tracing_subscriber::fmt::init();
     });
 
     let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
