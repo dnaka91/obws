@@ -18,7 +18,7 @@ coverage:
     rm -rf *.profraw ./target/debug/coverage
 
     RUSTFLAGS="-Zinstrument-coverage -Clink-dead-code" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +{{nightly}} test --all-features -- --test-threads 1
-    rustup run {{nightly}} grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage
+    rustup run {{nightly}} grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage --ignore 'examples/**' --ignore 'tests/**'
 
     rm -f *.profraw
 
