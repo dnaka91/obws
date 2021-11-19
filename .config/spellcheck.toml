@@ -1,0 +1,14 @@
+[Hunspell]
+lang = "en_US"
+search_dirs = ["."]
+extra_dictionaries = ["lingo.dic"]
+skip_os_lookups = true
+use_builtin = true
+
+[Hunspell.quirks]
+transform_regex = [
+    "^\\d+x\\d+$",
+    "v\\d+",
+    "\\+",
+    "\\=",
+]
