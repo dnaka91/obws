@@ -9,10 +9,10 @@ use obws::{
 };
 use tokio::time;
 
-mod common;
+use crate::common;
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn config() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.config();
 

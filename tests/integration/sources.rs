@@ -5,12 +5,10 @@ use std::env;
 use anyhow::Result;
 use obws::requests::{GetSourceScreenshot, SaveSourceScreenshot};
 
-use crate::common::TEST_TEXT;
-
-mod common;
+use crate::common::{self, TEST_TEXT};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn sources() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.sources();
 

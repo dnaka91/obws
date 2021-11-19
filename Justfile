@@ -2,9 +2,13 @@ set dotenv-load := true
 
 nightly := "nightly-2021-11-18"
 
-# list available recipes
-default:
+_default:
     @just --list --unsorted
+
+# run unit and integration tests
+test:
+    cargo test
+    cargo test --all-features --test integration -- --test-threads 1
 
 # run integration tests with coverage
 coverage:
@@ -13,7 +17,7 @@ coverage:
 
     rm -rf *.profraw ./target/debug/coverage
 
-    RUSTFLAGS="-Zinstrument-coverage -Clink-dead-code" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +{{nightly}} test --all-features
+    RUSTFLAGS="-Zinstrument-coverage -Clink-dead-code" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +{{nightly}} test --all-features -- --test-threads 1
     rustup run {{nightly}} grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage
 
     rm -f *.profraw

@@ -7,12 +7,10 @@ use obws::{
 };
 use time::Duration;
 
-use crate::common::{INPUT_KIND_BROWSER, TEST_BROWSER, TEST_BROWSER_RENAME, TEST_MEDIA};
-
-mod common;
+use crate::common::{self, INPUT_KIND_BROWSER, TEST_BROWSER, TEST_BROWSER_RENAME, TEST_MEDIA};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn inputs() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.inputs();
 

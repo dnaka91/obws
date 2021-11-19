@@ -4,10 +4,10 @@ use anyhow::Result;
 use obws::{events::Event, requests::KeyModifiers};
 use serde::Serialize;
 
-mod common;
+use crate::{common, wait_for};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn general() -> Result<()> {
     let client = common::new_client().await?;
     let events = client.events()?;
     let client = client.general();

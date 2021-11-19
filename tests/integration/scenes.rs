@@ -1,12 +1,11 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-use common::{TEST_SCENE, TEST_SCENE_CREATE, TEST_SCENE_RENAME};
 
-mod common;
+use crate::common::{self, TEST_SCENE, TEST_SCENE_CREATE, TEST_SCENE_RENAME};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn scenes() -> Result<()> {
     let client = common::new_client().await?;
     let general = client.general();
     let client = client.scenes();

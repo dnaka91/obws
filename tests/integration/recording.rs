@@ -6,10 +6,10 @@ use anyhow::Result;
 use obws::events::{Event, OutputState};
 use tokio::time;
 
-mod common;
+use crate::{common, wait_for};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn recording() -> Result<()> {
     let client = common::new_client().await?;
     let events = client.events()?;
     let client = client.recording();

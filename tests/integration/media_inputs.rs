@@ -4,12 +4,10 @@ use anyhow::Result;
 use obws::common::MediaAction;
 use time::Duration;
 
-use crate::common::TEST_MEDIA;
-
-mod common;
+use crate::common::{self, TEST_MEDIA};
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn media_inputs() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.media_inputs();
 

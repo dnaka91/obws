@@ -2,10 +2,10 @@
 
 use anyhow::Result;
 
-mod common;
+use crate::common;
 
 #[tokio::test]
-async fn main() -> Result<()> {
+async fn streaming() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.streaming();
 

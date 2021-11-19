@@ -51,9 +51,5 @@ name = "events"
 required-features = ["events"]
 
 [[test]]
-name = "general"
-required-features = ["events"]
-
-[[test]]
-name = "recording"
+name = "integration"
 required-features = ["events"]
