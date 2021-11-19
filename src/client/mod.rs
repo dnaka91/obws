@@ -16,7 +16,6 @@ use futures_util::{
     stream::{SplitSink, Stream, StreamExt},
     Sink,
 };
-use tracing::{debug, error, trace};
 use semver::{Comparator, Op, Prerelease};
 use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]
@@ -27,6 +26,7 @@ use tokio::{
     task::JoinHandle,
 };
 use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use tracing::{debug, error, trace};
 
 pub use self::{
     config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs,
