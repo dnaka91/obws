@@ -71,6 +71,10 @@ pub enum Event {
         input_name: String,
     },
     #[serde(rename_all = "camelCase")]
+    InputVolumeMeters {
+        inputs: Vec<InputVolumeMeter>,
+    },
+    #[serde(rename_all = "camelCase")]
     InputActiveStateChanged {
         input_name: String,
         video_active: bool,
@@ -239,6 +243,15 @@ pub enum Event {
         transition_name: String,
     },
     // --------------------------------
+    // External plugins
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    ExternalPluginEvent {
+        vendor_name: String,
+        event_type: String,
+        event_data: serde_json::Value,
+    },
+    // --------------------------------
     // Custom
     // --------------------------------
     /// Web-socket server is stopping.
@@ -248,6 +261,13 @@ pub enum Event {
     /// Fallback value for any unknown event type.
     #[serde(other)]
     Unknown,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InputVolumeMeter {
+    pub input_name: String,
+    pub input_levels_mul: Vec<[f32; 3]>,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
