@@ -206,19 +206,15 @@ impl Client {
 
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
+                if msg.is_close() {
+                    #[cfg(feature = "events")]
+                    events_tx.send(Event::ServerStopping).ok();
+                    continue;
+                }
+
                 trace!("{}", msg);
                 let res: Result<(), InnerError> = async {
                     let text = msg.into_text().map_err(InnerError::IntoText)?;
-                    let text = if text == "Server stopping" {
-                        debug!("Websocket server is stopping");
-                        let event = serde_json::json! {{
-                            "messageType": "Event",
-                            "eventType": "ServerStopping"
-                        }};
-                        event.to_string()
-                    } else {
-                        text
-                    };
 
                     let message = serde_json::from_str::<ServerMessage>(&text)
                         .map_err(InnerError::DeserializeMessage)?;
