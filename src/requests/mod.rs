@@ -538,16 +538,16 @@ pub struct SetSceneItemTransform<'a> {
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItemTransform {
-    pub position_x: Option<i32>,
-    pub position_y: Option<i32>,
+    pub position_x: Option<f32>,
+    pub position_y: Option<f32>,
     pub rotation: Option<f32>,
     pub scale_x: Option<f32>,
     pub scale_y: Option<f32>,
     pub alignment: Option<Alignment>,
     pub bounds_type: Option<BoundsType>,
     pub bounds_alignment: Option<Alignment>,
-    pub bounds_width: Option<u32>,
-    pub bounds_height: Option<u32>,
+    pub bounds_width: Option<f32>,
+    pub bounds_height: Option<f32>,
     pub crop_left: Option<u32>,
     pub crop_right: Option<u32>,
     pub crop_top: Option<u32>,
