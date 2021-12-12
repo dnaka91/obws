@@ -104,16 +104,16 @@ bitflags! {
         const SCENE_ITEMS = 1 << 7;
         /// Receive events in the `MediaInputs` category.
         const MEDIA_INPUTS = 1 << 8;
-        /// `InputVolumeMeters` event (high-volume).
-        const INPUT_VOLUME_METERS = 1 << 9;
-        /// `InputActiveStateChanged` event (high-volume).
-        const INPUT_ACTIVE_STATE_CHANGED = 1 << 10;
-        /// `InputShowStateChanged` event (high-volume).
-        const INPUT_SHOW_STATE_CHANGED = 1 << 11;
-        /// `SceneItemTransformChanged` event (high-volume).
-        const SCENE_ITEM_TRANSFORM_CHANGED = 1 << 12;
         /// Receive events from external OBS plugins.
-        const EXTERNAL_PLUGINS = 1 << 13;
+        const EXTERNAL_PLUGINS = 1 << 9;
+        /// `InputVolumeMeters` event (high-volume).
+        const INPUT_VOLUME_METERS = 1 << 16;
+        /// `InputActiveStateChanged` event (high-volume).
+        const INPUT_ACTIVE_STATE_CHANGED = 1 << 17;
+        /// `InputShowStateChanged` event (high-volume).
+        const INPUT_SHOW_STATE_CHANGED = 1 << 18;
+        /// `SceneItemTransformChanged` event (high-volume).
+        const SCENE_ITEM_TRANSFORM_CHANGED = 1 << 19;
         /// Receive all event categories.
         const ALL = Self::GENERAL.bits
             | Self::CONFIG.bits

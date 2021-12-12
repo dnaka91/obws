@@ -144,35 +144,37 @@ pub enum StatusCode {
     GenericError = 205,
     /// The request batch execution type is not supported.
     UnsupportedRequestBatchExecutionType = 206,
-    /// A required request parameter is missing.
-    MissingRequestParameter = 300,
+    /// A required request field is missing.
+    MissingRequestField = 300,
     /// The request does not have a valid `requestData` object.
     MissingRequestData = 301,
-    /// Generic invalid request parameter message (comment required).
-    InvalidRequestParameter = 400,
-    /// A request parameter has the wrong data type.
-    InvalidRequestParameterType = 401,
-    /// A request parameter (float or int) is out of valid range.
-    RequestParameterOutOfRange = 402,
-    /// A request parameter (string or array) is empty and cannot be.
-    RequestParameterEmpty = 403,
-    /// There are too many request parameters (for example a request takes two optional values,
-    /// where only one is allowed at a time).
-    TooManyRequestParameters = 404,
+    /// Generic invalid request field message.
+    ///
+    /// **Note:** A comment is required to be provided by obs-websocket.
+    InvalidRequestField = 400,
+    /// A request field has the wrong data type.
+    InvalidRequestFieldType = 401,
+    /// A request field (number) is outside of the allowed range.
+    RequestFieldOutOfRange = 402,
+    /// A request field (string or array) is empty and cannot be.
+    RequestFieldEmpty = 403,
+    /// There are too many request fields (eg. a request takes two optionals, where only one is
+    /// allowed at a time).
+    TooManyRequestFields = 404,
     /// An output is running and cannot be in order to perform the request (generic).
     OutputRunning = 500,
     /// An output is not running and should be.
     OutputNotRunning = 501,
     /// An output is paused and should not be.
     OutputPaused = 502,
+    /// An output is not paused and should be.
+    OutputNotPaused = 503,
     /// An output is disabled and should not be.
-    OutputDisabled = 503,
+    OutputDisabled = 504,
     /// Studio mode is active and cannot be.
-    StudioModeActive = 504,
+    StudioModeActive = 505,
     /// Studio mode is not active and should be.
-    StudioModeNotActive = 505,
-    /// An output is not paused and should be
-    OutputNotPaused = 506,
+    StudioModeNotActive = 506,
     /// The resource was not found.
     ResourceNotFound = 600,
     /// The resource already exists.
