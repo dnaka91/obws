@@ -28,7 +28,7 @@ async fn inputs() -> Result<()> {
         .set_input_settings(SetInputSettings {
             input_name: TEST_BROWSER,
             input_settings: &settings,
-            overlay: false,
+            overlay: Some(false),
         })
         .await?;
 

@@ -13,8 +13,8 @@ use crate::{
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
     /// First message sent from the server immediately on client connection. Contains authentication
-    /// information if it is required. Also contains RPC (remote procedure call) version for
-    /// version negotiation.
+    /// information if authentication is required. Also contains RPC version for version
+    /// negotiation.
     Hello(Hello),
     /// The identify request was received and validated, and the connection is now ready for normal
     /// operation.
@@ -26,6 +26,7 @@ pub(crate) enum ServerMessage {
     Event,
     /// `obs-websocket` is responding to a request coming from a client.
     RequestResponse(RequestResponse),
+    /// `obs-websocket` is responding to a request batch coming from the client.
     RequestBatchResponse(RequestBatchResponse),
 }
 
@@ -45,10 +46,17 @@ impl<'de> Deserialize<'de> for ServerMessage {
         #[derive(Deserialize_repr)]
         #[repr(u8)]
         enum OpCode {
+            /// The initial message sent by obs-websocket to newly connected clients.
             Hello = 0,
+            /// The response sent by obs-websocket to a client after it has successfully identified
+            /// with obs-websocket.
             Identified = 2,
+            /// The message sent by obs-websocket containing an event payload.
             Event = 5,
+            /// The message sent by obs-websocket in response to a particular request from a client.
             RequestResponse = 7,
+            /// The message sent by obs-websocket in response to a particular batch of requests from
+            /// a client.
             RequestBatchResponse = 9,
         }
 
@@ -83,16 +91,21 @@ impl<'de> Deserialize<'de> for ServerMessage {
     }
 }
 
+/// First message sent from the server immediately on client connection. Contains authentication
+/// information if authentication is required. Also contains RPC version for version negotiation.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Hello {
     pub obs_web_socket_version: SemVerVersion,
-    /// Version number which gets incremented on each **breaking change** to the obs-websocket
-    /// protocol.
+    /// version number which gets incremented on each **breaking change** to the obs-websocket
+    /// protocol. Its usage in this context is to provide the current RPC version that the server
+    /// would like to use.
     pub rpc_version: u32,
     pub authentication: Option<Authentication>,
 }
 
+/// The identify request was received and validated, and the connection is now ready for normal
+/// operation.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Identified {
@@ -100,9 +113,11 @@ pub(crate) struct Identified {
     pub negotiated_rpc_version: u32,
 }
 
+/// `obs-websocket` is responding to a request coming from a client.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RequestResponse {
+    pub request_type: String,
     pub request_id: String,
     pub request_status: Status,
     #[serde(default)]
@@ -124,23 +139,29 @@ pub(crate) struct Authentication {
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct Status {
+    /// Is true if the request resulted in [`StatusCode::Success`]. False if otherwise.
     pub result: bool,
     pub code: StatusCode,
+    /// May be provided by the server on errors to offer further details on why a request failed.
     pub comment: Option<String>,
 }
 
 #[derive(Debug, Deserialize_repr)]
 #[repr(u16)]
 pub enum StatusCode {
+    /// Unknown status, should never be used.
     Unknown = 0,
-    /// For internal use to signify a successful parameter check.
+    /// For internal use to signify a successful field check.
     NoError = 10,
+    /// The request has succeeded.
     Success = 100,
     /// The `requestType` field is missing from the request data.
     MissingRequestType = 203,
     /// The request type is invalid or does not exist.
     UnknownRequestType = 204,
-    /// Generic error code (comment required).
+    /// Generic error code.
+    ///
+    /// **Note:** A comment is required to be provided by obs-websocket.
     GenericError = 205,
     /// The request batch execution type is not supported.
     UnsupportedRequestBatchExecutionType = 206,
@@ -154,14 +175,14 @@ pub enum StatusCode {
     InvalidRequestField = 400,
     /// A request field has the wrong data type.
     InvalidRequestFieldType = 401,
-    /// A request field (number) is outside of the allowed range.
+    /// A request field (number) is outside the allowed range.
     RequestFieldOutOfRange = 402,
     /// A request field (string or array) is empty and cannot be.
     RequestFieldEmpty = 403,
-    /// There are too many request fields (eg. a request takes two optionals, where only one is
-    /// allowed at a time).
+    /// There are too many request fields (For example a request takes two optional fields, where
+    /// only one is allowed at a time).
     TooManyRequestFields = 404,
-    /// An output is running and cannot be in order to perform the request (generic).
+    /// An output is running and cannot be in order to perform the request.
     OutputRunning = 500,
     /// An output is not running and should be.
     OutputNotRunning = 501,
@@ -176,6 +197,9 @@ pub enum StatusCode {
     /// Studio mode is not active and should be.
     StudioModeNotActive = 506,
     /// The resource was not found.
+    ///
+    /// **Note:** Resources are any kind of object in obs-websocket, like inputs, profiles, outputs,
+    /// etc.
     ResourceNotFound = 600,
     /// The resource already exists.
     ResourceAlreadyExists = 601,
@@ -192,57 +216,77 @@ pub enum StatusCode {
     ResourceCreationFailed = 700,
     /// Performing an action on the resource failed.
     ResourceActionFailed = 701,
-    /// Processing the request failed unexpectedly (comment required).
+    /// Processing the request failed unexpectedly.
+    ///
+    /// **Note:** A comment is required to be provided by obs-websocket.
     RequestProcessingFailed = 702,
-    /// The combination of request parameters cannot be used to perform an action.
+    /// The combination of request fields cannot be used to perform an action.
     CannotAct = 703,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneCollections {
+    /// The name of the current scene collection.
     pub current_scene_collection_name: String,
+    /// Array of all available scene collections.
     pub scene_collections: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Profiles {
+    /// The name of the current profile.
     pub current_profile_name: String,
+    /// Array of all available profiles.
     pub profiles: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileParameter {
+    /// Value associated with the parameter.
     pub parameter_value: Option<String>,
+    /// Default value associated with the parameter.
     pub default_parameter_value: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VideoSettings {
+    /// Numerator of the fractional FPS value.
     pub fps_numerator: u32,
+    /// Denominator of the fractional FPS value.
     pub fps_denominator: u32,
+    /// Width of the base (canvas) resolution in pixels.
     pub base_width: u32,
+    /// Height of the base (canvas) resolution in pixels.
     pub base_height: u32,
+    /// Width of the output resolution in pixels.
     pub output_width: u32,
+    /// Height of the output resolution in pixels.
     pub output_height: u32,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamServiceSettings<T> {
+    /// Stream service type, like `rtmp_custom` or `rtmp_common`.
     pub stream_service_type: String,
+    /// Stream service settings.
     pub stream_service_settings: T,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
+    /// Current OBS Studio version.
     pub obs_version: SemVerVersion,
+    /// Current obs-websocket version.
     pub obs_web_socket_version: SemVerVersion,
+    /// Current latest obs-websocket RPC version.
     pub rpc_version: u32,
+    /// Array of available RPC requests for the currently negotiated RPC version.
     pub available_requests: Vec<String>,
     pub supported_image_formats: Vec<String>,
 }
@@ -250,25 +294,55 @@ pub struct Version {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats {
+    /// Current CPU usage in percent.
+    pub cpu_usage: f64,
+    /// Amount of memory in MB currently being used by OBS.
+    pub memory_usage: f64,
+    /// Available disk space on the device being used for recording storage.
+    pub available_disk_space: f64,
+    /// Current FPS being rendered.
+    pub active_fps: f64,
+    /// Average time in milliseconds that OBS is taking to render a frame.
+    pub average_frame_render_time: f64,
+    /// Number of frames skipped by OBS in the render thread.
+    pub render_skipped_frames: u32,
+    /// Total number of frames outputted by the render thread.
+    pub render_total_frames: u32,
+    /// Number of frames skipped by OBS in the output thread.
+    pub output_skipped_frames: u32,
+    /// Total number of frames outputted by the output thread.
+    pub output_total_frames: u32,
+    /// Total number of messages received by obs-websocket from the client.
     pub web_socket_session_incoming_messages: u64,
+    /// Total number of messages sent by obs-websocket to the client.
     pub web_socket_session_outgoing_messages: u64,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Hotkeys {
+    /// Array of hotkey names.
     pub hotkeys: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct StudioModeEnabled {
+    /// Whether studio mode is enabled.
     pub studio_mode_enabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct CallVendorResponse<T> {
+    /// Object containing appropriate response data.
+    pub response_data: T,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct Inputs {
+    /// Array of inputs.
     pub inputs: Vec<Input>,
 }
 
@@ -283,32 +357,39 @@ pub struct Input {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct InputKinds {
+    /// Array of input kinds.
     pub input_kinds: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct DefaultInputSettings<T> {
+    /// Object of default settings for the input kind.
     pub default_input_settings: T,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InputSettings<T> {
+    /// Object of settings for the input.
     pub input_settings: T,
+    /// The kind of the input.
     pub input_kind: String,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct InputMuted {
+    /// Whether the input is muted.
     pub input_muted: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InputVolume {
+    /// Volume setting in mul.
     pub input_volume_mul: f32,
+    /// Volume setting in dB.
     pub input_volume_db: f32,
 }
 
@@ -375,6 +456,7 @@ pub(crate) struct RecordDirectory {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemId {
+    /// ID of the newly created scene item.
     pub scene_item_id: i64,
 }
 
@@ -422,19 +504,22 @@ pub(crate) struct SceneItemIndex {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioSyncOffset {
-    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    /// Audio sync offset in milliseconds.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
     pub input_audio_sync_offset: Duration,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioMonitorType {
+    /// Audio monitor type.
     pub monitor_type: MonitorType,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ListPropertyItems {
+    /// Array of items in the list property.
     pub property_items: Vec<ListPropertyItem>,
 }
 
@@ -478,8 +563,11 @@ pub enum SourceType {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scenes {
+    /// Current program scene.
     pub current_program_scene_name: Option<String>,
+    /// Current preview scene. [`None`] if not in studio mode.
     pub current_preview_scene_name: Option<String>,
+    /// Array of scenes in OBS.
     pub scenes: Vec<Scene>,
 }
 
@@ -487,31 +575,36 @@ pub struct Scenes {
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
     pub scene_name: String,
-    pub is_group: bool,
+    pub scene_index: usize,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentProgramScene {
+    /// Current program scene.
     pub current_program_scene_name: String,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentPreviewScene {
+    /// Current preview scene.
     pub current_preview_scene_name: String,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SourceActive {
+    /// Whether the source is showing in program.
     pub video_active: bool,
+    /// Whether the source is showing in the UI (preview, projector, properties).
     pub video_showing: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ImageData {
+    /// Base64-encoded screenshot.
     pub image_data: String,
 }
 

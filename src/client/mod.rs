@@ -206,13 +206,14 @@ impl Client {
 
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
+                trace!("{}", msg);
+
                 if msg.is_close() {
                     #[cfg(feature = "events")]
                     events_tx.send(Event::ServerStopping).ok();
                     continue;
                 }
 
-                trace!("{}", msg);
                 let res: Result<(), InnerError> = async {
                     let text = msg.into_text().map_err(InnerError::IntoText)?;
 
@@ -221,6 +222,7 @@ impl Client {
 
                     match message {
                         ServerMessage::RequestResponse(RequestResponse {
+                            request_type: _,
                             request_id,
                             request_status,
                             response_data,
@@ -506,7 +508,6 @@ async fn handshake(
             let req = serde_json::to_string(&ClientRequest::Identify(Identify {
                 rpc_version,
                 authentication,
-                ignore_invalid_messages: false,
                 event_subscriptions,
             }))
             .map_err(HandshakeError::SerializeMessage)?;
@@ -549,4 +550,33 @@ fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
     base64::encode_config_buf(hasher.finalize(), base64::STANDARD, &mut auth);
 
     auth
+}
+
+pub enum WebSocketCloseCode {
+    /// For internal use only to tell the request handler not to perform any close action.
+    DontClose = 0,
+    /// Unknown reason, should never be used.
+    UnknownReason = 4000,
+    /// The server was unable to decode the incoming web-socket message.
+    MessageDecodeError = 4002,
+    /// A data field is required but missing from the payload.
+    MissingDataField = 4003,
+    /// A data field's value type is invalid.
+    InvalidDataFieldType = 4004,
+    /// A data field's value is invalid.
+    InvalidDataFieldValue = 4005,
+    /// The specified `op` was invalid or missing.
+    UnknownOpCode = 4006,
+    /// The client sent a web-socket message without first sending `Identify` message.
+    NotIdentified = 4007,
+    /// The client sent an `Identify` message while already identified.
+    AlreadyIdentified = 4008,
+    /// The authentication attempt (via `Identify`) failed.
+    AuthenticationFailed = 4009,
+    /// The server detected the usage of an old version of the obs-websocket RPC protocol.
+    UnsupportedRpcVersion = 4010,
+    /// The web-socket session has been invalidated by the obs-websocket server.
+    SessionInvalidated = 4011,
+    /// A requested feature is not supported due to hardware/software limitations.
+    UnsupportedFeature = 4012,
 }

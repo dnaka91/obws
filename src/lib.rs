@@ -71,6 +71,9 @@ pub enum Error {
     /// Failed to serialize custom user defined data for a message.
     #[error("failed to serialize custom data")]
     SerializeCustomData(#[source] serde_json::Error),
+    /// Custom data didn't serialize into a JSON object.
+    #[error("custom data must serialize into a JSON object")]
+    InvalidCustomData,
     /// An error returned from the obs-websocket API.
     #[error("API error: {code:?}")]
     Api {

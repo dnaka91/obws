@@ -14,28 +14,49 @@ pub enum Event {
     // --------------------------------
     // Config
     // --------------------------------
+    /// The current scene collection has begun changing.
+    ///
+    /// **Note:** We recommend using this event to trigger a pause of all polling requests, as
+    /// performing any requests during a scene collection change is considered undefined behavior
+    /// and can cause crashes!
     #[serde(rename_all = "camelCase")]
     CurrentSceneCollectionChanging {
+        /// Name of the current scene collection.
         scene_collection_name: String,
     },
+    /// The current scene collection has changed.
+    ///
+    /// **Note:** If polling has been paused during [`CurrentSceneCollectionChanging`], this is the
+    /// indicator to restart polling.
+    ///
+    /// [`CurrentSceneCollectionChanging`]: Event::CurrentSceneCollectionChanging
     #[serde(rename_all = "camelCase")]
     CurrentSceneCollectionChanged {
+        /// Name of the new scene collection.
         scene_collection_name: String,
     },
+    /// The scene collection list has changed.
     #[serde(rename_all = "camelCase")]
     SceneCollectionListChanged {
+        /// Updated list of scene collections.
         scene_collections: Vec<String>,
     },
+    /// The current profile has begun changing.
     #[serde(rename_all = "camelCase")]
     CurrentProfileChanging {
+        /// Name of the current profile.
         profile_name: String,
     },
+    /// The current profile has changed.
     #[serde(rename_all = "camelCase")]
     CurrentProfileChanged {
+        /// Name of the new profile.
         profile_name: String,
     },
+    /// The profile list has changed.
     #[serde(rename_all = "camelCase")]
     ProfileListChanged {
+        /// Updated list of profiles.
         profiles: Vec<String>,
     },
     // --------------------------------
@@ -45,7 +66,9 @@ pub enum Event {
     // General
     // --------------------------------
     CustomEvent(serde_json::Value),
+    /// OBS has begun the shutdown process.
     ExitStarted,
+    /// Studio mode has been enabled or disabled.
     #[serde(rename_all = "camelCase")]
     StudioModeStateChanged {
         studio_mode_enabled: bool,
@@ -243,10 +266,10 @@ pub enum Event {
         transition_name: String,
     },
     // --------------------------------
-    // External plugins
+    // Vendor (external plugins)
     // --------------------------------
     #[serde(rename_all = "camelCase")]
-    ExternalPluginEvent {
+    VendorEvent {
         vendor_name: String,
         event_type: String,
         event_data: serde_json::Value,
@@ -299,5 +322,5 @@ pub struct BasicSceneItem {
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
     scene_name: String,
-    is_group: bool,
+    scene_index: usize,
 }
