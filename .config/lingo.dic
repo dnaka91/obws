@@ -1,6 +1,7 @@
 100
 async
 bitflags
+CMD
 CoreAudio
 CSS
 Ctrl
@@ -10,6 +11,7 @@ FreeType2
 GDI
 I420
 I444
+JSON
 kilobits
 libobs
 luma
@@ -24,6 +26,7 @@ RGBA
 RPC
 RTMP
 runtime
+selectable
 serialize
 Sinus9
 sRGB
@@ -32,6 +35,7 @@ timestamp
 TLS
 tokio
 UI
+unversioned
 URI
 username
 VLC

@@ -35,7 +35,7 @@ impl<'a> Sources<'a> {
             .map(|id| id.image_data)
     }
 
-    /// Saves a screenshot of a source to the filesystem.
+    /// Saves a screenshot of a source to the file system.
     ///
     /// The [`image_width`] and [`image_height`] parameters are treated as "scale to inner", meaning
     /// the smallest ratio will be used and the aspect ratio of the original resolution is kept. If

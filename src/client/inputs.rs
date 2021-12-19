@@ -218,7 +218,7 @@ impl<'a> Inputs<'a> {
             .await
     }
 
-    /// Gets the audio monitor type of an input.
+    /// Gets the audio monitor type of input.
     ///
     /// - `input_name`: Name of the input to get the audio monitor type of.
     pub async fn get_input_audio_monitor_type(&self, input_name: &str) -> Result<MonitorType> {
@@ -230,7 +230,7 @@ impl<'a> Inputs<'a> {
             .map(|amt| amt.monitor_type)
     }
 
-    /// Sets the audio monitor type of an input.
+    /// Sets the audio monitor type of input.
     ///
     /// - `input_name`: Name of the input to set the audio monitor type of.
     /// - `monitor_type`: Audio monitor type.

@@ -17,7 +17,7 @@ mod ser;
 
 pub(crate) enum ClientRequest<'a> {
     /// Response to [`Hello`](crate::responses::ServerMessage::Hello) message, should contain
-    /// authentication string if authentication is required, along with PubSub subscriptions and
+    /// authentication string if authentication is required, along with Pub-sub subscriptions and
     /// other session parameters.
     Identify(Identify),
     /// Sent at any time after initial identification to update the provided session parameters.
@@ -69,7 +69,7 @@ impl<'a> Serialize for ClientRequest<'a> {
 }
 
 /// Response to [`Hello`](crate::responses::ServerMessage::Hello) message, should contain
-/// authentication string if authentication is required, along with PubSub subscriptions and other
+/// authentication string if authentication is required, along with Pub-sub subscriptions and other
 /// session parameters.
 #[skip_serializing_none]
 #[derive(Serialize)]
