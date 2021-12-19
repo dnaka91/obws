@@ -18,6 +18,16 @@ Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 
 [obs-websocket]: https://github.com/Palakis/obs-websocket
 
+## V5 support
+
+The upcoming obs-websocket v5 is already being worked on and most features are supported. Check out
+the [v5-api] branch for more information on how to use it.
+
+A new version will be released shortly after the relese of obs-websocket. Currently waiting on
+missing docs and eventual breaking changes before the release.
+
+[v5-api]: https://github.com/dnaka91/obws/tree/v5-api
+
 ## Usage
 
 Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it manually to your
