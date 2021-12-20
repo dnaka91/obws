@@ -14,6 +14,7 @@ use crate::common::{
 
 mod de;
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub(crate) struct Response<T> {
