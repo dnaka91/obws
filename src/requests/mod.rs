@@ -3,11 +3,11 @@
 use std::path::Path;
 
 use bitflags::bitflags;
-use chrono::Duration;
 use either::Either;
 pub use rgb::RGBA8;
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use time::Duration;
 
 use crate::common::{Align, Alignment, BoundsType, FontFlags, MonitorType, StreamType, Valign};
 

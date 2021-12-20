@@ -1,5 +1,5 @@
-use chrono::Duration;
 use serde::Serialize;
+use time::Duration;
 
 use super::Client;
 use crate::{requests::RequestType, responses, Error, Result};

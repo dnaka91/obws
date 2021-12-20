@@ -1,7 +1,7 @@
 //! All events that can be received from the API.
 
-use chrono::Duration;
 use serde::Deserialize;
+use time::Duration;
 
 use crate::common::{SceneItem, SceneItemTransform};
 

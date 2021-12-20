@@ -1,4 +1,4 @@
-use chrono::Duration;
+use time::Duration;
 
 use super::Client;
 use crate::{requests::RequestType, responses, Result};

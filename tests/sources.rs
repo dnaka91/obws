@@ -1,7 +1,6 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::{Context, Result};
-use chrono::Duration;
 use obws::{
     common::MonitorType,
     requests::{
@@ -10,6 +9,7 @@ use obws::{
     },
 };
 use serde_json::json;
+use time::Duration;
 
 use crate::common::{SOURCE_KIND_VLC, TEST_BROWSER, TEST_MEDIA, TEXT_SOURCE};
 

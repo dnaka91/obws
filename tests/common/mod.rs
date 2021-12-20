@@ -103,7 +103,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
     ensure!(
         sources.iter().any(is_required_source_2),
         "text source `{}` not found, required for sources tests",
-        TEXT_SOURCE
+        TEXT_SOURCE_2
     );
     ensure!(
         sources.iter().any(is_required_browser_source),
@@ -148,10 +148,25 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
     );
 
     client.scenes().set_current_scene(TEST_SCENE).await?;
-    client
-        .scenes()
-        .reorder_scene_items(Some(TEST_SCENE), SCENE_ORDER)
-        .await?;
+
+    let sources = client.scenes().get_current_scene().await?.sources;
+    ensure!(
+        sources.len() == 4,
+        "scene `{}` must have exactly 4 scene items",
+        TEST_SCENE
+    );
+
+    if sources[0].name != TEXT_SOURCE
+        || sources[1].name != TEXT_SOURCE_2
+        || sources[2].name != TEST_BROWSER
+        || sources[3].name != TEST_MEDIA
+    {
+        client
+            .scenes()
+            .reorder_scene_items(Some(TEST_SCENE), SCENE_ORDER)
+            .await?;
+    }
+
     client
         .transitions()
         .set_current_transition(TEST_TRANSITION)

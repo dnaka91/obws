@@ -1,5 +1,5 @@
-use chrono::Duration;
 use serde::{de::DeserializeOwned, Serialize};
+use time::Duration;
 
 use super::Client;
 use crate::{

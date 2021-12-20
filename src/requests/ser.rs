@@ -1,10 +1,12 @@
-use chrono::Duration;
+use std::convert::TryFrom;
+
 use rgb::RGBA8;
 use serde::ser::{self, Serialize, Serializer};
+use time::Duration;
 
 #[derive(Debug, thiserror::Error)]
 enum Error {
-    #[error("duration of {} days is too big to be serialized as nanoseconds", .0.num_days())]
+    #[error("duration of {} days is too big to be serialized as number", .0.whole_days())]
     DurationTooBig(Duration),
 }
 
@@ -13,7 +15,9 @@ where
     S: Serializer,
 {
     match value {
-        Some(duration) => serializer.serialize_some(&duration.num_milliseconds()),
+        Some(duration) => {
+            serializer.serialize_some(&to_i64(duration, duration.whole_milliseconds())?)
+        }
         None => serializer.serialize_none(),
     }
 }
@@ -22,18 +26,23 @@ pub fn duration_millis<S>(value: &Duration, serializer: S) -> Result<S::Ok, S::E
 where
     S: Serializer,
 {
-    serializer.serialize_i64(value.num_milliseconds())
+    serializer.serialize_i64(to_i64(value, value.whole_milliseconds())?)
 }
 
 pub fn duration_nanos<S>(value: &Duration, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    match value.num_nanoseconds() {
-        Some(nanos) => serializer.serialize_i64(nanos),
-        None => Err(ser::Error::custom(Error::DurationTooBig(*value))),
-    }
+    serializer.serialize_i64(to_i64(value, value.whole_nanoseconds())?)
 }
+
+fn to_i64<E>(duration: &Duration, value: i128) -> Result<i64, E>
+where
+    E: ser::Error,
+{
+    i64::try_from(value).map_err(|_| E::custom(Error::DurationTooBig(*duration)))
+}
+
 pub fn bitflags_u8<S, T>(value: &T, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -185,7 +194,7 @@ mod tests {
                 },
                 Token::Str("value"),
             ],
-            "duration of 365000000 days is too big to be serialized as nanoseconds",
+            "duration of 365000000 days is too big to be serialized as number",
         );
     }
 

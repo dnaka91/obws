@@ -1,8 +1,8 @@
 #![cfg(feature = "test-integration")]
 
 use anyhow::Result;
-use chrono::Duration;
 use obws::requests::Transition;
+use time::Duration;
 
 use crate::common::{TEST_SCENE_2, TEST_TRANSITION};
 

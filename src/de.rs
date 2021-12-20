@@ -7,8 +7,8 @@ use std::{
     marker::PhantomData,
 };
 
-use chrono::Duration;
 use serde::de::{self, Deserializer, Visitor};
+use time::Duration;
 
 #[derive(Debug, thiserror::Error)]
 enum Error {

@@ -3,10 +3,10 @@
 
 use std::path::Path;
 
-use chrono::Duration;
 use rgb::RGBA8;
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 use serde_repr::Serialize_repr;
+use time::Duration;
 
 use crate::{common::FontFlags, requests::ser};
 

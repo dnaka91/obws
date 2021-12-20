@@ -2,10 +2,10 @@
 
 use std::{collections::HashSet, path::PathBuf};
 
-use chrono::Duration;
 pub use rgb::RGBA8;
 pub use semver::Version as SemVerVersion;
 use serde::Deserialize;
+use time::Duration;
 
 use crate::common::{
     Align, Bounds, Crop, FontFlags, MonitorType, Position, Scale, SceneItem, SceneItemTransform,
