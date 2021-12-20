@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+This is going to be the last release before the upcoming **obs-websocket v5.0** release. Support
+is currently in progress on the `v5-api` branch and the release is expected to be soon.
+
+### Added
+
+- Several new types are available at the `requests::custom` module, that can be used for the generic
+  `set_source_settings` and `set_transition_settings` requests to provide typed versions for common
+  sources and transitions out of the box.
+  - **Note:** These typed versions are not covered by automated tests yet, so careful testing is
+    advised.
+
+### Changed
+
+- **BREAKING CHANGE:** Updated many dependencies, including `tokio-tungstenite` which included some
+  changes to the TLS feature.
+- **BREAKING CHANGE:** Replace the `chrono` crate with `time` to avoid potential security issues.
+  This crate only uses the `Duration` type, but the dependency was still switched in case of future
+  issues.
+- Reduce size of the crate bundle by excluding unnecessary files, making downloads from
+  <https://crates.io> faster.
+- Improved on several spelling errors throughout the API docs.
+
 ## [0.8.0] - 2021-06-14
 
 ### Added
