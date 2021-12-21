@@ -107,6 +107,8 @@ impl<'a> General<'a> {
     }
 
     /// Enables or disables studio mode.
+    ///
+    /// - `studio_mode_enabled`: Enable or disable the studio mode.
     pub async fn set_studio_mode_enabled(&self, studio_mode_enabled: bool) -> Result<()> {
         self.client
             .send_message(RequestType::SetStudioModeEnabled {

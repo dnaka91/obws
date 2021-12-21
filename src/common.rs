@@ -33,6 +33,8 @@ pub enum BoundsType {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub enum MediaAction {
+    #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NONE")]
+    None,
     #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PLAY")]
     Play,
     #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PAUSE")]

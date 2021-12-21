@@ -257,6 +257,7 @@ pub(crate) enum RequestType<'a> {
     GetVersion,
     #[serde(rename_all = "camelCase")]
     BroadcastCustomEvent {
+        /// Data payload to emit to all receivers.
         event_data: serde_json::Value,
     },
     CallVendorRequest(CallVendorRequestInternal<'a>),
@@ -264,16 +265,20 @@ pub(crate) enum RequestType<'a> {
     GetHotkeyList,
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByName {
+        /// Name of the hotkey to trigger.
         hotkey_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByKeySequence {
+        /// The OBS key ID to use.
         key_id: &'a str,
+        /// Object containing key modifiers to apply.
         key_modifiers: KeyModifiers,
     },
     GetStudioModeEnabled,
     #[serde(rename_all = "camelCase")]
     SetStudioModeEnabled {
+        /// Enable or disable the studio mode.
         studio_mode_enabled: bool,
     },
     // TODO: Sleep
@@ -324,7 +329,9 @@ pub(crate) enum RequestType<'a> {
     },
     #[serde(rename_all = "camelCase")]
     SetInputVolume {
+        /// Name of the input to set the volume of.
         input_name: &'a str,
+        /// Volume settings in either mul or dB.
         #[serde(flatten)]
         input_volume: Volume,
     },
@@ -420,45 +427,59 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     #[serde(rename_all = "camelCase")]
     GetSceneItemList {
+        /// Name of the scene to get the items of.
         scene_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetGroupSceneItemList {
+        /// Name of the group to get the items of.
         scene_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetSceneItemId {
+        /// Name of the scene or group to search in.
         scene_name: &'a str,
+        /// Name of the source to find.
         source_name: &'a str,
     },
     CreateSceneItem(CreateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     RemoveSceneItem {
+        /// Name of the scene the item is in.
         scene_name: &'a str,
+        /// Numeric ID of the scene item.
         scene_item_id: i64,
     },
     DuplicateSceneItem(DuplicateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemTransform {
+        /// Name of the scene the item is in.
         scene_name: &'a str,
+        /// Numeric ID of the scene item.
         scene_item_id: i64,
     },
     SetSceneItemTransform(SetSceneItemTransform<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemEnabled {
+        /// Name of the scene the item is in.
         scene_name: &'a str,
+        /// Numeric ID of the scene item.
         scene_item_id: i64,
     },
     SetSceneItemEnabled(SetSceneItemEnabled<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemLocked {
+        /// Name of the scene the item is in.
         scene_name: &'a str,
+        /// Numeric ID of the scene item.
         scene_item_id: i64,
     },
     SetSceneItemLocked(SetSceneItemLocked<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemIndex {
+        /// Name of the scene the item is in.
         scene_name: &'a str,
+        /// Numeric ID of the scene item.
         scene_item_id: i64,
     },
     #[serde(rename_all = "camelCase")]
@@ -587,8 +608,11 @@ pub struct CallVendorRequest<'a, T> {
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CallVendorRequestInternal<'a> {
+    /// Name of the vendor to use.
     pub vendor_name: &'a str,
+    /// The request type to call.
     pub request_type: &'a str,
+    /// Object containing appropriate request data.
     pub request_data: serde_json::Value,
 }
 
@@ -662,24 +686,33 @@ pub(crate) struct CreateInputInternal<'a> {
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSceneItem<'a> {
+    /// Name of the scene to create the new item in.
     pub scene_name: &'a str,
+    /// Name of the source to add to the scene.
     pub source_name: &'a str,
+    /// Enable state to apply to the scene item on creation.
     pub scene_item_enabled: Option<bool>,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DuplicateSceneItem<'a> {
+    /// Name of the scene the item is in.
     pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+    /// Name of the scene to create the duplicated item in.
     pub destination_scene_name: Option<&'a str>,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemTransform<'a> {
+    /// Name of the scene the item is in.
     pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+    /// Object containing scene item transform info to update.
     pub scene_item_transform: SceneItemTransform,
 }
 
@@ -705,24 +738,33 @@ pub struct SceneItemTransform {
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemEnabled<'a> {
+    /// Name of the scene the item is in.
     pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+    /// New enable state of the scene item.
     pub scene_item_enabled: bool,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemLocked<'a> {
+    /// Name of the scene the item is in.
     pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+    /// New lock state of the scene item.
     pub scene_item_locked: bool,
 }
 
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemIndex<'a> {
+    /// Name of the scene the item is in.
     pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+    /// New index position of the scene item.
     pub scene_item_index: u32,
 }
 

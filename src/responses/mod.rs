@@ -438,6 +438,7 @@ pub struct RecordStatus {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct OutputActive {
+    /// New state of the stream output.
     pub output_active: bool,
 }
 
@@ -456,8 +457,14 @@ pub(crate) struct RecordDirectory {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemId {
-    /// ID of the newly created scene item.
+    /// Numeric ID of the scene item.
     pub scene_item_id: i64,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct GetSceneItemTransform {
+    pub scene_item_transform: SceneItemTransform,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -486,18 +493,21 @@ pub struct SceneItemTransform {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemEnabled {
+    /// Whether the scene item is enabled.
     pub scene_item_enabled: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemLocked {
+    /// Whether the scene item is locked.
     pub scene_item_locked: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemIndex {
+    /// Index position of the scene item.
     pub scene_item_index: u32,
 }
 
@@ -534,6 +544,7 @@ pub struct ListPropertyItem {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemList {
+    /// Array of scene items in the scene or group.
     pub scene_items: Vec<SceneItem>,
 }
 
@@ -611,13 +622,20 @@ pub(crate) struct ImageData {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamStatus {
+    /// Whether the output is active.
     pub output_active: bool,
+    /// Whether the output is currently reconnecting.
     pub output_reconnecting: bool,
+    /// Current timecode for the output.
     #[serde(deserialize_with = "crate::de::duration_timecode")]
     pub output_timecode: Duration,
-    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    /// Current duration for the output.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
     pub output_duration: Duration,
+    /// Number of bytes sent by the output.
     pub output_bytes: u64,
+    /// Number of frames skipped by the output's process.
     pub output_skipped_frames: u32,
+    /// Total number of frames delivered by the output's process.
     pub output_total_frames: u32,
 }
