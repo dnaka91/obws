@@ -58,7 +58,7 @@ impl<'a> Inputs<'a> {
     ///
     /// - `input_name`: Name of the input to get the settings of.
     ///
-    /// [`get_input_default_settings`](Inputs::get_input_default_settings)
+    /// [`get_input_default_settings`]: Inputs::get_input_default_settings
     pub async fn get_input_settings<T>(
         &self,
         input_name: &str,

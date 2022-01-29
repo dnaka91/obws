@@ -23,7 +23,7 @@ impl<'a> SceneItems<'a> {
             .map(|sil| sil.scene_items)
     }
 
-    /// Basically GetSceneItemList, but for groups.
+    /// Basically [`get_scene_item_list`](Self::get_scene_item_list), but for groups.
     ///
     /// Using groups at all in OBS is discouraged, as they are very broken under the hood.
     ///
