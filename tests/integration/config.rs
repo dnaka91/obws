@@ -1,5 +1,3 @@
-#![cfg(feature = "test-integration")]
-
 use std::time::Duration;
 
 use anyhow::Result;

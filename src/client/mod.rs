@@ -29,7 +29,7 @@ use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use tracing::{debug, error, trace};
 
 pub use self::{
-    config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs,
+    config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
     recording::Recording, scene_items::SceneItems, scenes::Scenes, sources::Sources,
     streaming::Streaming,
 };
@@ -45,6 +45,7 @@ mod config;
 mod general;
 mod inputs;
 mod media_inputs;
+mod outputs;
 mod recording;
 mod scene_items;
 mod scenes;
@@ -410,6 +411,11 @@ impl Client {
     /// Access API functions related to media inputs.
     pub fn media_inputs(&self) -> MediaInputs<'_> {
         MediaInputs { client: self }
+    }
+
+    /// Access API functions related to outputs.
+    pub fn outputs(&self) -> Outputs<'_> {
+        Outputs { client: self }
     }
 
     /// Access API functions related to recording.

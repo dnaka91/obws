@@ -108,6 +108,18 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         "recording active, required to be stopped for recording tests"
     );
 
+    let virtual_cam_active = client.outputs().get_virtual_cam_status().await?;
+    ensure!(
+        !virtual_cam_active,
+        "virtual cam active, required to be stopped for outputs tests"
+    );
+
+    let replay_buffer_active = client.outputs().get_replay_buffer_status().await?;
+    ensure!(
+        !replay_buffer_active,
+        "replay buffer active, required to be stopped for outputs tests"
+    );
+
     client
         .scenes()
         .set_current_program_scene(TEST_SCENE)

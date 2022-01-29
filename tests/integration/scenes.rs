@@ -1,5 +1,3 @@
-#![cfg(feature = "test-integration")]
-
 use anyhow::Result;
 
 use crate::common::{self, TEST_SCENE, TEST_SCENE_CREATE, TEST_SCENE_RENAME};

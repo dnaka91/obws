@@ -1,5 +1,3 @@
-#![cfg(feature = "test-integration")]
-
 use anyhow::Result;
 use obws::{
     requests::{SetInputSettings, Volume},

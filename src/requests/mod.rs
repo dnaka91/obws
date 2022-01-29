@@ -412,6 +412,19 @@ pub(crate) enum RequestType<'a> {
         media_action: MediaAction,
     },
     // --------------------------------
+    // Outputs
+    // --------------------------------
+    GetVirtualCamStatus,
+    ToggleVirtualCam,
+    StartVirtualCam,
+    StopVirtualCam,
+    GetReplayBufferStatus,
+    ToggleReplayBuffer,
+    StartReplayBuffer,
+    StopReplayBuffer,
+    SaveReplayBuffer,
+    GetLastReplayBufferReplay,
+    // --------------------------------
     // Recording
     // --------------------------------
     GetRecordStatus,

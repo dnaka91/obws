@@ -1,5 +1,3 @@
-#![cfg(feature = "test-integration")]
-
 use anyhow::Result;
 use obws::{events::Event, requests::KeyModifiers};
 use serde::Serialize;

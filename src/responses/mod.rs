@@ -456,6 +456,12 @@ pub(crate) struct RecordDirectory {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct SavedReplayPath {
+    pub saved_replay_path: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemId {
     /// Numeric ID of the scene item.
     pub scene_item_id: i64,
@@ -626,7 +632,7 @@ pub struct StreamStatus {
     pub output_active: bool,
     /// Whether the output is currently reconnecting.
     pub output_reconnecting: bool,
-    /// Current timecode for the output.
+    /// Current time code for the output.
     #[serde(deserialize_with = "crate::de::duration_timecode")]
     pub output_timecode: Duration,
     /// Current duration for the output.
