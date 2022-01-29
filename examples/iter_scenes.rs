@@ -10,7 +10,7 @@ async fn main() -> Result<()> {
     env::set_var("RUST_LOG", "obws=debug");
     tracing_subscriber::fmt::init();
 
-    let client = Client::connect("localhost", 4444, env::var("OBS_PASSWORD").ok()).await?;
+    let client = Client::connect("localhost", 4455, env::var("OBS_PASSWORD").ok()).await?;
 
     let scene_list = client.scenes().get_scene_list().await?;
 

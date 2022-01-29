@@ -31,7 +31,7 @@ pub async fn new_client() -> Result<Client> {
     let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
     let port = env::var("OBS_PORT")
         .map(|p| p.parse())
-        .unwrap_or(Ok(4444))?;
+        .unwrap_or(Ok(4455))?;
     let client = Client::connect(host, port, env::var("OBS_PASSWORD").ok()).await?;
 
     ensure_obs_setup(&client).await?;

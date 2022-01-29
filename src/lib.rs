@@ -13,7 +13,7 @@
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     /// Connect to the OBS instance through obs-websocket.
-//!     let client = Client::connect("localhost", 4444, Some("password")).await?;
+//!     let client = Client::connect("localhost", 4455, Some("password")).await?;
 //!
 //!     /// Get and print out version information of OBS and obs-websocket.
 //!     let version = client.general().get_version().await?;
