@@ -1,6 +1,6 @@
 set dotenv-load := true
 
-nightly := "nightly-2021-11-18"
+nightly := "nightly-2022-02-08"
 
 _default:
     @just --list --unsorted
@@ -12,22 +12,24 @@ test:
 
 # run integration tests with coverage
 coverage:
-    cargo install grcov
+    cargo install cargo-llvm-cov
     rustup toolchain install {{nightly}} --component llvm-tools-preview
 
-    rm -rf *.profraw ./target/debug/coverage
-
-    RUSTFLAGS="-Zinstrument-coverage -Clink-dead-code" LLVM_PROFILE_FILE="coverage-%p-%m.profraw" cargo +{{nightly}} test --all-features -- --test-threads 1
-    rustup run {{nightly}} grcov . -s . --binary-path ./target/debug/ -t html --branch --ignore-not-existing -o ./target/debug/coverage --ignore 'examples/**' --ignore 'tests/**'
-
-    rm -f *.profraw
+    cargo +{{nightly}} llvm-cov --html --all-features -- --test-threads 1
+    cargo +{{nightly}} llvm-cov --no-run --json --summary-only | \
+        jq -c '.data[0].totals.lines.percent | { \
+            schemaVersion: 1, \
+            label: "coverage", \
+            message: "\(.|round)%", \
+            color: (if . < 70 then "red" elif . < 80 then "yellow" else "green" end) \
+        }' > target/llvm-cov/html/coverage.json
 
 # upload coverage to GitHub Pages
 upload-coverage: coverage
     git checkout gh-pages
-    rm -rf badges examples src tests coverage.json index.html
-    cp -R target/debug/coverage/ .
-    git add -A badges examples src tests coverage.json index.html
-    git commit -m "Coverage for $(git rev-parse --short main)"
+    rm -rf coverage coverage.json index.html style.css
+    cp -R target/llvm-cov/html/ .
+    git add -A coverage coverage.json index.html style.css
+    git commit -m "Coverage for $(git rev-parse --short v5-api)"
     git push
     git checkout main
