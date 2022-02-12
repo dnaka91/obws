@@ -12,6 +12,17 @@ impl<'a> Scenes<'a> {
         self.client.send_message(RequestType::GetSceneList).await
     }
 
+    /// Gets an array of all groups in OBS.
+    ///
+    /// Groups in OBS are actually scenes, but renamed and modified. In obs-websocket, we treat them
+    /// as scenes where we can.
+    pub async fn get_group_list(&self) -> Result<Vec<String>> {
+        self.client
+            .send_message::<responses::Groups>(RequestType::GetGroupList)
+            .await
+            .map(|g| g.groups)
+    }
+
     /// Gets the current program scene.
     pub async fn get_current_program_scene(&self) -> Result<String> {
         self.client

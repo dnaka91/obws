@@ -16,6 +16,7 @@ pub const TEST_TEXT_2: &str = "OBWS-TEST-Text2";
 pub const TEST_BROWSER: &str = "OBWS-TEST-Browser";
 pub const TEST_BROWSER_RENAME: &str = "OBWS-TEST-Browser-Renamed";
 pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
+pub const TEST_GROUP: &str = "OBWS-TEST-Group";
 pub const INPUT_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
 pub const INPUT_KIND_BROWSER: &str = "browser_source";
 pub const INPUT_KIND_VLC: &str = "vlc_source";
@@ -60,6 +61,13 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         !scenes.scenes.iter().any(is_created_scene),
         "scene `{}` found, must NOT be present for scenes tests",
         TEST_SCENE_CREATE
+    );
+
+    let groups = client.scenes().get_group_list().await?;
+    ensure!(
+        groups.iter().map(String::as_str).any(is_required_group),
+        "group `{}` not found, required for scenes and scene items tests",
+        TEST_GROUP
     );
 
     let inputs = client.inputs().get_input_list(None).await?;
@@ -142,6 +150,10 @@ fn is_renamed_scene(scene: &Scene) -> bool {
 
 fn is_created_scene(scene: &Scene) -> bool {
     scene.scene_name == TEST_SCENE_CREATE
+}
+
+fn is_required_group(group: &str) -> bool {
+    group == TEST_GROUP
 }
 
 fn is_required_text_input(input: &Input) -> bool {

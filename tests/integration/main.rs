@@ -7,6 +7,7 @@ mod inputs;
 mod media_inputs;
 mod outputs;
 mod recording;
+mod scene_items;
 mod scenes;
 mod sources;
 mod streaming;

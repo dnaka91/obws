@@ -501,6 +501,7 @@ pub(crate) enum RequestType<'a> {
     // Scenes
     // --------------------------------
     GetSceneList,
+    GetGroupList,
     GetCurrentProgramScene,
     #[serde(rename_all = "camelCase")]
     SetCurrentProgramScene {
@@ -746,6 +747,27 @@ pub struct SceneItemTransform {
     pub crop_right: Option<u32>,
     pub crop_top: Option<u32>,
     pub crop_bottom: Option<u32>,
+}
+
+impl From<crate::responses::SceneItemTransform> for SceneItemTransform {
+    fn from(t: crate::responses::SceneItemTransform) -> Self {
+        Self {
+            position_x: Some(t.position_x),
+            position_y: Some(t.position_y),
+            rotation: Some(t.rotation),
+            scale_x: Some(t.scale_x),
+            scale_y: Some(t.scale_y),
+            alignment: Some(t.alignment),
+            bounds_type: Some(t.bounds_type),
+            bounds_alignment: Some(t.bounds_alignment),
+            bounds_width: Some(t.bounds_width),
+            bounds_height: Some(t.bounds_height),
+            crop_left: Some(t.crop_left),
+            crop_right: Some(t.crop_right),
+            crop_top: Some(t.crop_top),
+            crop_bottom: Some(t.crop_bottom),
+        }
+    }
 }
 
 #[derive(Default, Serialize)]

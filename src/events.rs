@@ -277,7 +277,7 @@ pub enum Event {
         /// Name of the scene the item was removed from.
         scene_name: String,
         /// Name of the underlying source (input/scene).
-        input_name: String,
+        source_name: String,
         /// Numeric ID of the scene item.
         scene_item_id: u64,
     },

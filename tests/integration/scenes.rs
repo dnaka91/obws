@@ -11,6 +11,7 @@ async fn scenes() -> Result<()> {
     general.set_studio_mode_enabled(true).await?;
 
     let scenes = client.get_scene_list().await?.scenes;
+    client.get_group_list().await?;
 
     let current = client.get_current_program_scene().await?;
     let other = &scenes
