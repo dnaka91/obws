@@ -7,10 +7,12 @@ pub struct Recording<'a> {
 }
 
 impl<'a> Recording<'a> {
+    /// Gets the status of the record output.
     pub async fn get_record_status(&self) -> Result<responses::RecordStatus> {
         self.client.send_message(RequestType::GetRecordStatus).await
     }
 
+    /// Toggles the status of the record output.
     pub async fn toggle_record(&self) -> Result<bool> {
         self.client
             .send_message::<responses::OutputActive>(RequestType::ToggleRecord)
@@ -18,14 +20,17 @@ impl<'a> Recording<'a> {
             .map(|oa| oa.output_active)
     }
 
+    /// Starts the record output.
     pub async fn start_record(&self) -> Result<()> {
         self.client.send_message(RequestType::StartRecord).await
     }
 
+    /// Stops the record output.
     pub async fn stop_record(&self) -> Result<()> {
         self.client.send_message(RequestType::StopRecord).await
     }
 
+    /// Toggles pause on the record output.
     pub async fn toggle_record_pause(&self) -> Result<bool> {
         self.client
             .send_message::<responses::OutputPaused>(RequestType::ToggleRecordPause)
@@ -33,16 +38,17 @@ impl<'a> Recording<'a> {
             .map(|op| op.output_paused)
     }
 
+    /// Pauses the record output.
     pub async fn pause_record(&self) -> Result<()> {
         self.client.send_message(RequestType::PauseRecord).await
     }
 
+    /// Resumes the record output.
     pub async fn resume_record(&self) -> Result<()> {
         self.client.send_message(RequestType::ResumeRecord).await
     }
 
-    // Currently disabled in obs-websocket and will always fail.
-    #[doc(hidden)]
+    /// Gets the current directory that the record output is set to.
     pub async fn get_record_directory(&self) -> Result<String> {
         self.client
             .send_message::<responses::RecordDirectory>(RequestType::GetRecordDirectory)

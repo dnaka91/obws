@@ -426,12 +426,17 @@ pub enum MediaState {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RecordStatus {
+    /// Whether the output is active.
     pub output_active: bool,
+    /// Whether the output is paused.
     pub output_paused: bool,
+    /// Current formatted timecode string for the output.
     #[serde(deserialize_with = "crate::de::duration_timecode")]
     pub output_timecode: Duration,
-    #[serde(deserialize_with = "crate::de::duration_nanos")]
+    /// Current duration in milliseconds for the output.
+    #[serde(deserialize_with = "crate::de::duration_millis")]
     pub output_duration: Duration,
+    /// Number of bytes sent by the output.
     pub output_bytes: u64,
 }
 
@@ -451,6 +456,7 @@ pub(crate) struct OutputPaused {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RecordDirectory {
+    /// Output directory.
     pub record_directory: String,
 }
 
