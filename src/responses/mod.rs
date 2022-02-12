@@ -601,12 +601,11 @@ pub struct Scene {
     pub scene_index: usize,
 }
 
-
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Groups {
     /// Array of group names.
-    pub groups:Vec<String>
+    pub groups: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
