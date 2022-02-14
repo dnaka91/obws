@@ -29,4 +29,13 @@ impl<'a> Streaming<'a> {
     pub async fn stop_stream(&self) -> Result<()> {
         self.client.send_message(RequestType::StopStream).await
     }
+
+    /// Sends CEA-608 caption text over the stream output.
+    ///
+    /// - `caption_text`: Caption text.
+    pub async fn send_stream_caption(&self, caption_text: &str) -> Result<()> {
+        self.client
+            .send_message(RequestType::SendStreamCaption { caption_text })
+            .await
+    }
 }

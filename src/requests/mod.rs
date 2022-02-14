@@ -548,6 +548,11 @@ pub(crate) enum RequestType<'a> {
     ToggleStream,
     StartStream,
     StopStream,
+    #[serde(rename_all = "camelCase")]
+    SendStreamCaption {
+        /// Caption text.
+        caption_text: &'a str,
+    },
 }
 
 #[derive(Clone, Copy, Serialize)]
