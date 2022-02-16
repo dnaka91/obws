@@ -25,10 +25,6 @@ async fn general() -> Result<()> {
         .trigger_hotkey_by_key_sequence("OBS_KEY_P", KeyModifiers::default())
         .await?;
 
-    let enabled = client.get_studio_mode_enabled().await?;
-    client.set_studio_mode_enabled(!enabled).await?;
-    client.set_studio_mode_enabled(enabled).await?;
-
     Ok(())
 }
 

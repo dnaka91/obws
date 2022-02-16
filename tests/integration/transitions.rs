@@ -5,7 +5,7 @@ use crate::common::{self, TEST_TRANSITION};
 #[tokio::test]
 async fn transitions() -> Result<()> {
     let client = common::new_client().await?;
-    let general = client.general();
+    let ui = client.ui();
     let client = client.transitions();
 
     client.get_transition_kind_list().await?;
@@ -22,12 +22,12 @@ async fn transitions() -> Result<()> {
         .await?;
     client.get_current_scene_transition_cursor().await?;
 
-    general.set_studio_mode_enabled(true).await?;
+    ui.set_studio_mode_enabled(true).await?;
 
     client.trigger_studio_mode_transition().await?;
     client.set_tbar_position(0.5, None).await?;
 
-    general.set_studio_mode_enabled(false).await?;
+    ui.set_studio_mode_enabled(false).await?;
 
     Ok(())
 }

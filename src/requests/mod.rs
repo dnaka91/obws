@@ -251,6 +251,7 @@ pub(crate) enum RequestType<'a> {
         /// Settings to apply to the service.
         stream_service_settings: serde_json::Value,
     },
+    GetRecordDirectory,
     // --------------------------------
     // General
     // --------------------------------
@@ -274,12 +275,6 @@ pub(crate) enum RequestType<'a> {
         key_id: &'a str,
         /// Object containing key modifiers to apply.
         key_modifiers: KeyModifiers,
-    },
-    GetStudioModeEnabled,
-    #[serde(rename_all = "camelCase")]
-    SetStudioModeEnabled {
-        /// Enable or disable the studio mode.
-        studio_mode_enabled: bool,
     },
     // TODO: Sleep
     // --------------------------------
@@ -435,7 +430,6 @@ pub(crate) enum RequestType<'a> {
     ToggleRecordPause,
     PauseRecord,
     ResumeRecord,
-    GetRecordDirectory,
     // --------------------------------
     // Scene items
     // --------------------------------
@@ -595,6 +589,30 @@ pub(crate) enum RequestType<'a> {
         /// another position update.
         #[serde(skip_serializing_if = "Option::is_none")]
         release: Option<bool>,
+    },
+    // --------------------------------
+    // UI
+    // --------------------------------
+    GetStudioModeEnabled,
+    #[serde(rename_all = "camelCase")]
+    SetStudioModeEnabled {
+        /// Enable or disable the studio mode.
+        studio_mode_enabled: bool,
+    },
+    #[serde(rename_all = "camelCase")]
+    OpenInputPropertiesDialog {
+        /// Name of the input to open the dialog of.
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    OpenInputFiltersDialog {
+        /// Name of the input to open the dialog of.
+        input_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    OpenInputInteractDialog {
+        /// Name of the input to open the dialog of.
+        input_name: &'a str,
     },
 }
 

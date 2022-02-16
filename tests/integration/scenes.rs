@@ -7,10 +7,10 @@ use crate::common::{self, TEST_SCENE, TEST_SCENE_CREATE, TEST_SCENE_RENAME, TEST
 #[tokio::test]
 async fn scenes() -> Result<()> {
     let client = common::new_client().await?;
-    let general = client.general();
+    let ui = client.ui();
     let client = client.scenes();
 
-    general.set_studio_mode_enabled(true).await?;
+    ui.set_studio_mode_enabled(true).await?;
 
     let scenes = client.get_scene_list().await?.scenes;
     client.get_group_list().await?;
@@ -57,7 +57,7 @@ async fn scenes() -> Result<()> {
         })
         .await?;
 
-    general.set_studio_mode_enabled(false).await?;
+    ui.set_studio_mode_enabled(false).await?;
 
     Ok(())
 }

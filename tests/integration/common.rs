@@ -105,7 +105,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_PROFILE
     );
 
-    let studio_mode_enabled = client.general().get_studio_mode_enabled().await?;
+    let studio_mode_enabled = client.ui().get_studio_mode_enabled().await?;
     ensure!(
         !studio_mode_enabled,
         "studio mode enabled, required to be disabled for studio mode tests"

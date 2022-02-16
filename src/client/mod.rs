@@ -31,7 +31,7 @@ use tracing::{debug, error, trace};
 pub use self::{
     config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
     recording::Recording, scene_items::SceneItems, scenes::Scenes, sources::Sources,
-    streaming::Streaming, transitions::Transitions,
+    streaming::Streaming, transitions::Transitions, ui::Ui,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -52,6 +52,7 @@ mod scenes;
 mod sources;
 mod streaming;
 mod transitions;
+mod ui;
 
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
@@ -447,6 +448,11 @@ impl Client {
     /// Access API functions related to transitions.
     pub fn transitions(&self) -> Transitions<'_> {
         Transitions { client: self }
+    }
+
+    /// Access API functions related to the user interface.
+    pub fn ui(&self) -> Ui<'_> {
+        Ui { client: self }
     }
 }
 
