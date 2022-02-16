@@ -7,7 +7,7 @@ pub struct Streaming<'a> {
 }
 
 impl<'a> Streaming<'a> {
-    /// Gets the status of the stream output..
+    /// Gets the status of the stream output.
     pub async fn get_stream_status(&self) -> Result<responses::StreamStatus> {
         self.client.send_message(RequestType::GetStreamStatus).await
     }

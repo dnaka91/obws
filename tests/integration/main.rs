@@ -11,3 +11,4 @@ mod scene_items;
 mod scenes;
 mod sources;
 mod streaming;
+mod transitions;

@@ -668,3 +668,59 @@ pub struct StreamStatus {
     /// Total number of frames delivered by the output's process.
     pub output_total_frames: u32,
 }
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct TransitionKinds {
+    /// Array of transition kinds.
+    pub transition_kinds: Vec<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneTransitionList {
+    /// Name of the current scene transition.
+    pub current_scene_transition_name: Option<String>,
+    /// Kind of the current scene transition.
+    pub current_scene_transition_kind: Option<String>,
+    /// Array of transitions.
+    pub transitions: Vec<Transition>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Transition {
+    /// Name of the transition.
+    pub transition_name: String,
+    /// Kind of the transition.
+    pub transition_kind: String,
+    /// Whether the transition uses a fixed (unconfigurable) duration.
+    pub transition_fixed: bool,
+    /// Whether the transition supports being configured.
+    pub transition_configurable: bool,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CurrentSceneTransition {
+    /// Name of the transition.
+    pub transition_name: String,
+    /// Kind of the transition.
+    pub transition_kind: String,
+    /// Whether the transition uses a fixed (unconfigurable) duration.
+    pub transition_fixed: bool,
+    /// Configured transition duration in milliseconds.
+    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    pub transition_duration: Option<Duration>,
+    /// Whether the transition supports being configured.
+    pub transition_configurable: bool,
+    /// Object of settings for the transition.
+    pub transition_settings: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct TransitionCursor {
+    /// Cursor position, between `0.0` and `1.0`.
+    pub transition_cursor: f32,
+}

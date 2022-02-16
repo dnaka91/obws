@@ -288,6 +288,7 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     GetInputList {
         /// Restrict the array to only inputs of the specified kind.
+        #[serde(skip_serializing_if = "Option::is_none")]
         input_kind: Option<&'a str>,
     },
     GetInputKindList {
@@ -559,6 +560,42 @@ pub(crate) enum RequestType<'a> {
         /// Caption text.
         caption_text: &'a str,
     },
+    // --------------------------------
+    // Transitions
+    // --------------------------------
+    GetTransitionKindList,
+    GetSceneTransitionList,
+    GetCurrentSceneTransition,
+    #[serde(rename_all = "camelCase")]
+    SetCurrentSceneTransition {
+        /// Name of the transition to make active.
+        transition_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetCurrentSceneTransitionDuration {
+        /// Duration in milliseconds.
+        #[serde(serialize_with = "ser::duration_millis")]
+        transition_duration: Duration,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetCurrentSceneTransitionSettings {
+        /// Settings object to apply to the transition.
+        transition_settings: serde_json::Value,
+        /// Whether to overlay over the current settings or replace them.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        overlay: Option<bool>,
+    },
+    GetCurrentSceneTransitionCursor,
+    TriggerStudioModeTransition,
+    #[serde(rename_all = "camelCase", rename = "SetTBarPosition")]
+    SetTbarPosition {
+        /// New position.
+        position: f32,
+        /// Whether to release the TBar. Only set `false` if you know that you will be sending
+        /// another position update.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        release: Option<bool>,
+    },
 }
 
 #[derive(Clone, Copy, Serialize)]
@@ -580,6 +617,7 @@ pub struct SetPersistentData<'a> {
     pub slot_value: &'a serde_json::Value,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetProfileParameter<'a> {
@@ -591,6 +629,7 @@ pub struct SetProfileParameter<'a> {
     pub parameter_value: Option<&'a str>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetVideoSettings {
@@ -663,6 +702,7 @@ pub struct SetInputSettings<'a, T> {
     pub overlay: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SetInputSettingsInternal<'a> {
@@ -698,6 +738,7 @@ pub struct CreateInput<'a, T> {
     pub scene_item_enabled: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CreateInputInternal<'a> {
@@ -708,6 +749,7 @@ pub(crate) struct CreateInputInternal<'a> {
     pub scene_item_enabled: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSceneItem<'a> {
@@ -719,6 +761,7 @@ pub struct CreateSceneItem<'a> {
     pub scene_item_enabled: Option<bool>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DuplicateSceneItem<'a> {
@@ -741,6 +784,7 @@ pub struct SetSceneItemTransform<'a> {
     pub scene_item_transform: SceneItemTransform,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItemTransform {
@@ -814,6 +858,7 @@ pub struct SetSceneItemIndex<'a> {
     pub scene_item_index: u32,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneSceneTransitionOverride<'a> {
@@ -826,6 +871,7 @@ pub struct SetSceneSceneTransitionOverride<'a> {
     pub transition_duration: Option<Duration>,
 }
 
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSourceScreenshot<'a> {
@@ -844,6 +890,7 @@ pub struct GetSourceScreenshot<'a> {
     pub image_compression_quality: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveSourceScreenshot<'a> {
