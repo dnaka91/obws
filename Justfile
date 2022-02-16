@@ -32,4 +32,4 @@ upload-coverage: coverage
     git add -A coverage coverage.json index.html style.css
     git commit -m "Coverage for $(git rev-parse --short v5-api)"
     git push
-    git checkout main
+    git checkout v5-api
