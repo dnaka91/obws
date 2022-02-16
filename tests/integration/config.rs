@@ -84,5 +84,7 @@ async fn config() -> Result<()> {
         )
         .await?;
 
+    client.get_record_directory().await?;
+
     Ok(())
 }

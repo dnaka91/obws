@@ -624,6 +624,16 @@ pub(crate) struct CurrentPreviewScene {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SceneTransitionOverride {
+    /// Name of the overridden scene transition.
+    pub transition_name: Option<String>,
+    /// Duration of the overridden scene transition.
+    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
+    pub transition_duration: Option<Duration>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SourceActive {
     /// Whether the source is showing in program.
     pub video_active: bool,

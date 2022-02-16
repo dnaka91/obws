@@ -15,7 +15,6 @@ async fn recording() -> Result<()> {
     tokio::pin!(events);
 
     client.get_record_status().await?;
-    client.get_record_directory().await?;
 
     client.start_record().await?;
     wait_for!(

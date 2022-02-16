@@ -531,6 +531,12 @@ pub(crate) enum RequestType<'a> {
         /// Name of the scene to remove.
         scene_name: &'a str,
     },
+    #[serde(rename_all = "camelCase")]
+    GetSceneSceneTransitionOverride {
+        /// Name of the scene.
+        scene_name: &'a str,
+    },
+    SetSceneSceneTransitionOverride(SetSceneSceneTransitionOverride<'a>),
     // --------------------------------
     // Sources
     // --------------------------------
@@ -806,6 +812,18 @@ pub struct SetSceneItemIndex<'a> {
     pub scene_item_id: i64,
     /// New index position of the scene item.
     pub scene_item_index: u32,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSceneSceneTransitionOverride<'a> {
+    /// Name of the scene.
+    pub scene_name: &'a str,
+    /// Name of the scene transition to use as override.
+    pub transition_name: Option<&'a str>,
+    /// Duration to use for any overridden transition.
+    #[serde(serialize_with = "ser::duration_millis_opt")]
+    pub transition_duration: Option<Duration>,
 }
 
 #[derive(Default, Serialize)]

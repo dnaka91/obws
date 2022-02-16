@@ -47,12 +47,4 @@ impl<'a> Recording<'a> {
     pub async fn resume_record(&self) -> Result<()> {
         self.client.send_message(RequestType::ResumeRecord).await
     }
-
-    /// Gets the current directory that the record output is set to.
-    pub async fn get_record_directory(&self) -> Result<String> {
-        self.client
-            .send_message::<responses::RecordDirectory>(RequestType::GetRecordDirectory)
-            .await
-            .map(|rd| rd.record_directory)
-    }
 }

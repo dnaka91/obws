@@ -1,5 +1,8 @@
 use super::Client;
-use crate::{requests::RequestType, responses, Result};
+use crate::{
+    requests::{RequestType, SetSceneSceneTransitionOverride},
+    responses, Result,
+};
 
 /// API functions related to scenes.
 pub struct Scenes<'a> {
@@ -89,6 +92,30 @@ impl<'a> Scenes<'a> {
     pub async fn remove_scene(&self, scene_name: &str) -> Result<()> {
         self.client
             .send_message(RequestType::RemoveScene { scene_name })
+            .await
+    }
+
+    /// Gets the scene transition overridden for a scene.
+    ///
+    /// - `scene_name`: Name of the scene.
+    pub async fn get_scene_scene_transition_override(
+        &self,
+        scene_name: &str,
+    ) -> Result<responses::SceneTransitionOverride> {
+        self.client
+            .send_message(RequestType::GetSceneSceneTransitionOverride { scene_name })
+            .await
+    }
+
+    /// Sets the scene transition overridden for a scene.
+    pub async fn set_scene_scene_transition_override(
+        &self,
+        transition_override: SetSceneSceneTransitionOverride<'_>,
+    ) -> Result<()> {
+        self.client
+            .send_message(RequestType::SetSceneSceneTransitionOverride(
+                transition_override,
+            ))
             .await
     }
 }

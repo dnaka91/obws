@@ -182,4 +182,12 @@ impl<'a> Config<'a> {
             })
             .await
     }
+
+    /// Gets the current directory that the record output is set to.
+    pub async fn get_record_directory(&self) -> Result<String> {
+        self.client
+            .send_message::<responses::RecordDirectory>(RequestType::GetRecordDirectory)
+            .await
+            .map(|rd| rd.record_directory)
+    }
 }
