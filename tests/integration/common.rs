@@ -18,6 +18,7 @@ pub const TEST_BROWSER_RENAME: &str = "OBWS-TEST-Browser-Renamed";
 pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
 pub const TEST_GROUP: &str = "OBWS-TEST-Group";
 pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
+pub const TEST_FILTER: &str = "OBWS-TEST-Filter";
 pub const INPUT_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
 pub const INPUT_KIND_BROWSER: &str = "browser_source";
 pub const INPUT_KIND_VLC: &str = "vlc_source";

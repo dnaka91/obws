@@ -2,6 +2,7 @@
 
 mod common;
 mod config;
+mod filters;
 mod general;
 mod inputs;
 mod media_inputs;

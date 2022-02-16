@@ -29,9 +29,9 @@ use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use tracing::{debug, error, trace};
 
 pub use self::{
-    config::Config, general::General, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
-    recording::Recording, scene_items::SceneItems, scenes::Scenes, sources::Sources,
-    streaming::Streaming, transitions::Transitions, ui::Ui,
+    config::Config, filters::Filters, general::General, inputs::Inputs, media_inputs::MediaInputs,
+    outputs::Outputs, recording::Recording, scene_items::SceneItems, scenes::Scenes,
+    sources::Sources, streaming::Streaming, transitions::Transitions, ui::Ui,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -42,6 +42,7 @@ use crate::{
 };
 
 mod config;
+mod filters;
 mod general;
 mod inputs;
 mod media_inputs;
@@ -398,6 +399,11 @@ impl Client {
     /// Access API functions related to OBS configuration.
     pub fn config(&self) -> Config<'_> {
         Config { client: self }
+    }
+
+    /// Access API functions related to filters.
+    pub fn filters(&self) -> Filters<'_> {
+        Filters { client: self }
     }
 
     /// Access general API functions.

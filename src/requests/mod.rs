@@ -253,6 +253,16 @@ pub(crate) enum RequestType<'a> {
     },
     GetRecordDirectory,
     // --------------------------------
+    // Filters
+    // --------------------------------
+    #[serde(rename_all = "camelCase")]
+    GetSourceFilter {
+        /// Name of the source.
+        source_name: &'a str,
+        /// Name of the filter.
+        filter_name: &'a str,
+    },
+    // --------------------------------
     // General
     // --------------------------------
     GetVersion,

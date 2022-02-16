@@ -279,6 +279,19 @@ pub struct StreamServiceSettings<T> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct SourceFilter {
+    /// Whether the filter is enabled.
+    pub filter_enabled: bool,
+    /// Index of the filter in the list, beginning at 0.
+    pub filter_index: u32,
+    /// The kind of filter.
+    pub filter_kind: String,
+    /// Settings object associated with the filter.
+    pub filter_settings: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Version {
     /// Current OBS Studio version.
     pub obs_version: SemVerVersion,
