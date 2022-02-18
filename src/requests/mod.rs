@@ -256,12 +256,34 @@ pub(crate) enum RequestType<'a> {
     // Filters
     // --------------------------------
     #[serde(rename_all = "camelCase")]
+    GetSourceFilterList {
+        /// Name of the source.
+        source_name: &'a str,
+    },
+    #[serde(rename_all = "camelCase")]
+    GetSourceFilterDefaultSettings {
+        /// Filter kind to get the default settings for.
+        filter_kind: &'a str,
+    },
+    CreateSourceFilter(CreateSourceFilterInternal<'a>),
+    #[serde(rename_all = "camelCase")]
+    RemoveSourceFilter {
+        /// Name of the source the filter is on.
+        source_name: &'a str,
+        /// Name of the filter to remove.
+        filter_name: &'a str,
+    },
+    SetSourceFilterName(SetSourceFilterName<'a>),
+    #[serde(rename_all = "camelCase")]
     GetSourceFilter {
         /// Name of the source.
         source_name: &'a str,
         /// Name of the filter.
         filter_name: &'a str,
     },
+    SetSourceFilterIndex(SetSourceFilterIndex<'a>),
+    SetSourceFilterSettings(SetSourceFilterSettingsInternal<'a>),
+    SetSourceFilterEnabled(SetSourceFilterEnabled<'a>),
     // --------------------------------
     // General
     // --------------------------------
@@ -686,6 +708,91 @@ impl From<crate::responses::VideoSettings> for SetVideoSettings {
             output_height: Some(v.output_height),
         }
     }
+}
+
+pub struct CreateSourceFilter<'a, T> {
+    /// Name of the source to add the filter to.
+    pub source_name: &'a str,
+    /// Name of the new filter to be created.
+    pub filter_name: &'a str,
+    /// The kind of filter to be created.
+    pub filter_kind: &'a str,
+    /// Settings object to initialize the filter with.
+    pub filter_settings: Option<T>,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct CreateSourceFilterInternal<'a> {
+    /// Name of the source to add the filter to.
+    pub source_name: &'a str,
+    /// Name of the new filter to be created.
+    pub filter_name: &'a str,
+    /// The kind of filter to be created.
+    pub filter_kind: &'a str,
+    /// Settings object to initialize the filter with.
+    pub filter_settings: Option<serde_json::Value>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSourceFilterName<'a> {
+    /// Name of the source the filter is on.
+    pub source_name: &'a str,
+    /// Current name of the filter.
+    pub filter_name: &'a str,
+    /// New name for the filter.
+    pub new_filter_name: &'a str,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSourceFilterIndex<'a> {
+    /// Name of the source the filter is on.
+    pub source_name: &'a str,
+    /// Name of the filter.
+    pub filter_name: &'a str,
+    /// New index position of the filter.
+    pub filter_index: u32,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSourceFilterSettings<'a, T> {
+    /// Name of the source the filter is on.
+    pub source_name: &'a str,
+    /// Name of the filter to set the settings of.
+    pub filter_name: &'a str,
+    /// Object of settings to apply.
+    pub filter_settings: T,
+    /// Whether to overlay over the current settings or replace them.
+    pub overlay: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SetSourceFilterSettingsInternal<'a> {
+    /// Name of the source the filter is on.
+    pub source_name: &'a str,
+    /// Name of the filter to set the settings of.
+    pub filter_name: &'a str,
+    /// Object of settings to apply.
+    pub filter_settings: serde_json::Value,
+    /// Whether to overlay over the current settings or replace them.
+    pub overlay: Option<bool>,
+}
+
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SetSourceFilterEnabled<'a> {
+    /// Name of the source the filter is on.
+    pub source_name: &'a str,
+    /// Name of the filter.
+    pub filter_name: &'a str,
+    /// New enable state of the filter.
+    pub filter_enabled: bool,
 }
 
 pub struct CallVendorRequest<'a, T> {

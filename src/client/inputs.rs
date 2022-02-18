@@ -39,7 +39,7 @@ impl<'a> Inputs<'a> {
     /// Gets the default settings for an input kind.
     ///
     /// - `input_kind`: Input kind to get the default settings for.
-    pub async fn get_input_default_settings<'de, T>(&self, input_kind: &str) -> Result<T>
+    pub async fn get_input_default_settings<T>(&self, input_kind: &str) -> Result<T>
     where
         T: DeserializeOwned,
     {

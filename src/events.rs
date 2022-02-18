@@ -5,7 +5,11 @@ use std::{collections::BTreeMap, path::PathBuf};
 use serde::Deserialize;
 use time::Duration;
 
-use crate::{common::MediaAction, responses::SceneItemTransform, MonitorType};
+use crate::{
+    common::MediaAction,
+    responses::{SceneItemTransform, SourceFilter},
+    MonitorType,
+};
 
 /// All possible event types that can occur while the user interacts with OBS.
 #[derive(Clone, Debug, Deserialize)]
@@ -62,6 +66,57 @@ pub enum Event {
     // --------------------------------
     // Filters
     // --------------------------------
+    /// A filter has been added to a source.
+    #[serde(rename_all = "camelCase")]
+    SourceFilterCreated {
+        /// Name of the source the filter was added to.
+        source_name: String,
+        /// Name of the filter.
+        filter_name: String,
+        /// The kind of the filter.
+        filter_kind: String,
+        /// Index position of the filter.
+        filter_index: u32,
+        /// The settings configured to the filter when it was created.
+        filter_settings: serde_json::Value,
+        /// The default settings for the filter.
+        default_filter_settings: serde_json::Value,
+    },
+    /// A filter has been removed from a source.
+    #[serde(rename_all = "camelCase")]
+    SourceFilterRemoved {
+        /// Name of the source the filter was on.
+        source_name: String,
+        /// Name of the filter.
+        filter_name: String,
+    },
+    /// A source's filter list has been reindexed.
+    #[serde(rename_all = "camelCase")]
+    SourceFilterListReindexed {
+        /// Name of the source.
+        source_name: String,
+        /// Array of filter objects.
+        filters: Vec<SourceFilter>,
+    },
+    /// A source filter's enable state has changed.
+    #[serde(rename_all = "camelCase")]
+    SourceFilterEnableStateChanged {
+        /// Name of the source the filter is on.
+        source_name: String,
+        /// Name of the filter.
+        filter_name: String,
+        /// Whether the filter is enabled.
+        filter_enabled: bool,
+    },
+    #[serde(rename_all = "camelCase")]
+    SourceFilterNameChanged {
+        /// The source the filter is on.
+        source_name: String,
+        /// Old name of the filter.
+        old_filter_name: String,
+        /// New name of the filter.
+        filter_name: String,
+    },
     // --------------------------------
     // General
     // --------------------------------

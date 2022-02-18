@@ -2,7 +2,7 @@ use std::{env, sync::Once};
 
 use anyhow::{ensure, Result};
 use obws::{
-    responses::{Input, Scene},
+    responses::{Input, Scene, SourceFilter},
     Client,
 };
 
@@ -19,9 +19,12 @@ pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
 pub const TEST_GROUP: &str = "OBWS-TEST-Group";
 pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
 pub const TEST_FILTER: &str = "OBWS-TEST-Filter";
+pub const TEST_FILTER_2: &str = "OBWS-TEST-Filter2";
+pub const TEST_FILTER_RENAME: &str = "OBWS-TEST-Filter-Renamed";
 pub const INPUT_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
 pub const INPUT_KIND_BROWSER: &str = "browser_source";
 pub const INPUT_KIND_VLC: &str = "vlc_source";
+pub const FILTER_COLOR: &str = "color_filter";
 
 static INIT: Once = Once::new();
 
@@ -97,6 +100,23 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         !inputs.iter().any(is_renamed_input),
         "browser input `{}` found, must NOT be present for inputs tests",
         TEST_BROWSER_RENAME
+    );
+
+    let filters = client.filters().get_source_filter_list(TEST_TEXT).await?;
+    ensure!(
+        filters.iter().any(is_required_filter),
+        "filter `{}` not found, required for filters tests",
+        TEST_FILTER
+    );
+    ensure!(
+        !filters.iter().any(is_filter_2),
+        "filter `{}` found, must NOT be present for filters tests",
+        TEST_FILTER_2
+    );
+    ensure!(
+        !filters.iter().any(is_renamed_filter),
+        "filter `{}` found, must NOT be present for filters tests",
+        TEST_FILTER_RENAME
     );
 
     let profiles = client.config().get_profile_list().await?.profiles;
@@ -188,6 +208,18 @@ fn is_browser_input(input: &Input) -> bool {
 
 fn is_media_input(input: &Input) -> bool {
     input.input_kind == INPUT_KIND_VLC
+}
+
+fn is_required_filter(filter: &SourceFilter) -> bool {
+    filter.filter_name == TEST_FILTER
+}
+
+fn is_filter_2(filter: &SourceFilter) -> bool {
+    filter.filter_name == TEST_FILTER_2
+}
+
+fn is_renamed_filter(filter: &SourceFilter) -> bool {
+    filter.filter_name == TEST_FILTER_RENAME
 }
 
 fn is_required_profile(profile: &str) -> bool {

@@ -279,6 +279,13 @@ pub struct StreamServiceSettings<T> {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct Filters {
+    /// Array of filters.
+    pub filters: Vec<SourceFilter>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SourceFilter {
     /// Whether the filter is enabled.
     pub filter_enabled: bool,
@@ -286,8 +293,18 @@ pub struct SourceFilter {
     pub filter_index: u32,
     /// The kind of filter.
     pub filter_kind: String,
+    /// name of the filter.
+    #[serde(default)]
+    pub filter_name: String,
     /// Settings object associated with the filter.
     pub filter_settings: serde_json::Value,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct DefaultFilterSettings<T> {
+    /// Object of default settings for the filter kind.
+    pub default_filter_settings: T,
 }
 
 #[derive(Debug, Deserialize)]
