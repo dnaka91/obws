@@ -12,3 +12,9 @@ expression = "MIT AND ISC AND OpenSSL"
 license-files = [
     { path = "LICENSE", hash = 0xbd0eed23 },
 ]
+
+[bans]
+skip = [
+    { name = "block-buffer", version = "=0.9.0" },
+    { name = "digest", version = "0.9.0" },
+]
