@@ -334,51 +334,70 @@ pub struct TextGdiPlusProperties {
     /// Source name.
     pub source: String,
     /// Text Alignment ("left", "center", "right").
-    pub align: Align,
+    pub align: Option<Align>,
     /// Background color.
+    #[serde(default)]
     pub bk_color: u32,
     /// Background opacity (0-100).
+    #[serde(default)]
     pub bk_opacity: u8,
     /// Chat log.
+    #[serde(default)]
     pub chatlog: bool,
     /// Chat log lines.
+    #[serde(default)]
     pub chatlog_lines: u64,
     /// Text color.
+    #[serde(default)]
     pub color: u32,
     /// Extents wrap.
+    #[serde(default)]
     pub extents: bool,
     /// Extents `cx`.
+    #[serde(default)]
     pub extents_cx: i64,
     /// Extents `cy`.
+    #[serde(default)]
     pub extents_cy: i64,
     /// File path name.
-    pub file: PathBuf,
+    pub file: Option<PathBuf>,
     /// Read text from the specified file.
+    #[serde(default)]
     pub read_from_file: bool,
     /// Holds data for the font. Ex:
     /// `"font": { "face": "Arial", "flags": 0, "size": 150, "style": "" }`.
-    pub font: Font,
+    pub font: Option<Font>,
     /// Gradient enabled.
+    #[serde(default)]
     pub gradient: bool,
     /// Gradient color.
+    #[serde(default)]
     pub gradient_color: u32,
     /// Gradient direction.
+    #[serde(default)]
     pub gradient_dir: f32,
     /// Gradient opacity (0-100).
+    #[serde(default)]
     pub gradient_opacity: u8,
     /// Outline.
+    #[serde(default)]
     pub outline: bool,
     /// Outline color.
+    #[serde(default)]
     pub outline_color: u32,
     /// Outline size.
+    #[serde(default)]
     pub outline_size: u64,
     /// Outline opacity (0-100).
+    #[serde(default)]
     pub outline_opacity: u8,
     /// Text content to be displayed.
+    #[serde(default)]
     pub text: String,
     /// Text vertical alignment ("top", "center", "bottom").
-    pub valign: Valign,
+    pub valign: Option<Valign>,
     /// Vertical text enabled.
+    #[serde(default)]
     pub vertical: bool,
 }
 
@@ -412,6 +431,7 @@ pub struct TextFreetype2Properties {
     #[serde(default)]
     pub outline: bool,
     /// Text content to be displayed.
+    #[serde(default)]
     pub text: String,
     /// File path.
     pub text_file: Option<PathBuf>,
@@ -1037,4 +1057,31 @@ pub struct VirtualCamStatus {
     /// Time elapsed since virtual cam started (only present if virtual cam currently active).
     #[serde(default, deserialize_with = "crate::de::duration_opt")]
     pub virtual_cam_timecode: Option<Duration>,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn deserialize_text_gdiplus_properties_default_plugin() {
+        let body = r#"{
+            "message-id": "4",
+            "source": "TEST_SOURCE",
+            "status": "ok"
+        }"#;
+
+        let _: TextGdiPlusProperties = serde_json::from_str(&body).unwrap();
+    }
+
+    #[test]
+    fn deserialize_text_freetype2_properties_default_plugin() {
+        let body = r#"{
+            "message-id": "5",
+            "source": "TEST_SOURCE",
+            "status": "ok"
+        }"#;
+
+        let _: TextFreetype2Properties = serde_json::from_str(&body).unwrap();
+    }
 }
