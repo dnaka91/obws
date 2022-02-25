@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Deserialization of Freetype2 and GDI+ failed in some situations, especially when many fields were
-  not set to a custom value (as OBS omits default values). Thank you @peddermaster2 !
+  not set to a custom value (as OBS omits default values).
+  Thank you [@peddermaster2](https://github.com/peddermaster2)!
 
 ## [0.9.0] - 2021-12-20
 
