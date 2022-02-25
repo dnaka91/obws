@@ -35,7 +35,7 @@ Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it 
 
 ```toml
 [dependencies]
-obws = "0.9.0"
+obws = "0.9.1"
 ```
 
 In addition, you will need to use the latest [tokio](https://tokio.rs) runtime to use this library
