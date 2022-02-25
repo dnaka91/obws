@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Deserialization of Freetype2 and GDI+ failed in some situations, especially when many fields were
+  not set to a custom value (as OBS omits default values). Thank you @peddermaster2 !
+
 ## [0.9.0] - 2021-12-20
 
 This is going to be the last release before the upcoming **obs-websocket v5.0** release. Support
