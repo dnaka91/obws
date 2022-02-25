@@ -3,7 +3,7 @@ sign-tag = true
 
 pre-release-commit-message = "Bump up version number to {{version}}"
 tag-message = "Version {{version}}"
-no-dev-version = true
+dev-version = false
 
 [[pre-release-replacements]]
 file = "README.md"
