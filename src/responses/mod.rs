@@ -460,7 +460,7 @@ pub struct RecordStatus {
     pub output_active: bool,
     /// Whether the output is paused.
     pub output_paused: bool,
-    /// Current formatted timecode string for the output.
+    /// Current formatted time code string for the output.
     #[serde(deserialize_with = "crate::de::duration_timecode")]
     pub output_timecode: Duration,
     /// Current duration in milliseconds for the output.
@@ -724,7 +724,7 @@ pub struct Transition {
     pub transition_name: String,
     /// Kind of the transition.
     pub transition_kind: String,
-    /// Whether the transition uses a fixed (unconfigurable) duration.
+    /// Whether the transition uses a fixed (non-configurable) duration.
     pub transition_fixed: bool,
     /// Whether the transition supports being configured.
     pub transition_configurable: bool,
@@ -737,7 +737,7 @@ pub struct CurrentSceneTransition {
     pub transition_name: String,
     /// Kind of the transition.
     pub transition_kind: String,
-    /// Whether the transition uses a fixed (unconfigurable) duration.
+    /// Whether the transition uses a fixed (non-configurable) duration.
     pub transition_fixed: bool,
     /// Configured transition duration in milliseconds.
     #[serde(deserialize_with = "crate::de::duration_millis_opt")]

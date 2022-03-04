@@ -99,13 +99,13 @@ impl<'a> Transitions<'a> {
             .await
     }
 
-    /// Sets the position of the TBar.
+    /// Sets the position of the T-Bar.
     ///
     /// **Very important note:** This will be deprecated and replaced in a future version of
     /// `obs-websocket`.
     ///
     /// - `position`: New position.
-    /// - `release`: Whether to release the TBar. Only set `false` if you know that you will be
+    /// - `release`: Whether to release the T-Bar. Only set `false` if you know that you will be
     ///   sending another position update.
     pub async fn set_tbar_position(&self, position: f32, release: Option<bool>) -> Result<()> {
         self.client

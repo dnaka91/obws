@@ -90,7 +90,7 @@ pub enum Event {
         /// Name of the filter.
         filter_name: String,
     },
-    /// A source's filter list has been reindexed.
+    /// A source's filter list has been re-indexed.
     #[serde(rename_all = "camelCase")]
     SourceFilterListReindexed {
         /// Name of the source.

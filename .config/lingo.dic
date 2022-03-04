@@ -17,6 +17,7 @@ libobs
 luma
 mul
 Mul
+namespace
 NV12
 OBS/M
 obws

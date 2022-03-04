@@ -617,7 +617,7 @@ pub(crate) enum RequestType<'a> {
     SetTbarPosition {
         /// New position.
         position: f32,
-        /// Whether to release the TBar. Only set `false` if you know that you will be sending
+        /// Whether to release the T-Bar. Only set `false` if you know that you will be sending
         /// another position update.
         #[serde(skip_serializing_if = "Option::is_none")]
         release: Option<bool>,
