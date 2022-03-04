@@ -443,6 +443,32 @@ pub enum Event {
         #[serde(deserialize_with = "crate::de::duration_millis")]
         transition_duration: Duration,
     },
+    /// A scene transition has started.
+    #[serde(rename_all = "camelCase")]
+    SceneTransitionStarted {
+        /// Scene transition name.
+        transition_name: String,
+    },
+    /// A scene transition has completed fully.
+    ///
+    /// **Note:** Does not appear to trigger when the transition is interrupted by the user.
+    #[serde(rename_all = "camelCase")]
+    SceneTransitionEnded {
+        /// Scene transition name.
+        transition_name: String,
+    },
+    /// A scene transition's video has completed fully.
+    ///
+    /// Useful for stinger transitions to tell when the video *actually* ends.
+    /// [`Self::SceneTransitionEnded`] only signifies the cut point, not the completion of
+    /// transition playback.
+    ///
+    /// **Note:** Appears to be called by every transition, regardless of relevance.
+    #[serde(rename_all = "camelCase")]
+    SceneTransitionVideoEnded {
+        /// Scene transition name.
+        transition_name: String,
+    },
     // --------------------------------
     // UI
     // --------------------------------
