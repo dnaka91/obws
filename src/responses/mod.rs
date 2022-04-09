@@ -426,9 +426,12 @@ pub struct InputVolume {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MediaStatus {
+    /// State of the media input.
     pub media_state: MediaState,
+    /// Total duration of the playing media. [`None`] if not playing.
     #[serde(deserialize_with = "crate::de::duration_millis_opt")]
     pub media_duration: Option<Duration>,
+    /// Position of the cursor. [`None`] if not playing.
     #[serde(deserialize_with = "crate::de::duration_millis_opt")]
     pub media_cursor: Option<Duration>,
 }

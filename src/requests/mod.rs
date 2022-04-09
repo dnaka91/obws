@@ -420,23 +420,30 @@ pub(crate) enum RequestType<'a> {
     // --------------------------------
     #[serde(rename_all = "camelCase")]
     GetMediaInputStatus {
+        /// Name of the media input.
         input_name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     SetMediaInputCursor {
+        /// Name of the media input.
         input_name: &'a str,
+        /// New cursor position to set.
         #[serde(serialize_with = "ser::duration_millis")]
         media_cursor: Duration,
     },
     #[serde(rename_all = "camelCase")]
     OffsetMediaInputCursor {
+        /// Name of the media input.
         input_name: &'a str,
+        /// Value to offset the current cursor position by.
         #[serde(serialize_with = "ser::duration_millis")]
         media_cursor_offset: Duration,
     },
     #[serde(rename_all = "camelCase")]
     TriggerMediaInputAction {
+        /// Name of the media input.
         input_name: &'a str,
+        /// Identifier of the media action.
         media_action: MediaAction,
     },
     // --------------------------------
