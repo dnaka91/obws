@@ -13,8 +13,8 @@ coverage:
     cargo install cargo-llvm-cov
     rustup component add llvm-tools-preview
 
-    cargo llvm-cov --html --all-features -- --test-threads 1
-    cargo llvm-cov --no-run --json --summary-only | \
+    cargo llvm-cov --remap-path-prefix --html --all-features -- --test-threads 1
+    cargo llvm-cov --remap-path-prefix --no-run --json --summary-only | \
         jq -c '.data[0].totals.lines.percent | { \
             schemaVersion: 1, \
             label: "coverage", \
