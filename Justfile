@@ -1,7 +1,5 @@
 set dotenv-load := true
 
-nightly := "nightly-2022-02-08"
-
 _default:
     @just --list --unsorted
 
@@ -13,10 +11,10 @@ test:
 # run integration tests with coverage
 coverage:
     cargo install cargo-llvm-cov
-    rustup toolchain install {{nightly}} --component llvm-tools-preview
+    rustup component add llvm-tools-preview
 
-    cargo +{{nightly}} llvm-cov --html --all-features -- --test-threads 1
-    cargo +{{nightly}} llvm-cov --no-run --json --summary-only | \
+    cargo llvm-cov --html --all-features -- --test-threads 1
+    cargo llvm-cov --no-run --json --summary-only | \
         jq -c '.data[0].totals.lines.percent | { \
             schemaVersion: 1, \
             label: "coverage", \
