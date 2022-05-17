@@ -2,8 +2,8 @@ use anyhow::Result;
 use obws::{
     common::BoundsType,
     requests::{
-        CreateSceneItem, DuplicateSceneItem, SceneItemTransform, SetSceneItemEnabled,
-        SetSceneItemIndex, SetSceneItemLocked, SetSceneItemTransform,
+        CreateSceneItem, DuplicateSceneItem, GetSceneItemId, SceneItemTransform,
+        SetSceneItemEnabled, SetSceneItemIndex, SetSceneItemLocked, SetSceneItemTransform,
     },
 };
 
@@ -17,7 +17,13 @@ async fn scene_items() -> Result<()> {
     client.get_scene_item_list(TEST_SCENE).await?;
     client.get_group_scene_item_list(TEST_GROUP).await?;
 
-    let test_text_id = client.get_scene_item_id(TEST_SCENE, TEST_TEXT).await?;
+    let test_text_id = client
+        .get_scene_item_id(GetSceneItemId {
+            scene_name: TEST_SCENE,
+            source_name: TEST_TEXT,
+            search_offset: None,
+        })
+        .await?;
 
     let id = client
         .duplicate_scene_item(DuplicateSceneItem {

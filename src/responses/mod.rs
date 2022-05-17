@@ -151,10 +151,13 @@ pub(crate) struct Status {
 pub enum StatusCode {
     /// Unknown status, should never be used.
     Unknown = 0,
+
     /// For internal use to signify a successful field check.
     NoError = 10,
+
     /// The request has succeeded.
     Success = 100,
+
     /// The `requestType` field is missing from the request data.
     MissingRequestType = 203,
     /// The request type is invalid or does not exist.
@@ -165,10 +168,12 @@ pub enum StatusCode {
     GenericError = 205,
     /// The request batch execution type is not supported.
     UnsupportedRequestBatchExecutionType = 206,
+
     /// A required request field is missing.
     MissingRequestField = 300,
     /// The request does not have a valid `requestData` object.
     MissingRequestData = 301,
+
     /// Generic invalid request field message.
     ///
     /// **Note:** A comment is required to be provided by obs-websocket.
@@ -182,6 +187,7 @@ pub enum StatusCode {
     /// There are too many request fields (For example a request takes two optional fields, where
     /// only one is allowed at a time).
     TooManyRequestFields = 404,
+
     /// An output is running and cannot be in order to perform the request.
     OutputRunning = 500,
     /// An output is not running and should be.
@@ -196,6 +202,7 @@ pub enum StatusCode {
     StudioModeActive = 505,
     /// Studio mode is not active and should be.
     StudioModeNotActive = 506,
+
     /// The resource was not found.
     ///
     /// **Note:** Resources are any kind of object in obs-websocket, like inputs, profiles, outputs,
@@ -212,6 +219,14 @@ pub enum StatusCode {
     InvalidResourceState = 604,
     /// The specified input (obs_source_t-OBS_SOURCE_TYPE_INPUT) had the wrong kind.
     InvalidInputKind = 605,
+    /// The resource does not support being configured.
+    ///
+    /// This is particularly relevant to transitions, where they do not always have changeable
+    /// settings.
+    ResourceNotConfigurable = 606,
+    /// The specified filter had the wrong kind.
+    InvalidFilterKind = 607,
+
     /// Creating the resource failed.
     ResourceCreationFailed = 700,
     /// Performing an action on the resource failed.
@@ -318,7 +333,13 @@ pub struct Version {
     pub rpc_version: u32,
     /// Array of available RPC requests for the currently negotiated RPC version.
     pub available_requests: Vec<String>,
+    /// Image formats available in `GetSourceScreenshot` and `SaveSourceScreenshot` requests.
     pub supported_image_formats: Vec<String>,
+    /// Name of the platform. Usually `windows`, `macos`, or `ubuntu` (Linux flavor). Not guaranteed
+    /// to be any of those.
+    pub platform: String,
+    /// Description of the platform, like `Windows 10 (10.0)`.
+    pub platform_description: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -558,6 +579,12 @@ pub(crate) struct SceneItemIndex {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub(crate) struct SceneItemSettings<T> {
+    pub scene_item_settings: T,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(crate) struct AudioSyncOffset {
     /// Audio sync offset in milliseconds.
     #[serde(deserialize_with = "crate::de::duration_millis")]
@@ -756,4 +783,25 @@ pub struct CurrentSceneTransition {
 pub(crate) struct TransitionCursor {
     /// Cursor position, between `0.0` and `1.0`.
     pub transition_cursor: f32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct MonitorList {
+    pub monitors: Vec<Monitor>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Monitor {
+    /// Name of this monitor.
+    pub monitor_name: String,
+    /// Pixel width.
+    pub monitor_width: u16,
+    /// Pixel height.
+    pub monitor_height: u16,
+    /// Horizontal position on the screen.
+    pub monitor_position_x: u16,
+    /// Vertical position on the screen.
+    pub monitor_position_y: u16,
 }

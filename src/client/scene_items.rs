@@ -1,10 +1,13 @@
+use serde::{de::DeserializeOwned, Serialize};
+
 use super::Client;
 use crate::{
     requests::{
-        CreateSceneItem, DuplicateSceneItem, RequestType, SetSceneItemEnabled, SetSceneItemIndex,
-        SetSceneItemLocked, SetSceneItemTransform,
+        CreateSceneItem, DuplicateSceneItem, GetSceneItemId, RequestType, SetSceneItemEnabled,
+        SetSceneItemIndex, SetSceneItemLocked, SetSceneItemPrivateSettings,
+        SetSceneItemPrivateSettingsInternal, SetSceneItemTransform,
     },
-    responses, Result,
+    responses, Error, Result,
 };
 
 /// API functions related to scene items.
@@ -44,12 +47,9 @@ impl<'a> SceneItems<'a> {
     ///
     /// - `scene_name`: Name of the scene or group to search in.
     /// - `source_name`: Name of the source to find.
-    pub async fn get_scene_item_id(&self, scene_name: &str, source_name: &str) -> Result<i64> {
+    pub async fn get_scene_item_id(&self, get: GetSceneItemId<'_>) -> Result<i64> {
         self.client
-            .send_message::<responses::SceneItemId>(RequestType::GetSceneItemId {
-                scene_name,
-                source_name,
-            })
+            .send_message::<responses::SceneItemId>(RequestType::GetSceneItemId(get))
             .await
             .map(|sii| sii.scene_item_id)
     }
@@ -155,7 +155,7 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Sets the lock state of a scene item.
-    pub async fn set_scene_item_locked(&self, locked: SetSceneItemLocked<'a>) -> Result<()> {
+    pub async fn set_scene_item_locked(&self, locked: SetSceneItemLocked<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemLocked(locked))
             .await
@@ -178,9 +178,49 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Sets the index position of a scene item in a scene.
-    pub async fn set_scene_item_index(&self, index: SetSceneItemIndex<'a>) -> Result<()> {
+    pub async fn set_scene_item_index(&self, index: SetSceneItemIndex<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemIndex(index))
+            .await
+    }
+
+    /// TODO: docs
+    pub async fn get_scene_item_private_settings<T>(
+        &self,
+        scene_name: &str,
+        scene_item_id: i64,
+    ) -> Result<T>
+    where
+        T: DeserializeOwned,
+    {
+        self.client
+            .send_message::<responses::SceneItemSettings<T>>(
+                RequestType::GetSceneItemPrivateSettings {
+                    scene_name,
+                    scene_item_id,
+                },
+            )
+            .await
+            .map(|sis| sis.scene_item_settings)
+    }
+
+    /// TODO: docs
+    pub async fn set_scene_item_private_settings<T>(
+        &self,
+        settings: SetSceneItemPrivateSettings<'_, T>,
+    ) -> Result<()>
+    where
+        T: Serialize,
+    {
+        self.client
+            .send_message(RequestType::SetSceneItemPrivateSettings(
+                SetSceneItemPrivateSettingsInternal {
+                    scene_name: settings.scene_name,
+                    scene_item_id: settings.scene_item_id,
+                    scene_item_settings: serde_json::to_value(&settings.scene_item_settings)
+                        .map_err(Error::SerializeCustomData)?,
+                },
+            ))
             .await
     }
 }

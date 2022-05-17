@@ -52,4 +52,12 @@ impl<'a> Ui<'a> {
             .send_message(RequestType::OpenInputInteractDialog { input_name })
             .await
     }
+
+    /// Gets a list of connected monitors and information about them.
+    pub async fn get_monitor_list(&self) -> Result<Vec<responses::Monitor>> {
+        self.client
+            .send_message::<responses::MonitorList>(RequestType::GetMonitorList)
+            .await
+            .map(|ml| ml.monitors)
+    }
 }

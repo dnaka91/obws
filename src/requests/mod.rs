@@ -144,6 +144,8 @@ bitflags! {
         ///
         /// [`VendorEvent`]: crate::events::Event::VendorEvent
         const VENDORS = 1 << 9;
+        /// Subscription value to receive events in the `Ui` category.
+        const UI = 1 << 10;
 
         /// Helper to receive all non-high-volume events.
         const ALL = Self::GENERAL.bits
@@ -155,7 +157,8 @@ bitflags! {
             | Self::OUTPUTS.bits
             | Self::SCENE_ITEMS.bits
             | Self::MEDIA_INPUTS.bits
-            | Self::VENDORS.bits;
+            | Self::VENDORS.bits
+            | Self::UI.bits;
 
         /// Subscription value to receive the [`InputVolumeMeters`] high-volume event.
         ///
@@ -482,13 +485,7 @@ pub(crate) enum RequestType<'a> {
         /// Name of the group to get the items of.
         scene_name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
-    GetSceneItemId {
-        /// Name of the scene or group to search in.
-        scene_name: &'a str,
-        /// Name of the source to find.
-        source_name: &'a str,
-    },
+    GetSceneItemId(GetSceneItemId<'a>),
     CreateSceneItem(CreateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     RemoveSceneItem {
@@ -531,6 +528,15 @@ pub(crate) enum RequestType<'a> {
     },
     #[serde(rename_all = "camelCase")]
     SetSceneItemIndex(SetSceneItemIndex<'a>),
+    #[serde(rename_all = "camelCase")]
+    GetSceneItemPrivateSettings {
+        /// Name of the scene the item is in.
+        scene_name: &'a str,
+        /// Numeric ID of the scene item.
+        scene_item_id: i64,
+    },
+    #[serde(rename_all = "camelCase")]
+    SetSceneItemPrivateSettings(SetSceneItemPrivateSettingsInternal<'a>),
     // --------------------------------
     // Scenes
     // --------------------------------
@@ -653,6 +659,7 @@ pub(crate) enum RequestType<'a> {
         /// Name of the input to open the dialog of.
         input_name: &'a str,
     },
+    GetMonitorList,
 }
 
 #[derive(Clone, Copy, Serialize)]
@@ -894,6 +901,20 @@ pub(crate) struct CreateInputInternal<'a> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct GetSceneItemId<'a> {
+    /// Name of the scene or group to search in.
+    pub scene_name: &'a str,
+    /// Name of the source to find.
+    pub source_name: &'a str,
+    /// Number of matches to skip during search.
+    ///
+    /// `>= 0` means first forward. `-1` means last (top) item.
+    pub search_offset: Option<i32>,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateSceneItem<'a> {
     /// Name of the scene to create the new item in.
     pub scene_name: &'a str,
@@ -998,6 +1019,27 @@ pub struct SetSceneItemIndex<'a> {
     pub scene_item_id: i64,
     /// New index position of the scene item.
     pub scene_item_index: u32,
+}
+
+pub struct SetSceneItemPrivateSettings<'a, T> {
+    /// Name of the scene the item is in.
+    pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
+    pub scene_item_id: i64,
+    /// Object of settings to apply.
+    pub scene_item_settings: &'a T,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct SetSceneItemPrivateSettingsInternal<'a> {
+    /// Name of the scene the item is in.
+    pub scene_name: &'a str,
+    /// Numeric ID of the scene item.
+    pub scene_item_id: i64,
+    /// Object of settings to apply.
+    pub scene_item_settings: serde_json::Value,
 }
 
 #[skip_serializing_none]
