@@ -19,8 +19,11 @@ use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]
 use tokio::sync::broadcast;
 use tokio::{net::TcpStream, sync::Mutex, task::JoinHandle};
-use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
-use tracing::{debug, error, trace};
+use tokio_tungstenite::{
+    tungstenite::{protocol::CloseFrame, Message},
+    MaybeTlsStream, WebSocketStream,
+};
+use tracing::{debug, error, info, trace};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
@@ -233,14 +236,16 @@ impl Client {
 
                     match message {
                         ServerMessage::RequestResponse(response) => {
-                            trace!("got message with id {}", response.request_id);
+                            trace!(id = %response.request_id, "got request-response message");
                             receivers2.notify(response).await?;
                         }
                         #[cfg(feature = "events")]
                         ServerMessage::Event(event) => {
+                            trace!("got OBS event");
                             events_tx.send(event).ok();
                         }
                         ServerMessage::Identified(identified) => {
+                            trace!("got identified message");
                             reidentify_receivers2.notify(identified).await;
                         }
                         _ => return Err(InnerError::UnexpectedMessage(message)),
@@ -250,8 +255,8 @@ impl Client {
                 }
                 .await;
 
-                if let Err(e) = res {
-                    error!("failed handling message: {:?}", e);
+                if let Err(error) = res {
+                    error!(?error, "failed handling message");
                 }
             }
 
@@ -323,7 +328,7 @@ impl Client {
 
         let rx = self.receivers.add(id).await;
 
-        debug!("sending message: {}", json);
+        trace!(%json, "sending message");
         let write_result = self
             .write
             .lock()
@@ -388,8 +393,8 @@ impl Client {
 
         let resp = rx.await.map_err(Error::ReceiveMessage)?;
         debug!(
-            "re-identified with RPC version {}",
-            resp.negotiated_rpc_version
+            rpc_version = %resp.negotiated_rpc_version,
+            "re-identified against obs-websocket",
         );
 
         Ok(())
