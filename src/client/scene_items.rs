@@ -184,7 +184,10 @@ impl<'a> SceneItems<'a> {
             .await
     }
 
-    /// TODO: docs
+    /// Gets private scene item settings.
+    ///
+    /// - `scene_name`: Name of the scene the item is in.
+    /// - `scene_item_id`: Numeric ID of the scene item.
     pub async fn get_scene_item_private_settings<T>(
         &self,
         scene_name: &str,
@@ -204,7 +207,10 @@ impl<'a> SceneItems<'a> {
             .map(|sis| sis.scene_item_settings)
     }
 
-    /// TODO: docs
+    /// Sets private scene item settings.
+    ///
+    /// - `scene_name`: Name of the scene the item is in.
+    /// - `scene_item_id`: Numeric ID of the scene item.
     pub async fn set_scene_item_private_settings<T>(
         &self,
         settings: SetSceneItemPrivateSettings<'_, T>,

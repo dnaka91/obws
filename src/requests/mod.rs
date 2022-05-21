@@ -8,10 +8,7 @@ use serde_repr::Serialize_repr;
 use serde_with::skip_serializing_none;
 use time::Duration;
 
-use crate::{
-    common::{Alignment, BoundsType, MediaAction},
-    MonitorType,
-};
+use crate::common::{Alignment, BoundsType, MediaAction, MonitorType};
 
 mod ser;
 
@@ -117,6 +114,8 @@ pub(crate) struct RequestBatch<'a> {
 }
 
 bitflags! {
+    /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
+    /// instance.
     #[derive(Serialize)]
     #[serde(transparent)]
     pub struct EventSubscription: u32 {
@@ -662,14 +661,20 @@ pub(crate) enum RequestType<'a> {
     GetMonitorList,
 }
 
+/// Request information for [`get_persistent_data`](crate::client::Config::get_persistent_data) and
+/// [`set_persistent_data`](crate::client::Config::set_persistent_data) as part of
+/// [`SetPersistentData`].
 #[derive(Clone, Copy, Serialize)]
 pub enum Realm {
+    /// Data located in the global settings.
     #[serde(rename = "OBS_WEBSOCKET_DATA_REALM_GLOBAL")]
     Global,
+    /// Data bound to the current profile.
     #[serde(rename = "OBS_WEBSOCKET_DATA_REALM_PROFILE")]
     Profile,
 }
 
+/// Request information for [`set_persistent_data`](crate::client::Config::set_persistent_data).
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetPersistentData<'a> {
@@ -681,6 +686,7 @@ pub struct SetPersistentData<'a> {
     pub slot_value: &'a serde_json::Value,
 }
 
+/// Request information for [`set_profile_parameter`](crate::client::Config::set_profile_parameter).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -693,6 +699,7 @@ pub struct SetProfileParameter<'a> {
     pub parameter_value: Option<&'a str>,
 }
 
+/// Request information for [`set_video_settings`](crate::client::Config::set_video_settings).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -724,6 +731,7 @@ impl From<crate::responses::VideoSettings> for SetVideoSettings {
     }
 }
 
+/// Request information for [`create_source_filter`](crate::client::Filters::create_source_filter).
 pub struct CreateSourceFilter<'a, T> {
     /// Name of the source to add the filter to.
     pub source_name: &'a str,
@@ -735,6 +743,7 @@ pub struct CreateSourceFilter<'a, T> {
     pub filter_settings: Option<T>,
 }
 
+/// Request information for [`create_source_filter`](crate::client::Filters::create_source_filter).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -749,6 +758,8 @@ pub(crate) struct CreateSourceFilterInternal<'a> {
     pub filter_settings: Option<serde_json::Value>,
 }
 
+/// Request information for
+/// [`set_source_filter_name`](crate::client::Filters::set_source_filter_name).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterName<'a> {
@@ -760,6 +771,8 @@ pub struct SetSourceFilterName<'a> {
     pub new_filter_name: &'a str,
 }
 
+/// Request information for
+/// [`set_source_filter_index`](crate::client::Filters::set_source_filter_index).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterIndex<'a> {
@@ -771,6 +784,8 @@ pub struct SetSourceFilterIndex<'a> {
     pub filter_index: u32,
 }
 
+/// Request information for
+/// [`set_source_filter_settings`](crate::client::Filters::set_source_filter_settings).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -785,6 +800,8 @@ pub struct SetSourceFilterSettings<'a, T> {
     pub overlay: Option<bool>,
 }
 
+/// Request information for
+/// [`set_source_filter_settings`](crate::client::Filters::set_source_filter_settings).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SetSourceFilterSettingsInternal<'a> {
@@ -798,6 +815,8 @@ pub(crate) struct SetSourceFilterSettingsInternal<'a> {
     pub overlay: Option<bool>,
 }
 
+/// Request information for
+/// [`set_source_filter_enabled`](crate::client::Filters::set_source_filter_enabled).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterEnabled<'a> {
@@ -809,6 +828,7 @@ pub struct SetSourceFilterEnabled<'a> {
     pub filter_enabled: bool,
 }
 
+/// Request information for [`call_vendor_request`](crate::client::General::call_vendor_request).
 pub struct CallVendorRequest<'a, T> {
     /// Name of the vendor to use.
     pub vendor_name: &'a str,
@@ -818,6 +838,7 @@ pub struct CallVendorRequest<'a, T> {
     pub request_data: &'a T,
 }
 
+/// Request information for [`call_vendor_request`](crate::client::General::call_vendor_request).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CallVendorRequestInternal<'a> {
@@ -829,6 +850,8 @@ pub(crate) struct CallVendorRequestInternal<'a> {
     pub request_data: serde_json::Value,
 }
 
+/// Request information for
+/// [`trigger_hotkey_by_key_sequence`](crate::client::General::trigger_hotkey_by_key_sequence).
 #[derive(Default, Serialize)]
 pub struct KeyModifiers {
     /// Press Shift.
@@ -841,6 +864,7 @@ pub struct KeyModifiers {
     pub command: bool,
 }
 
+/// Request information for [`set_input_settings`](crate::client::Inputs::set_input_settings).
 pub struct SetInputSettings<'a, T> {
     /// Name of the input to set the settings of.
     pub input_name: &'a str,
@@ -851,6 +875,7 @@ pub struct SetInputSettings<'a, T> {
     pub overlay: Option<bool>,
 }
 
+/// Request information for [`set_input_settings`](crate::client::Inputs::set_input_settings).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -864,6 +889,7 @@ pub(crate) struct SetInputSettingsInternal<'a> {
     pub overlay: Option<bool>,
 }
 
+/// Request information for [`set_input_volume`](crate::client::Inputs::set_input_volume).
 #[derive(Serialize)]
 pub enum Volume {
     /// Volume setting in mul.
@@ -874,6 +900,7 @@ pub enum Volume {
     Db(f32),
 }
 
+/// Request information for [`create_input`](crate::client::Inputs::create_input).
 pub struct CreateInput<'a, T> {
     /// Name of the scene to add the input to as a scene item.
     pub scene_name: &'a str,
@@ -887,6 +914,7 @@ pub struct CreateInput<'a, T> {
     pub scene_item_enabled: Option<bool>,
 }
 
+/// Request information for [`create_input`](crate::client::Inputs::create_input).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -898,6 +926,7 @@ pub(crate) struct CreateInputInternal<'a> {
     pub scene_item_enabled: Option<bool>,
 }
 
+/// Request information for [`get_scene_item_id`](crate::client::SceneItems::get_scene_item_id).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -912,6 +941,7 @@ pub struct GetSceneItemId<'a> {
     pub search_offset: Option<i32>,
 }
 
+/// Request information for [`create_scene_item`](crate::client::SceneItems::create_scene_item).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -924,6 +954,8 @@ pub struct CreateSceneItem<'a> {
     pub scene_item_enabled: Option<bool>,
 }
 
+/// Request information for
+/// [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -936,6 +968,8 @@ pub struct DuplicateSceneItem<'a> {
     pub destination_scene_name: Option<&'a str>,
 }
 
+/// Request information for
+/// [`set_scene_item_transform`](crate::client::SceneItems::set_scene_item_transform).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemTransform<'a> {
@@ -947,23 +981,40 @@ pub struct SetSceneItemTransform<'a> {
     pub scene_item_transform: SceneItemTransform,
 }
 
+/// Request information for
+/// [`set_scene_item_transform`](crate::client::SceneItems::set_scene_item_transform) as part of
+/// [`SetSceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItemTransform {
+    /// The x position of the source from the left.
     pub position_x: Option<f32>,
+    /// The y position of the source from the top.
     pub position_y: Option<f32>,
+    /// The clockwise rotation of the scene item in degrees around the point of alignment.
     pub rotation: Option<f32>,
+    /// The x-scale factor of the source.
     pub scale_x: Option<f32>,
+    /// The y-scale factor of the source.
     pub scale_y: Option<f32>,
+    /// The point on the source that the item is manipulated from.
     pub alignment: Option<Alignment>,
+    /// Type of bounding box.
     pub bounds_type: Option<BoundsType>,
+    /// Alignment of the bounding box.
     pub bounds_alignment: Option<Alignment>,
+    /// Width of the bounding box.
     pub bounds_width: Option<f32>,
+    /// Height of the bounding box.
     pub bounds_height: Option<f32>,
+    /// The number of pixels cropped off the left of the source before scaling.
     pub crop_left: Option<u32>,
+    /// The number of pixels cropped off the right of the source before scaling.
     pub crop_right: Option<u32>,
+    /// The number of pixels cropped off the top of the source before scaling.
     pub crop_top: Option<u32>,
+    /// The number of pixels cropped off the bottom of the source before scaling.
     pub crop_bottom: Option<u32>,
 }
 
@@ -988,6 +1039,8 @@ impl From<crate::responses::SceneItemTransform> for SceneItemTransform {
     }
 }
 
+/// Request information for
+/// [`set_scene_item_enabled`](crate::client::SceneItems::set_scene_item_enabled).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemEnabled<'a> {
@@ -999,6 +1052,8 @@ pub struct SetSceneItemEnabled<'a> {
     pub scene_item_enabled: bool,
 }
 
+/// Request information for
+/// [`set_scene_item_locked`](crate::client::SceneItems::set_scene_item_locked).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemLocked<'a> {
@@ -1010,6 +1065,8 @@ pub struct SetSceneItemLocked<'a> {
     pub scene_item_locked: bool,
 }
 
+/// Request information for
+/// [`set_scene_item_index`](crate::client::SceneItems::set_scene_item_index).
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemIndex<'a> {
@@ -1021,6 +1078,8 @@ pub struct SetSceneItemIndex<'a> {
     pub scene_item_index: u32,
 }
 
+/// Request information for
+/// [`set_scene_item_private_settings`](crate::client::SceneItems::set_scene_item_private_settings).
 pub struct SetSceneItemPrivateSettings<'a, T> {
     /// Name of the scene the item is in.
     pub scene_name: &'a str,
@@ -1030,6 +1089,8 @@ pub struct SetSceneItemPrivateSettings<'a, T> {
     pub scene_item_settings: &'a T,
 }
 
+/// Request information for
+/// [`set_scene_item_private_settings`](crate::client::SceneItems::set_scene_item_private_settings).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1042,6 +1103,8 @@ pub(crate) struct SetSceneItemPrivateSettingsInternal<'a> {
     pub scene_item_settings: serde_json::Value,
 }
 
+/// Request information for
+/// [`set_scene_scene_transition_override`](crate::client::Scenes::set_scene_scene_transition_override).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1055,6 +1118,8 @@ pub struct SetSceneSceneTransitionOverride<'a> {
     pub transition_duration: Option<Duration>,
 }
 
+/// Request information for
+/// [`get_source_screenshot`](crate::client::Sources::get_source_screenshot).
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1074,6 +1139,8 @@ pub struct GetSourceScreenshot<'a> {
     pub image_compression_quality: Option<i32>,
 }
 
+/// Request information for
+/// [`save_source_screenshot`](crate::client::Sources::save_source_screenshot).
 #[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

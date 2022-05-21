@@ -3,11 +3,12 @@ use time::Duration;
 
 use super::Client;
 use crate::{
+    common::MonitorType,
     requests::{
         CreateInput, CreateInputInternal, RequestType, SetInputSettings, SetInputSettingsInternal,
         Volume,
     },
-    responses, Error, MonitorType, Result,
+    responses, Error, Result,
 };
 
 /// API functions related to inputs.

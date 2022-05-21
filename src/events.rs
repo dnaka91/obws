@@ -6,9 +6,8 @@ use serde::Deserialize;
 use time::Duration;
 
 use crate::{
-    common::MediaAction,
+    common::{MediaAction, MonitorType},
     responses::{SceneItemTransform, SourceFilter},
-    MonitorType,
 };
 
 /// All possible event types that can occur while the user interacts with OBS.
@@ -108,6 +107,7 @@ pub enum Event {
         /// Whether the filter is enabled.
         filter_enabled: bool,
     },
+    /// The name of a source filter has changed.
     #[serde(rename_all = "camelCase")]
     SourceFilterNameChanged {
         /// The source the filter is on.
@@ -120,6 +120,10 @@ pub enum Event {
     // --------------------------------
     // General
     // --------------------------------
+    /// A custom event that was triggered by
+    /// [`broadcast_custom_event`](crate::client::General::broadcast_custom_event).
+    ///
+    /// The content can be any valid JSON object.
     CustomEvent(serde_json::Value),
     /// OBS has begun the shutdown process.
     ExitStarted,
@@ -475,6 +479,7 @@ pub enum Event {
     /// Studio mode has been enabled or disabled.
     #[serde(rename_all = "camelCase")]
     StudioModeStateChanged {
+        /// Whether the studio mode is enabled.
         studio_mode_enabled: bool,
     },
     // --------------------------------
@@ -489,41 +494,58 @@ pub enum Event {
     Unknown,
 }
 
+/// Volume meter information for a single input, describing the current volume level.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InputVolumeMeter {
+    /// Name of this input.
     pub input_name: String,
+    /// List of volume levels, in Mul.
     pub input_levels_mul: Vec<[f32; 3]>,
 }
 
+/// The output state describes the current status of any output (like recording, virtual-cam, ...).
 #[derive(Clone, Copy, Debug, Deserialize)]
 pub enum OutputState {
+    /// A request to start the output has been issued.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTING")]
     Starting,
+    /// Output started successfully.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTED")]
     Started,
+    /// A request to stop the output has been issued.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STOPPING")]
     Stopping,
+    /// Output stopped successfully.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STOPPED")]
     Stopped,
+    /// Current output paused.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_PAUSED")]
     Paused,
+    /// Current output resumed.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_RESUMED")]
     Resumed,
+    /// Fallback for any unknown event type.
     #[serde(other)]
     Unknown,
 }
 
+/// A basic scene item, only describing identifier and position.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BasicSceneItem {
-    scene_item_id: u64,
-    scene_item_index: u32,
+    /// Identifier of this scene item.
+    pub scene_item_id: u64,
+    /// Positional index within the owning scene.
+    pub scene_item_index: u32,
 }
 
+/// The scene describes basic details about a single scene setup in OBS.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
-    scene_name: String,
-    scene_index: usize,
+    /// Name of this scene.
+    pub scene_name: String,
+    /// Positional index in the scene list.
+    pub scene_index: usize,
 }

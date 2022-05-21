@@ -1,7 +1,11 @@
 //! Custom deserializers that are used in both the [`events`](crate::events) and
 //! [`responses`](crate::responses) modules.
 
-use std::{convert::TryFrom, fmt};
+use std::{
+    convert::TryFrom,
+    fmt::{self, Display},
+    marker::PhantomData,
+};
 
 use serde::de::{self, Deserializer, Visitor};
 use time::Duration;
@@ -18,8 +22,12 @@ enum Error {
     MillisecondsMissing,
     #[error("invalid integer")]
     InvalidInteger(#[from] std::num::ParseIntError),
-    #[error("value {1} is too large for an i64: {0}")]
-    ValueTooLargeI64(#[source] std::num::TryFromIntError, u64),
+    #[error("value is too large for an i64: {0}")]
+    ValueTooLargeI64(#[source] std::num::TryFromIntError),
+    #[error("value is too large for an u8: {0}")]
+    ValueTooLargeU8(#[source] std::num::TryFromIntError),
+    #[error("conversion from integer failed: {0}")]
+    IntConversionFailed(String),
 }
 
 pub fn duration_timecode<'de, D>(deserializer: D) -> Result<Duration, D::Error>
@@ -89,10 +97,9 @@ impl<'de> Visitor<'de> for DurationMillisVisitor {
     where
         E: de::Error,
     {
-        match i64::try_from(v) {
-            Ok(value) => self.visit_i64(value),
-            Err(e) => Err(de::Error::custom(Error::ValueTooLargeI64(e, v))),
-        }
+        i64::try_from(v)
+            .map_err(|e| de::Error::custom(Error::ValueTooLargeI64(e)))
+            .and_then(|v| self.visit_i64(v))
     }
 }
 
@@ -129,37 +136,53 @@ impl<'de> Visitor<'de> for DurationMillisOptVisitor {
     }
 }
 
-pub fn duration_nanos<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+pub fn bitflags_u8<'de, D, T, TE>(deserializer: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
+    T: TryFrom<u8, Error = TE>,
+    TE: Display,
 {
-    deserializer.deserialize_i64(DurationNanosVisitor)
+    deserializer.deserialize_u8(BitflagsU8Visitor { flags: PhantomData })
 }
 
-struct DurationNanosVisitor;
+struct BitflagsU8Visitor<T, TE> {
+    flags: PhantomData<(T, TE)>,
+}
 
-impl<'de> Visitor<'de> for DurationNanosVisitor {
-    type Value = Duration;
+impl<'de, T, TE> Visitor<'de> for BitflagsU8Visitor<T, TE>
+where
+    T: TryFrom<u8, Error = TE>,
+    TE: Display,
+{
+    type Value = T;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("a duration in nanoseconds")
+        formatter.write_str("bitflags encoded as u8 integer")
     }
 
     fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        Ok(Duration::nanoseconds(v))
+        u8::try_from(v)
+            .map_err(|e| de::Error::custom(Error::ValueTooLargeU8(e)))
+            .and_then(|v| self.visit_u8(v))
+    }
+
+    fn visit_u8<E>(self, v: u8) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        T::try_from(v).map_err(|e| de::Error::custom(Error::IntConversionFailed(e.to_string())))
     }
 
     fn visit_u64<E>(self, v: u64) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        match i64::try_from(v) {
-            Ok(value) => self.visit_i64(value),
-            Err(e) => Err(de::Error::custom(Error::ValueTooLargeI64(e, v))),
-        }
+        u8::try_from(v)
+            .map_err(|e| de::Error::custom(Error::ValueTooLargeU8(e)))
+            .and_then(|v| self.visit_u8(v))
     }
 }
 
@@ -296,59 +319,6 @@ mod tests {
                 Token::StructEnd,
             ],
             "missing field `value`",
-        );
-    }
-
-    #[test]
-    fn deser_duration_nanos() {
-        #[derive(Debug, PartialEq, Eq, Deserialize)]
-        struct SimpleDuration {
-            #[serde(deserialize_with = "duration_nanos")]
-            value: Duration,
-        }
-
-        assert_de_tokens(
-            &SimpleDuration {
-                value: Duration::nanoseconds(150),
-            },
-            &[
-                Token::Struct {
-                    name: "SimpleDuration",
-                    len: 1,
-                },
-                Token::Str("value"),
-                Token::I64(150),
-                Token::StructEnd,
-            ],
-        );
-
-        assert_de_tokens(
-            &SimpleDuration {
-                value: Duration::nanoseconds(150),
-            },
-            &[
-                Token::Struct {
-                    name: "SimpleDuration",
-                    len: 1,
-                },
-                Token::Str("value"),
-                Token::U64(150),
-                Token::StructEnd,
-            ],
-        );
-
-        assert_de_tokens_error::<SimpleDuration>(
-            &[
-                Token::Struct {
-                    name: "SimpleDuration",
-                    len: 1,
-                },
-                Token::Str("value"),
-                Token::U64(u64::MAX),
-                Token::StructEnd,
-            ],
-            "value 18446744073709551615 is too large for an i64: \
-            out of range integral type conversion attempted",
         );
     }
 }

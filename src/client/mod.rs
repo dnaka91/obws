@@ -110,7 +110,10 @@ where
     pub host: H,
     /// Port to connect to.
     pub port: u16,
+    /// Optional password to authenticate against `obs-websocket`.
     pub password: Option<P>,
+    /// Optional list of event subscriptions, controlling what events to receive. By default all
+    /// events are listened to, with the exception of high volume events.
     pub event_subscriptions: Option<EventSubscription>,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
     #[cfg(feature = "tls")]
@@ -366,6 +369,12 @@ impl Client {
         }
     }
 
+    /// Adjust settings of the currently active connection by re-identifying against
+    /// `obs-websocket`.
+    ///
+    /// This currently allows to change the events to listen for, without the need of a full
+    /// disconnect and new connection.
+    #[doc(hidden)]
     pub async fn reidentify(&self) -> Result<()> {
         todo!("The `Reidentify` command is not yet implemented")
     }
@@ -576,6 +585,7 @@ fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
     auth
 }
 
+/// Possible custom web-socket close codes, that are send by the server in case of a problem.
 pub enum WebSocketCloseCode {
     /// For internal use only to tell the request handler not to perform any close action.
     DontClose = 0,

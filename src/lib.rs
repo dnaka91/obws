@@ -28,7 +28,6 @@
 //! ```
 
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
-#![allow(dead_code, missing_docs)] // FIXME: TEMPORARY! Only during v5 development
 
 use responses::StatusCode;
 pub use semver::{Comparator, Version};
@@ -77,7 +76,9 @@ pub enum Error {
     /// An error returned from the obs-websocket API.
     #[error("API error: {code:?}")]
     Api {
+        /// Status code that describes the kind of error.
         code: StatusCode,
+        /// Optional message to provide additional details about the error.
         message: Option<String>,
     },
     /// The obs-websocket API requires authentication but no password was given.
@@ -98,16 +99,11 @@ pub enum Error {
     #[error("obs-websocket version {0} doesn't match required {1}")]
     ObsWebsocketVersion(Version, Comparator),
     /// The obs-websocket plugin negotiated a different RPC version than requested.
-    #[error("RPC version {requested} request but server negotiated version {negotiated}")]
-    RpcVersion { requested: u32, negotiated: u32 },
-}
-
-#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
-pub enum MonitorType {
-    #[serde(rename = "OBS_MONITORING_TYPE_NONE")]
-    None,
-    #[serde(rename = "OBS_MONITORING_TYPE_MONITOR_ONLY")]
-    MonitorOnly,
-    #[serde(rename = "OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT")]
-    MonitorAndOutput,
+    #[error("RPC version {requested} requested, but server negotiated version {negotiated}")]
+    RpcVersion {
+        /// Version requested by the client.
+        requested: u32,
+        /// Unexpected version as negotiated by the server.
+        negotiated: u32,
+    },
 }

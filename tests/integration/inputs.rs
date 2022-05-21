@@ -1,7 +1,7 @@
 use anyhow::Result;
 use obws::{
+    common::MonitorType,
     requests::{SetInputSettings, Volume},
-    MonitorType,
 };
 use time::Duration;
 
