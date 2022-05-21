@@ -50,7 +50,7 @@ impl ReceiverList {
         Ok(())
     }
 
-    /// Reset the list, cancelling any outstanding receivers.
+    /// Reset the list, canceling any outstanding receivers.
     pub async fn reset(&self) {
         self.0.lock().await.clear();
     }
@@ -68,14 +68,14 @@ impl ReidentifyReceiverList {
         rx
     }
 
-    /// Notify the next listener in the queue, transfering it the response.
+    /// Notify the next listener in the queue, transferring it the response.
     pub async fn notify(&self, identified: Identified) {
         if let Some(tx) = self.0.lock().await.pop_front() {
             tx.send(identified).ok();
         }
     }
 
-    /// Reset the list, cancelling any outstanding receivers.
+    /// Reset the list, canceling any outstanding receivers.
     pub async fn reset(&self) {
         self.0.lock().await.clear();
     }
