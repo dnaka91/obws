@@ -215,9 +215,11 @@ impl Client {
 
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
-                trace!("{}", msg);
+               if let Message::Close(info) = &msg {
+                    if let Some(CloseFrame { reason, .. }) = info {
+                        info!(%reason, "connection closed with reason");
+                    }
 
-                if msg.is_close() {
                     #[cfg(feature = "events")]
                     events_tx.send(Event::ServerStopping).ok();
                     continue;
