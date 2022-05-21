@@ -5,12 +5,11 @@ use tokio::sync::{oneshot, Mutex};
 use tokio_tungstenite::tungstenite::Message;
 use tracing::debug;
 
+use super::InnerError;
 use crate::{
     requests::{ClientRequest, EventSubscription, Identify},
     responses::{Hello, Identified, RequestResponse, ServerMessage, Status},
 };
-
-use super::InnerError;
 
 /// Wrapper for the list of ongoing requests that wait for response.
 #[derive(Default)]

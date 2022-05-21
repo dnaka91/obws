@@ -218,7 +218,7 @@ impl Client {
 
         let handle = tokio::spawn(async move {
             while let Some(Ok(msg)) = read.next().await {
-               if let Message::Close(info) = &msg {
+                if let Message::Close(info) = &msg {
                     if let Some(CloseFrame { reason, .. }) = info {
                         info!(%reason, "connection closed with reason");
                     }
