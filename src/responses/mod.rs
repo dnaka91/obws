@@ -93,6 +93,7 @@ impl<'de> Deserialize<'de> for ServerMessage {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Hello {
+    #[allow(dead_code)]
     pub obs_web_socket_version: SemVerVersion,
     /// version number which gets incremented on each **breaking change** to the obs-websocket
     /// protocol. Its usage in this context is to provide the current RPC version that the server
@@ -114,6 +115,7 @@ pub(crate) struct Identified {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RequestResponse {
+    #[allow(dead_code)]
     pub request_type: String,
     pub request_id: String,
     pub request_status: Status,
@@ -124,7 +126,9 @@ pub(crate) struct RequestResponse {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct RequestBatchResponse {
+    #[allow(dead_code)]
     pub request_id: String,
+    #[allow(dead_code)]
     pub results: Vec<serde_json::Value>,
 }
 

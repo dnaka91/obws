@@ -23,6 +23,7 @@ pub(crate) enum ClientRequest<'a> {
     Request(Request<'a>),
     /// Client is making a batch of requests for obs-websocket. Requests are processed serially
     /// (in order) by the server.
+    #[allow(dead_code)]
     RequestBatch(RequestBatch<'a>),
 }
 
@@ -179,6 +180,7 @@ bitflags! {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Serialize_repr)]
 #[repr(i8)]
 pub(crate) enum ExecutionType {
