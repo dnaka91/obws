@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        toolchain: [stable, 1.56]
+        toolchain: [stable, 1.61]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
