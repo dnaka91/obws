@@ -10,9 +10,11 @@ use std::{
     },
 };
 
+#[cfg(feature = "events")]
+use futures_util::stream::Stream;
 use futures_util::{
     sink::SinkExt,
-    stream::{SplitSink, Stream, StreamExt},
+    stream::{SplitSink, StreamExt},
 };
 use semver::{Comparator, Op, Prerelease};
 use serde::de::DeserializeOwned;
