@@ -21,6 +21,34 @@ pub enum MonitorType {
 }
 
 bitflags! {
+    /// Different flags for font display that can be combined.
+    pub struct FontFlags: u8 {
+        /// Make the text appear thicker.
+        const BOLD = 1;
+        /// Make the text appear cursive.
+        const ITALIC = 2;
+        /// Underline the text with a straight line.
+        const UNDERLINE = 4;
+        /// Strikeout the text.
+        const STRIKEOUT = 8;
+    }
+}
+
+impl TryFrom<u8> for FontFlags {
+    type Error = Error;
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        Self::from_bits(value).ok_or(Error::UnknownFlags(value))
+    }
+}
+
+impl From<FontFlags> for u8 {
+    fn from(value: FontFlags) -> Self {
+        value.bits
+    }
+}
+
+bitflags! {
     /// Alignment for different items on the scene that is described in two axis. The default is
     /// center for both axis.
     ///

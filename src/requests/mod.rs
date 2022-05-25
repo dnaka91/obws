@@ -10,6 +10,7 @@ use time::Duration;
 
 use crate::common::{Alignment, BoundsType, MediaAction, MonitorType};
 
+pub mod custom;
 mod ser;
 
 pub(crate) enum ClientRequest<'a> {
