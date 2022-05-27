@@ -8,53 +8,45 @@ pub struct Ui<'a> {
 
 impl<'a> Ui<'a> {
     /// Gets whether studio is enabled.
-    pub async fn get_studio_mode_enabled(&self) -> Result<bool> {
+    pub async fn studio_mode_enabled(&self) -> Result<bool> {
         self.client
             .send_message::<responses::StudioModeEnabled>(RequestType::GetStudioModeEnabled)
             .await
-            .map(|sme| sme.studio_mode_enabled)
+            .map(|sme| sme.enabled)
     }
 
     /// Enables or disables studio mode.
     ///
-    /// - `studio_mode_enabled`: Enable or disable the studio mode.
-    pub async fn set_studio_mode_enabled(&self, studio_mode_enabled: bool) -> Result<()> {
+    /// - `enabled`: Enable or disable the studio mode.
+    pub async fn set_studio_mode_enabled(&self, enabled: bool) -> Result<()> {
         self.client
-            .send_message(RequestType::SetStudioModeEnabled {
-                studio_mode_enabled,
-            })
+            .send_message(RequestType::SetStudioModeEnabled { enabled })
             .await
     }
 
     /// Opens the properties dialog of an input.
-    ///
-    /// - `input_name`: Name of the input to open the dialog of.
-    pub async fn open_input_properties_dialog(&self, input_name: &str) -> Result<()> {
+    pub async fn open_properties_dialog(&self, input: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::OpenInputPropertiesDialog { input_name })
+            .send_message(RequestType::OpenInputPropertiesDialog { input })
             .await
     }
 
     /// Opens the filters dialog of an input.
-    ///
-    /// - `input_name`: Name of the input to open the dialog of.
-    pub async fn open_input_filters_dialog(&self, input_name: &str) -> Result<()> {
+    pub async fn open_filters_dialog(&self, input: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::OpenInputFiltersDialog { input_name })
+            .send_message(RequestType::OpenInputFiltersDialog { input })
             .await
     }
 
     /// Opens the interact dialog of an input.
-    ///
-    /// - `input_name`: Name of the input to open the dialog of.
-    pub async fn open_input_interact_dialog(&self, input_name: &str) -> Result<()> {
+    pub async fn open_interact_dialog(&self, input: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::OpenInputInteractDialog { input_name })
+            .send_message(RequestType::OpenInputInteractDialog { input })
             .await
     }
 
     /// Gets a list of connected monitors and information about them.
-    pub async fn get_monitor_list(&self) -> Result<Vec<responses::Monitor>> {
+    pub async fn list_monitors(&self) -> Result<Vec<responses::Monitor>> {
         self.client
             .send_message::<responses::MonitorList>(RequestType::GetMonitorList)
             .await

@@ -12,48 +12,38 @@ async fn scenes() -> Result<()> {
 
     ui.set_studio_mode_enabled(true).await?;
 
-    let scenes = client.get_scene_list().await?.scenes;
-    client.get_group_list().await?;
+    let scenes = client.list().await?.scenes;
+    client.list_groups().await?;
 
-    let current = client.get_current_program_scene().await?;
-    let other = &scenes
-        .iter()
-        .find(|s| s.scene_name != current)
-        .unwrap()
-        .scene_name;
+    let current = client.current_program_scene().await?;
+    let other = &scenes.iter().find(|s| s.name != current).unwrap().name;
     client.set_current_program_scene(other).await?;
     client.set_current_program_scene(&current).await?;
 
-    let current = client.get_current_preview_scene().await?;
-    let other = &scenes
-        .iter()
-        .find(|s| s.scene_name != current)
-        .unwrap()
-        .scene_name;
+    let current = client.current_preview_scene().await?;
+    let other = &scenes.iter().find(|s| s.name != current).unwrap().name;
     client.set_current_preview_scene(other).await?;
     client.set_current_preview_scene(&current).await?;
 
-    client.set_scene_name(TEST_SCENE, TEST_SCENE_RENAME).await?;
-    client.set_scene_name(TEST_SCENE_RENAME, TEST_SCENE).await?;
+    client.set_name(TEST_SCENE, TEST_SCENE_RENAME).await?;
+    client.set_name(TEST_SCENE_RENAME, TEST_SCENE).await?;
 
-    client.create_scene(TEST_SCENE_CREATE).await?;
-    client.remove_scene(TEST_SCENE_CREATE).await?;
+    client.create(TEST_SCENE_CREATE).await?;
+    client.remove(TEST_SCENE_CREATE).await?;
 
-    let to = client
-        .get_scene_scene_transition_override(TEST_SCENE)
-        .await?;
+    let to = client.transition_override(TEST_SCENE).await?;
     client
-        .set_scene_scene_transition_override(SetSceneSceneTransitionOverride {
-            scene_name: TEST_SCENE,
-            transition_name: Some(TEST_TRANSITION),
-            transition_duration: Some(Duration::seconds(5)),
+        .set_transition_override(SetSceneSceneTransitionOverride {
+            scene: TEST_SCENE,
+            transition: Some(TEST_TRANSITION),
+            duration: Some(Duration::seconds(5)),
         })
         .await?;
     client
-        .set_scene_scene_transition_override(SetSceneSceneTransitionOverride {
-            scene_name: TEST_SCENE,
-            transition_name: to.transition_name.as_deref(),
-            transition_duration: to.transition_duration,
+        .set_transition_override(SetSceneSceneTransitionOverride {
+            scene: TEST_SCENE,
+            transition: to.name.as_deref(),
+            duration: to.duration,
         })
         .await?;
 

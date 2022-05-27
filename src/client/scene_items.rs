@@ -17,37 +17,25 @@ pub struct SceneItems<'a> {
 
 impl<'a> SceneItems<'a> {
     /// Gets a list of all scene items in a scene.
-    ///
-    /// - `scene_name`: Name of the scene to get the items of.
-    pub async fn get_scene_item_list(&self, scene_name: &str) -> Result<Vec<responses::SceneItem>> {
+    pub async fn list(&self, scene: &str) -> Result<Vec<responses::SceneItem>> {
         self.client
-            .send_message::<responses::SceneItemList>(RequestType::GetSceneItemList { scene_name })
+            .send_message::<responses::SceneItemList>(RequestType::GetSceneItemList { scene })
             .await
             .map(|sil| sil.scene_items)
     }
 
-    /// Basically [`get_scene_item_list`](Self::get_scene_item_list), but for groups.
+    /// Basically [`Self::list`], but for groups.
     ///
     /// Using groups at all in OBS is discouraged, as they are very broken under the hood.
-    ///
-    /// - `scene_name`: Name of the group to get the items of.
-    pub async fn get_group_scene_item_list(
-        &self,
-        scene_name: &str,
-    ) -> Result<Vec<responses::SceneItem>> {
+    pub async fn list_group(&self, scene: &str) -> Result<Vec<responses::SceneItem>> {
         self.client
-            .send_message::<responses::SceneItemList>(RequestType::GetGroupSceneItemList {
-                scene_name,
-            })
+            .send_message::<responses::SceneItemList>(RequestType::GetGroupSceneItemList { scene })
             .await
             .map(|sil| sil.scene_items)
     }
 
     /// Searches a scene for a source, and returns its id.
-    ///
-    /// - `scene_name`: Name of the scene or group to search in.
-    /// - `source_name`: Name of the source to find.
-    pub async fn get_scene_item_id(&self, get: GetSceneItemId<'_>) -> Result<i64> {
+    pub async fn id(&self, get: GetSceneItemId<'_>) -> Result<i64> {
         self.client
             .send_message::<responses::SceneItemId>(RequestType::GetSceneItemId(get))
             .await
@@ -55,7 +43,7 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Creates a new scene item using a source.
-    pub async fn create_scene_item(&self, create: CreateSceneItem<'_>) -> Result<i64> {
+    pub async fn create(&self, create: CreateSceneItem<'_>) -> Result<i64> {
         self.client
             .send_message::<responses::SceneItemId>(RequestType::CreateSceneItem(create))
             .await
@@ -63,20 +51,14 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Removes a scene item from a scene.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn remove_scene_item(&self, scene_name: &str, scene_item_id: i64) -> Result<()> {
+    pub async fn remove(&self, scene: &str, item_id: i64) -> Result<()> {
         self.client
-            .send_message(RequestType::RemoveSceneItem {
-                scene_name,
-                scene_item_id,
-            })
+            .send_message(RequestType::RemoveSceneItem { scene, item_id })
             .await
     }
 
     /// Duplicates a scene item, copying all transform and crop info.
-    pub async fn duplicate_scene_item(&self, duplicate: DuplicateSceneItem<'_>) -> Result<i64> {
+    pub async fn duplicate(&self, duplicate: DuplicateSceneItem<'_>) -> Result<i64> {
         self.client
             .send_message::<responses::SceneItemId>(RequestType::DuplicateSceneItem(duplicate))
             .await
@@ -84,78 +66,58 @@ impl<'a> SceneItems<'a> {
     }
 
     /// Gets the transform and crop info of a scene item.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn get_scene_item_transform(
+    pub async fn transform(
         &self,
-        scene_name: &str,
-        scene_item_id: i64,
+        scene: &str,
+        item_id: i64,
     ) -> Result<responses::SceneItemTransform> {
         self.client
             .send_message::<responses::GetSceneItemTransform>(RequestType::GetSceneItemTransform {
-                scene_name,
-                scene_item_id,
+                scene,
+                item_id,
             })
             .await
             .map(|gsit| gsit.scene_item_transform)
     }
 
     /// Sets the transform and crop info of a scene item.
-    pub async fn set_scene_item_transform(
-        &self,
-        transform: SetSceneItemTransform<'_>,
-    ) -> Result<()> {
+    pub async fn set_transform(&self, transform: SetSceneItemTransform<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemTransform(transform))
             .await
     }
 
     /// Gets the enable state of a scene item.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn get_scene_item_enabled(
-        &self,
-        scene_name: &str,
-        scene_item_id: i64,
-    ) -> Result<bool> {
+    pub async fn enabled(&self, scene: &str, item_id: i64) -> Result<bool> {
         self.client
             .send_message::<responses::SceneItemEnabled>(RequestType::GetSceneItemEnabled {
-                scene_name,
-                scene_item_id,
+                scene,
+                item_id,
             })
             .await
             .map(|sie| sie.scene_item_enabled)
     }
 
     /// Sets the enable state of a scene item.
-    pub async fn set_scene_item_enabled(&self, enabled: SetSceneItemEnabled<'a>) -> Result<()> {
+    pub async fn set_enabled(&self, enabled: SetSceneItemEnabled<'a>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemEnabled(enabled))
             .await
     }
 
     /// Gets the lock state of a scene item.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn get_scene_item_locked(
-        &self,
-        scene_name: &str,
-        scene_item_id: i64,
-    ) -> Result<bool> {
+    pub async fn locked(&self, scene: &str, item_id: i64) -> Result<bool> {
         self.client
             .send_message::<responses::SceneItemLocked>(RequestType::GetSceneItemLocked {
-                scene_name,
-                scene_item_id,
+                scene,
+                item_id,
             })
             .await
             .map(|sil| sil.scene_item_locked)
     }
 
     /// Sets the lock state of a scene item.
-    pub async fn set_scene_item_locked(&self, locked: SetSceneItemLocked<'_>) -> Result<()> {
+    pub async fn set_locked(&self, locked: SetSceneItemLocked<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemLocked(locked))
             .await
@@ -164,54 +126,38 @@ impl<'a> SceneItems<'a> {
     /// Gets the index position of a scene item in a scene.
     ///
     /// An index of 0 is at the bottom of the source list in the UI.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn get_scene_item_index(&self, scene_name: &str, scene_item_id: i64) -> Result<u32> {
+    pub async fn index(&self, scene: &str, item_id: i64) -> Result<u32> {
         self.client
             .send_message::<responses::SceneItemIndex>(RequestType::GetSceneItemIndex {
-                scene_name,
-                scene_item_id,
+                scene,
+                item_id,
             })
             .await
             .map(|sii| sii.scene_item_index)
     }
 
     /// Sets the index position of a scene item in a scene.
-    pub async fn set_scene_item_index(&self, index: SetSceneItemIndex<'_>) -> Result<()> {
+    pub async fn set_index(&self, index: SetSceneItemIndex<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSceneItemIndex(index))
             .await
     }
 
     /// Gets private scene item settings.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn get_scene_item_private_settings<T>(
-        &self,
-        scene_name: &str,
-        scene_item_id: i64,
-    ) -> Result<T>
+    pub async fn private_settings<T>(&self, scene: &str, item_id: i64) -> Result<T>
     where
         T: DeserializeOwned,
     {
         self.client
             .send_message::<responses::SceneItemSettings<T>>(
-                RequestType::GetSceneItemPrivateSettings {
-                    scene_name,
-                    scene_item_id,
-                },
+                RequestType::GetSceneItemPrivateSettings { scene, item_id },
             )
             .await
             .map(|sis| sis.scene_item_settings)
     }
 
     /// Sets private scene item settings.
-    ///
-    /// - `scene_name`: Name of the scene the item is in.
-    /// - `scene_item_id`: Numeric ID of the scene item.
-    pub async fn set_scene_item_private_settings<T>(
+    pub async fn set_private_settings<T>(
         &self,
         settings: SetSceneItemPrivateSettings<'_, T>,
     ) -> Result<()>
@@ -221,9 +167,9 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message(RequestType::SetSceneItemPrivateSettings(
                 SetSceneItemPrivateSettingsInternal {
-                    scene_name: settings.scene_name,
-                    scene_item_id: settings.scene_item_id,
-                    scene_item_settings: serde_json::to_value(&settings.scene_item_settings)
+                    scene: settings.scene,
+                    item_id: settings.item_id,
+                    settings: serde_json::to_value(&settings.settings)
                         .map_err(Error::SerializeCustomData)?,
                 },
             ))

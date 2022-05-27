@@ -81,7 +81,7 @@ pub struct Client {
     /// of a request ID and the value is a oneshot sender that allows to send the response back to
     /// the other end that waits for the response.
     receivers: Arc<ReceiverList>,
-    /// A list of awaiting [`reidentify`](Self::reidentify) requests, waiting for confirmation. As
+    /// A list of awaiting [`Self::reidentify`] requests, waiting for confirmation. As
     /// these requests don't carry any kind of ID, they're handled sequentially and must be tracked
     /// separate from normal requests.
     reidentify_receivers: Arc<ReidentifyReceiverList>,
@@ -238,16 +238,20 @@ impl Client {
 
                     match message {
                         ServerMessage::RequestResponse(response) => {
-                            trace!(id = %response.request_id, "got request-response message");
+                            trace!(
+                                id = %response.id,
+                                status = ?response.status,
+                                "got request-response message",
+                            );
                             receivers2.notify(response).await?;
                         }
                         #[cfg(feature = "events")]
                         ServerMessage::Event(event) => {
-                            trace!("got OBS event");
+                            trace!(?event, "got OBS event");
                             events_tx.send(event).ok();
                         }
                         ServerMessage::Identified(identified) => {
-                            trace!("got identified message");
+                            trace!(?identified, "got identified message");
                             reidentify_receivers2.notify(identified).await;
                         }
                         _ => return Err(InnerError::UnexpectedMessage(message)),

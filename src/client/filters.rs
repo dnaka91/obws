@@ -17,12 +17,7 @@ pub struct Filters<'a> {
 
 impl<'a> Filters<'a> {
     /// Gets an array of all of a source's filters.
-    ///
-    /// - `source_name`: Name of the source.
-    pub async fn get_source_filter_list(
-        &self,
-        source_name: &str,
-    ) -> Result<Vec<responses::SourceFilter>> {
+    pub async fn list(&self, source_name: &str) -> Result<Vec<responses::SourceFilter>> {
         self.client
             .send_message::<responses::Filters>(RequestType::GetSourceFilterList { source_name })
             .await
@@ -30,9 +25,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Gets the default settings for a filter kind.
-    ///
-    /// - `filter_kind`: Filter kind to get the default settings for.
-    pub async fn get_source_filter_default_settings<T>(&self, filter_kind: &str) -> Result<T>
+    pub async fn default_settings<T>(&self, filter_kind: &str) -> Result<T>
     where
         T: DeserializeOwned,
     {
@@ -45,18 +38,18 @@ impl<'a> Filters<'a> {
     }
 
     /// Creates a new filter, adding it to the specified source.
-    pub async fn create_source_filter<T>(&self, filter: CreateSourceFilter<'_, T>) -> Result<()>
+    pub async fn create<T>(&self, filter: CreateSourceFilter<'_, T>) -> Result<()>
     where
         T: Serialize,
     {
         self.client
             .send_message(RequestType::CreateSourceFilter(
                 CreateSourceFilterInternal {
-                    source_name: filter.source_name,
-                    filter_name: filter.filter_name,
-                    filter_kind: filter.filter_kind,
-                    filter_settings: filter
-                        .filter_settings
+                    source: filter.source,
+                    filter: filter.filter,
+                    kind: filter.kind,
+                    settings: filter
+                        .settings
                         .map(|settings| serde_json::to_value(&settings))
                         .transpose()
                         .map_err(Error::SerializeCustomData)?,
@@ -66,63 +59,44 @@ impl<'a> Filters<'a> {
     }
 
     /// Removes a filter from a source.
-    ///
-    /// - `source_name`: Name of the source the filter is on.
-    /// - `filter_name`: Name of the filter to remove.
-    pub async fn remove_source_filter(&self, source_name: &str, filter_name: &str) -> Result<()> {
+    pub async fn remove(&self, source: &str, filter: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::RemoveSourceFilter {
-                source_name,
-                filter_name,
-            })
+            .send_message(RequestType::RemoveSourceFilter { source, filter })
             .await
     }
 
     /// Sets the name of a source filter (rename).
-    pub async fn set_source_filter_name(&self, name: SetSourceFilterName<'_>) -> Result<()> {
+    pub async fn set_name(&self, name: SetSourceFilterName<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceFilterName(name))
             .await
     }
 
     /// Gets the info for a specific source filter.
-    ///
-    /// - `source_name`: Name of the source.
-    /// - `filter_name`: Name of the filter.
-    pub async fn get_source_filter(
-        &self,
-        source_name: &str,
-        filter_name: &str,
-    ) -> Result<responses::SourceFilter> {
+    pub async fn get(&self, source: &str, filter: &str) -> Result<responses::SourceFilter> {
         self.client
-            .send_message(RequestType::GetSourceFilter {
-                source_name,
-                filter_name,
-            })
+            .send_message(RequestType::GetSourceFilter { source, filter })
             .await
     }
 
     /// Sets the index position of a filter on a source.
-    pub async fn set_source_filter_index(&self, index: SetSourceFilterIndex<'_>) -> Result<()> {
+    pub async fn set_index(&self, index: SetSourceFilterIndex<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceFilterIndex(index))
             .await
     }
 
     /// Sets the settings of a source filter.
-    pub async fn set_source_filter_settings<T>(
-        &self,
-        settings: SetSourceFilterSettings<'_, T>,
-    ) -> Result<()>
+    pub async fn set_settings<T>(&self, settings: SetSourceFilterSettings<'_, T>) -> Result<()>
     where
         T: Serialize,
     {
         self.client
             .send_message(RequestType::SetSourceFilterSettings(
                 SetSourceFilterSettingsInternal {
-                    source_name: settings.source_name,
-                    filter_name: settings.filter_name,
-                    filter_settings: serde_json::to_value(&settings.filter_settings)
+                    source: settings.source,
+                    filter: settings.filter,
+                    settings: serde_json::to_value(&settings.settings)
                         .map_err(Error::SerializeCustomData)?,
                     overlay: settings.overlay,
                 },
@@ -131,10 +105,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Sets the enable state of a source filter.
-    pub async fn set_source_filter_enabled(
-        &self,
-        enabled: SetSourceFilterEnabled<'_>,
-    ) -> Result<()> {
+    pub async fn set_enabled(&self, enabled: SetSourceFilterEnabled<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SetSourceFilterEnabled(enabled))
             .await

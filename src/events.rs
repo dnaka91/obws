@@ -22,10 +22,10 @@ pub enum Event {
     /// **Note:** We recommend using this event to trigger a pause of all polling requests, as
     /// performing any requests during a scene collection change is considered undefined behavior
     /// and can cause crashes!
-    #[serde(rename_all = "camelCase")]
     CurrentSceneCollectionChanging {
         /// Name of the current scene collection.
-        scene_collection_name: String,
+        #[serde(rename = "sceneCollectionName")]
+        name: String,
     },
     /// The current scene collection has changed.
     ///
@@ -33,28 +33,28 @@ pub enum Event {
     /// indicator to restart polling.
     ///
     /// [`CurrentSceneCollectionChanging`]: Event::CurrentSceneCollectionChanging
-    #[serde(rename_all = "camelCase")]
     CurrentSceneCollectionChanged {
         /// Name of the new scene collection.
-        scene_collection_name: String,
+        #[serde(rename = "sceneCollectionName")]
+        name: String,
     },
     /// The scene collection list has changed.
-    #[serde(rename_all = "camelCase")]
     SceneCollectionListChanged {
         /// Updated list of scene collections.
-        scene_collections: Vec<String>,
+        #[serde(rename = "sceneCollections")]
+        collections: Vec<String>,
     },
     /// The current profile has begun changing.
-    #[serde(rename_all = "camelCase")]
     CurrentProfileChanging {
         /// Name of the current profile.
-        profile_name: String,
+        #[serde(rename = "profileName")]
+        name: String,
     },
     /// The current profile has changed.
-    #[serde(rename_all = "camelCase")]
     CurrentProfileChanged {
         /// Name of the new profile.
-        profile_name: String,
+        #[serde(rename = "profileName")]
+        name: String,
     },
     /// The profile list has changed.
     #[serde(rename_all = "camelCase")]
@@ -82,46 +82,51 @@ pub enum Event {
         default_filter_settings: serde_json::Value,
     },
     /// A filter has been removed from a source.
-    #[serde(rename_all = "camelCase")]
     SourceFilterRemoved {
         /// Name of the source the filter was on.
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Name of the filter.
-        filter_name: String,
+        #[serde(rename = "filterName")]
+        filter: String,
     },
     /// A source's filter list has been re-indexed.
-    #[serde(rename_all = "camelCase")]
     SourceFilterListReindexed {
         /// Name of the source.
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Array of filter objects.
         filters: Vec<SourceFilter>,
     },
     /// A source filter's enable state has changed.
-    #[serde(rename_all = "camelCase")]
     SourceFilterEnableStateChanged {
         /// Name of the source the filter is on.
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Name of the filter.
-        filter_name: String,
+        #[serde(rename = "filterName")]
+        filter: String,
         /// Whether the filter is enabled.
-        filter_enabled: bool,
+        #[serde(rename = "filterEnabled")]
+        enabled: bool,
     },
     /// The name of a source filter has changed.
-    #[serde(rename_all = "camelCase")]
     SourceFilterNameChanged {
         /// The source the filter is on.
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Old name of the filter.
-        old_filter_name: String,
+        #[serde(rename = "oldFilterName")]
+        old_name: String,
         /// New name of the filter.
-        filter_name: String,
+        #[serde(rename = "filterName")]
+        new_name: String,
     },
     // --------------------------------
     // General
     // --------------------------------
     /// A custom event that was triggered by
-    /// [`broadcast_custom_event`](crate::client::General::broadcast_custom_event).
+    /// [`crate::client::General::broadcast_custom_event`].
     ///
     /// The content can be any valid JSON object.
     CustomEvent(serde_json::Value),
@@ -159,88 +164,101 @@ pub enum Event {
         default_input_settings: serde_json::Value,
     },
     /// An input has been removed.
-    #[serde(rename_all = "camelCase")]
     InputRemoved {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
     },
     /// The name of an input has changed.
-    #[serde(rename_all = "camelCase")]
     InputNameChanged {
         /// Old name of the input.
-        old_input_name: String,
+        #[serde(rename = "oldInputName")]
+        old_name: String,
         /// New name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        new_name: String,
     },
     /// An input's active state has changed.
     ///
     /// When an input is active, it means it's being shown by the program feed.
-    #[serde(rename_all = "camelCase")]
     InputActiveStateChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// Whether the input is active.
-        video_active: bool,
+        #[serde(rename = "videoActive")]
+        active: bool,
     },
     /// An input's show state has changed.
     ///
     /// When an input is showing, it means it's being shown by the preview or a dialog.
-    #[serde(rename_all = "camelCase")]
     InputShowStateChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// Whether the input is showing.
-        video_showing: bool,
+        #[serde(rename = "videoShowing")]
+        showing: bool,
     },
     /// An input's mute state has changed.
-    #[serde(rename_all = "camelCase")]
     InputMuteStateChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// Whether the input is muted.
-        input_muted: bool,
+        #[serde(rename = "inputMuted")]
+        muted: bool,
     },
     /// An input's volume level has changed.
     #[serde(rename_all = "camelCase")]
     InputVolumeChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// New volume level in `multimap`.
-        input_volume_mul: f64,
+        #[serde(rename = "inputVolumeMul")]
+        mul: f64,
         /// New volume level in `dB`.
-        input_volume_db: f64,
+        #[serde(rename = "inputVolumeDb")]
+        db: f64,
     },
     /// The audio balance value of an input has changed.
-    #[serde(rename_all = "camelCase")]
     InputAudioBalanceChanged {
         /// Name of the affected input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// New audio balance value of the input.
-        input_audio_balance: f64,
+        #[serde(rename = "inputAudioBalance")]
+        audio_balance: f64,
     },
     /// The sync offset of an input has changed.
-    #[serde(rename_all = "camelCase")]
     InputAudioSyncOffsetChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// New sync offset in milliseconds.
-        #[serde(deserialize_with = "crate::de::duration_millis")]
-        input_audio_sync_offset: Duration,
+        #[serde(
+            rename = "inputAudioSyncOffset",
+            deserialize_with = "crate::de::duration_millis"
+        )]
+        offset: Duration,
     },
     /// The audio tracks of an input have changed.
-    #[serde(rename_all = "camelCase")]
     InputAudioTracksChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// Object of audio tracks along with their associated enable states.
-        input_audio_tracks: BTreeMap<String, bool>,
+        #[serde(rename = "inputAudioTracks")]
+        tracks: BTreeMap<String, bool>,
     },
     /// The monitor type of an input has changed.
-    #[serde(rename_all = "camelCase")]
     InputAudioMonitorTypeChanged {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// New monitor type of the input.
+        #[serde(rename = "monitorType")]
         monitor_type: MonitorType,
     },
     /// A high-volume event providing volume levels of all active inputs every 50 milliseconds.
@@ -253,180 +271,200 @@ pub enum Event {
     // Media Inputs
     // --------------------------------
     /// A media input has started playing.
-    #[serde(rename_all = "camelCase")]
     MediaInputPlaybackStarted {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
     },
     /// A media input has finished playing.
-    #[serde(rename_all = "camelCase")]
     MediaInputPlaybackEnded {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
     },
     /// An action has been performed on an input.
-    #[serde(rename_all = "camelCase")]
     MediaInputActionTriggered {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// Action performed on the input.
+        #[serde(rename = "mediaAction")]
         media_action: MediaAction,
     },
     // --------------------------------
     // Outputs
     // --------------------------------
     /// The state of the stream output has changed.
-    #[serde(rename_all = "camelCase")]
     StreamStateChanged {
         /// Whether the output is active.
-        output_active: bool,
+        #[serde(rename = "outputActive")]
+        active: bool,
         /// The specific state of the output.
-        output_state: OutputState,
+        #[serde(rename = "outputState")]
+        state: OutputState,
     },
     /// The state of the record output has changed.
-    #[serde(rename_all = "camelCase")]
     RecordStateChanged {
         /// Whether the output is active.
-        output_active: bool,
+        #[serde(rename = "outputActive")]
+        active: bool,
         /// The specific state of the output.
-        output_state: OutputState,
+        #[serde(rename = "outputState")]
+        state: OutputState,
     },
     /// The state of the replay buffer output has changed.
-    #[serde(rename_all = "camelCase")]
     ReplayBufferStateChanged {
         /// Whether the output is active.
-        output_active: bool,
+        #[serde(rename = "outputActive")]
+        active: bool,
         /// The specific state of the output.
-        output_state: OutputState,
+        #[serde(rename = "outputState")]
+        state: OutputState,
     },
     /// The state of the virtual cam output has changed.
-    #[serde(rename_all = "camelCase")]
     VirtualcamStateChanged {
         /// Whether the output is active.
-        output_active: bool,
+        #[serde(rename = "outputActive")]
+        active: bool,
         /// The specific state of the output.
-        output_state: OutputState,
+        #[serde(rename = "outputState")]
+        state: OutputState,
     },
     /// The replay buffer has been saved.
-    #[serde(rename_all = "camelCase")]
     ReplayBufferSaved {
         /// Path of the saved replay file.
-        saved_replay_path: PathBuf,
+        #[serde(rename = "savedReplayPath")]
+        path: PathBuf,
     },
     // --------------------------------
     // Scene Items
     // --------------------------------
     /// A scene item has been created.
-    #[serde(rename_all = "camelCase")]
     SceneItemCreated {
         /// Name of the scene the item was added to.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Name of the underlying source (input/scene).
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
         /// Index position of the item.
-        scene_item_index: u32,
+        #[serde(rename = "sceneItemIndex")]
+        index: u32,
     },
     /// A scene item has been removed.
     ///
     /// This event is not emitted when the scene the item is in is removed.
-    #[serde(rename_all = "camelCase")]
     SceneItemRemoved {
         /// Name of the scene the item was removed from.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Name of the underlying source (input/scene).
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
     },
     /// A scene's item list has been re-indexed.
-    #[serde(rename_all = "camelCase")]
     SceneItemListReindexed {
         /// Name of the scene.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Array of scene item objects.
-        scene_items: Vec<BasicSceneItem>,
+        #[serde(rename = "sceneItems")]
+        items: Vec<BasicSceneItem>,
     },
     /// A scene item's enable state has changed.
-    #[serde(rename_all = "camelCase")]
     SceneItemEnableStateChanged {
         /// Name of the scene the item is in.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
         /// Whether the scene item is enabled (visible).
-        scene_item_enabled: bool,
+        #[serde(rename = "sceneItemEnabled")]
+        enabled: bool,
     },
     /// A scene item's lock state has changed.
-    #[serde(rename_all = "camelCase")]
     SceneItemLockStateChanged {
         /// Name of the scene the item is in.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
         /// Whether the scene item is locked.
-        scene_item_locked: bool,
+        #[serde(rename = "sceneItemLocked")]
+        locked: bool,
     },
     /// A scene item has been selected in the UI.
-    #[serde(rename_all = "camelCase")]
     SceneItemSelected {
         /// Name of the scene the item is in.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
     },
     /// The transform/crop of a scene item has changed.
-    #[serde(rename_all = "camelCase")]
     SceneItemTransformChanged {
         /// The name of the scene the item is in.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        scene: String,
         /// Numeric ID of the scene item.
-        scene_item_id: u64,
+        #[serde(rename = "sceneItemId")]
+        item_id: u64,
         /// New transform/crop info of the scene item.
-        scene_item_transform: SceneItemTransform,
+        #[serde(rename = "sceneItemTransform")]
+        transform: SceneItemTransform,
     },
     // --------------------------------
     // Scenes
     // --------------------------------
     /// A new scene has been created.
-    #[serde(rename_all = "camelCase")]
     SceneCreated {
         /// Name of the new scene.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        name: String,
         /// Whether the new scene is a group.
+        #[serde(rename = "isGroup")]
         is_group: bool,
     },
     /// A scene has been removed.
-    #[serde(rename_all = "camelCase")]
     SceneRemoved {
         /// Name of the removed scene.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        name: String,
         /// Whether the scene was a group.
+        #[serde(rename = "isGroup")]
         is_group: bool,
     },
     /// The name of a scene has changed.
-    #[serde(rename_all = "camelCase")]
     SceneNameChanged {
         /// Old name of the scene.
-        old_scene_name: String,
+        #[serde(rename = "oldSceneName")]
+        old_name: String,
         /// New name of the scene.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        new_name: String,
     },
     /// The current program scene has changed.
-    #[serde(rename_all = "camelCase")]
     CurrentProgramSceneChanged {
         /// Name of the scene that was switched to.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        name: String,
     },
     /// The current preview scene has changed.
-    #[serde(rename_all = "camelCase")]
     CurrentPreviewSceneChanged {
         /// Name of the scene that was switched to.
-        scene_name: String,
+        #[serde(rename = "sceneName")]
+        name: String,
     },
     /// The list of scenes has changed.
-    #[serde(rename_all = "camelCase")]
     SceneListChanged {
         /// Updated array of scenes.
         scenes: Vec<Scene>,
@@ -435,31 +473,33 @@ pub enum Event {
     // Transitions
     // --------------------------------
     /// The current scene transition has changed.
-    #[serde(rename_all = "camelCase")]
     CurrentSceneTransitionChanged {
         /// Name of the new transition.
-        transition_name: String,
+        #[serde(rename = "transitionName")]
+        name: String,
     },
     /// The current scene transition duration has changed.
-    #[serde(rename_all = "camelCase")]
     CurrentSceneTransitionDurationChanged {
         /// Transition duration in milliseconds.
-        #[serde(deserialize_with = "crate::de::duration_millis")]
-        transition_duration: Duration,
+        #[serde(
+            rename = "transitionDuration",
+            deserialize_with = "crate::de::duration_millis"
+        )]
+        duration: Duration,
     },
     /// A scene transition has started.
-    #[serde(rename_all = "camelCase")]
     SceneTransitionStarted {
         /// Scene transition name.
-        transition_name: String,
+        #[serde(rename = "transitionName")]
+        name: String,
     },
     /// A scene transition has completed fully.
     ///
     /// **Note:** Does not appear to trigger when the transition is interrupted by the user.
-    #[serde(rename_all = "camelCase")]
     SceneTransitionEnded {
         /// Scene transition name.
-        transition_name: String,
+        #[serde(rename = "transitionName")]
+        name: String,
     },
     /// A scene transition's video has completed fully.
     ///
@@ -468,19 +508,19 @@ pub enum Event {
     /// transition playback.
     ///
     /// **Note:** Appears to be called by every transition, regardless of relevance.
-    #[serde(rename_all = "camelCase")]
     SceneTransitionVideoEnded {
         /// Scene transition name.
-        transition_name: String,
+        #[serde(rename = "transitionName")]
+        name: String,
     },
     // --------------------------------
     // UI
     // --------------------------------
     /// Studio mode has been enabled or disabled.
-    #[serde(rename_all = "camelCase")]
     StudioModeStateChanged {
         /// Whether the studio mode is enabled.
-        studio_mode_enabled: bool,
+        #[serde(rename = "studioModeEnabled")]
+        enabled: bool,
     },
     // --------------------------------
     // Custom
@@ -496,12 +536,13 @@ pub enum Event {
 
 /// Volume meter information for a single input, describing the current volume level.
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InputVolumeMeter {
     /// Name of this input.
-    pub input_name: String,
-    /// List of volume levels, in Mul.
-    pub input_levels_mul: Vec<[f32; 3]>,
+    #[serde(rename = "inputName")]
+    pub name: String,
+    /// List of volume levels, in **Mul**.
+    #[serde(rename = "inputLevelsMul")]
+    pub levels: Vec<[f32; 3]>,
 }
 
 /// The output state describes the current status of any output (like recording, virtual-cam, ...).
@@ -532,20 +573,22 @@ pub enum OutputState {
 
 /// A basic scene item, only describing identifier and position.
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct BasicSceneItem {
     /// Identifier of this scene item.
-    pub scene_item_id: u64,
+    #[serde(rename = "sceneItemId")]
+    pub id: u64,
     /// Positional index within the owning scene.
-    pub scene_item_index: u32,
+    #[serde(rename = "sceneItemIndex")]
+    pub index: u32,
 }
 
 /// The scene describes basic details about a single scene setup in OBS.
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Scene {
     /// Name of this scene.
-    pub scene_name: String,
+    #[serde(rename = "sceneName")]
+    pub name: String,
     /// Positional index in the scene list.
-    pub scene_index: usize,
+    #[serde(rename = "sceneIndex")]
+    pub index: usize,
 }

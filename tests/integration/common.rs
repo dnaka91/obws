@@ -46,7 +46,7 @@ pub async fn new_client() -> Result<Client> {
 }
 
 async fn ensure_obs_setup(client: &Client) -> Result<()> {
-    let scenes = client.scenes().get_scene_list().await?;
+    let scenes = client.scenes().list().await?;
     ensure!(
         scenes.scenes.iter().any(is_required_scene),
         "scene `{}` not found, required for scenes tests",
@@ -68,14 +68,14 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_SCENE_CREATE
     );
 
-    let groups = client.scenes().get_group_list().await?;
+    let groups = client.scenes().list_groups().await?;
     ensure!(
         groups.iter().map(String::as_str).any(is_required_group),
         "group `{}` not found, required for scenes and scene items tests",
         TEST_GROUP
     );
 
-    let inputs = client.inputs().get_input_list(None).await?;
+    let inputs = client.inputs().list(None).await?;
     ensure!(
         inputs.iter().any(is_required_text_input),
         "text input `{}` not found, required for inputs tests",
@@ -102,7 +102,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_BROWSER_RENAME
     );
 
-    let filters = client.filters().get_source_filter_list(TEST_TEXT).await?;
+    let filters = client.filters().list(TEST_TEXT).await?;
     ensure!(
         filters.iter().any(is_required_filter),
         "filter `{}` not found, required for filters tests",
@@ -119,32 +119,32 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_FILTER_RENAME
     );
 
-    let profiles = client.config().get_profile_list().await?.profiles;
+    let profiles = client.config().list_profiles().await?.profiles;
     ensure!(
         profiles.iter().map(String::as_str).any(is_required_profile),
         "profile `{}` not found, required for profiles tests",
         TEST_PROFILE
     );
 
-    let studio_mode_enabled = client.ui().get_studio_mode_enabled().await?;
+    let studio_mode_enabled = client.ui().studio_mode_enabled().await?;
     ensure!(
         !studio_mode_enabled,
         "studio mode enabled, required to be disabled for studio mode tests"
     );
 
-    let recording_active = client.recording().get_record_status().await?.output_active;
+    let recording_active = client.recording().status().await?.active;
     ensure!(
         !recording_active,
         "recording active, required to be stopped for recording tests"
     );
 
-    let virtual_cam_active = client.outputs().get_virtual_cam_status().await?;
+    let virtual_cam_active = client.outputs().virtual_cam_status().await?;
     ensure!(
         !virtual_cam_active,
         "virtual cam active, required to be stopped for outputs tests"
     );
 
-    let replay_buffer_active = client.outputs().get_replay_buffer_status().await?;
+    let replay_buffer_active = client.outputs().replay_buffer_status().await?;
     ensure!(
         !replay_buffer_active,
         "replay buffer active, required to be stopped for outputs tests"
@@ -159,19 +159,19 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
 }
 
 fn is_required_scene(scene: &Scene) -> bool {
-    scene.scene_name == TEST_SCENE
+    scene.name == TEST_SCENE
 }
 
 fn is_required_scene_2(scene: &Scene) -> bool {
-    scene.scene_name == TEST_SCENE_2
+    scene.name == TEST_SCENE_2
 }
 
 fn is_renamed_scene(scene: &Scene) -> bool {
-    scene.scene_name == TEST_SCENE_RENAME
+    scene.name == TEST_SCENE_RENAME
 }
 
 fn is_created_scene(scene: &Scene) -> bool {
-    scene.scene_name == TEST_SCENE_CREATE
+    scene.name == TEST_SCENE_CREATE
 }
 
 fn is_required_group(group: &str) -> bool {
@@ -179,47 +179,47 @@ fn is_required_group(group: &str) -> bool {
 }
 
 fn is_required_text_input(input: &Input) -> bool {
-    input.input_name == TEST_TEXT && is_text_input(input)
+    input.name == TEST_TEXT && is_text_input(input)
 }
 
 fn is_required_text_2_input(input: &Input) -> bool {
-    input.input_name == TEST_TEXT_2 && is_text_input(input)
+    input.name == TEST_TEXT_2 && is_text_input(input)
 }
 
 fn is_required_browser_input(input: &Input) -> bool {
-    input.input_name == TEST_BROWSER && is_browser_input(input)
+    input.name == TEST_BROWSER && is_browser_input(input)
 }
 
 fn is_required_media_input(input: &Input) -> bool {
-    input.input_name == TEST_MEDIA && is_media_input(input)
+    input.name == TEST_MEDIA && is_media_input(input)
 }
 
 fn is_renamed_input(input: &Input) -> bool {
-    input.input_name == TEST_BROWSER_RENAME
+    input.name == TEST_BROWSER_RENAME
 }
 
 fn is_text_input(input: &Input) -> bool {
-    input.input_kind == INPUT_KIND_TEXT_FT2
+    input.kind == INPUT_KIND_TEXT_FT2
 }
 
 fn is_browser_input(input: &Input) -> bool {
-    input.input_kind == INPUT_KIND_BROWSER
+    input.kind == INPUT_KIND_BROWSER
 }
 
 fn is_media_input(input: &Input) -> bool {
-    input.input_kind == INPUT_KIND_VLC
+    input.kind == INPUT_KIND_VLC
 }
 
 fn is_required_filter(filter: &SourceFilter) -> bool {
-    filter.filter_name == TEST_FILTER
+    filter.name == TEST_FILTER
 }
 
 fn is_filter_2(filter: &SourceFilter) -> bool {
-    filter.filter_name == TEST_FILTER_2
+    filter.name == TEST_FILTER_2
 }
 
 fn is_renamed_filter(filter: &SourceFilter) -> bool {
-    filter.filter_name == TEST_FILTER_RENAME
+    filter.name == TEST_FILTER_RENAME
 }
 
 fn is_required_profile(profile: &str) -> bool {

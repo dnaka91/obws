@@ -12,12 +12,12 @@ async fn main() -> Result<()> {
 
     let client = Client::connect("localhost", 4455, env::var("OBS_PASSWORD").ok()).await?;
 
-    let scene_list = client.scenes().get_scene_list().await?;
+    let scene_list = client.scenes().list().await?;
 
     for scene in scene_list.scenes.iter().cycle() {
         client
             .scenes()
-            .set_current_program_scene(&scene.scene_name)
+            .set_current_program_scene(&scene.name)
             .await?;
         tokio::time::sleep(Duration::from_secs(1)).await;
     }

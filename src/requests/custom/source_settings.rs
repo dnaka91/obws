@@ -1,5 +1,5 @@
 //! Additional structs for use with
-//! [`Inputs::set_input_settings`](crate::client::Inputs::set_input_settings).
+//! [`crate::client::Inputs::set_settings`].
 
 use std::path::Path;
 
@@ -483,17 +483,17 @@ pub struct TextFt2SourceV2<'a> {
     pub drop_shadow: bool,
     /// Settings for the font.
     pub font: Font<'a>,
-    /// Load the text from a file (must be set in combination with [`text_file`](Self::text_file)).
+    /// Load the text from a file (must be set in combination with [`Self::text_file`]).
     pub from_file: bool,
-    /// Amount of log lines if [`log_mode`](Self::log_mode) is `true`. Minimum value is `1`.
+    /// Amount of log lines if [`Self::log_mode`] is `true`. Minimum value is `1`.
     pub log_lines: u32,
     /// Log mode (not sure what this does).
     pub log_mode: bool,
     /// Draw a black border around the text corners.
     pub outline: bool,
-    /// Text to display (only used if [`from_file`](Self::from_file) is `false`).
+    /// Text to display (only used if [`Self::from_file`] is `false`).
     pub text: &'a str,
-    /// File to load the display text from ([`from_file`](Self::from_file) must be `true`). The
+    /// File to load the display text from ([`Self::from_file`] must be `true`). The
     /// content must be in either **UTF-8** or **UTF-16** encoding.
     pub text_file: &'a Path,
     /// Wrap the words within the boundaries of the scene item.
@@ -530,7 +530,7 @@ pub struct Font<'a> {
     pub flags: FontFlags,
     /// Display size.
     pub size: u32,
-    /// Specific font style. Must eventually be set together with [`flags`](Self::flags).
+    /// Specific font style. Must eventually be set together with [`Self::flags`].
     ///
     /// For example:
     /// - [`FontFlags::BOLD`] and style `"Bold"`.
@@ -592,29 +592,29 @@ impl<'a> Default for VlcSource<'a> {
 pub struct AvCaptureInputV2<'a> {
     /// Whether to use buffering.
     pub buffering: bool,
-    /// Specific color space of the video. Only used if [`use_preset`](Self::use_preset) is
+    /// Specific color space of the video. Only used if [`Self::use_preset`] is
     /// `false`).
     pub color_space: ColorSpace,
     /// Device identifier.
     pub device: &'a str,
     /// Name of the capture device.
     pub device_name: &'a str,
-    /// Frame rate of the capture. Only used if [`use_preset`](Self::use_preset) is `false`).
+    /// Frame rate of the capture. Only used if [`Self::use_preset`] is `false`).
     pub frame_rate: FrameRate,
-    /// Encoded input format. Only used if [`use_preset`](Self::use_preset) is `false`).
+    /// Encoded input format. Only used if [`Self::use_preset`] is `false`).
     pub input_format: u32,
-    /// Pre-configured setting. Only used if [`use_preset`](Self::use_preset) is `true`).
+    /// Pre-configured setting. Only used if [`Self::use_preset`] is `true`).
     pub preset: AvPreset,
-    /// Video resolution. Only used if [`use_preset`](Self::use_preset) is `false`).
+    /// Video resolution. Only used if [`Self::use_preset`] is `false`).
     #[serde(serialize_with = "ser::json_string")]
     pub resolution: Resolution,
     /// Whether to use a setting preset.
     pub use_preset: bool,
-    /// Video color range. Only used if [`use_preset`](Self::use_preset) is `false`).
+    /// Video color range. Only used if [`Self::use_preset`] is `false`).
     pub video_range: VideoRange,
 }
 
-/// Color space as part of an [`AvCaptureInput`].
+/// Color space as part of an [`AvCaptureInputV2`].
 #[derive(Serialize_repr)]
 #[repr(i8)]
 pub enum ColorSpace {
@@ -632,7 +632,7 @@ impl Default for ColorSpace {
     }
 }
 
-/// Video color range as part of an [`AvCaptureInput`].
+/// Video color range as part of an [`AvCaptureInputV2`].
 #[derive(Serialize_repr)]
 #[repr(i8)]
 pub enum VideoRange {
@@ -650,7 +650,7 @@ impl Default for VideoRange {
     }
 }
 
-/// Different presets for the [`AvCaptureInput`].
+/// Different presets for the [`AvCaptureInputV2`].
 #[derive(Serialize)]
 pub enum AvPreset {
     /// Preset for resolution _3840x2160_ (may not be available).
@@ -685,7 +685,7 @@ pub enum AvPreset {
     Low,
 }
 
-/// Video frame rate of an [`AvCaptureInput`].
+/// Video frame rate of an [`AvCaptureInputV2`].
 ///
 /// The value is split into numerator and denominator as integer values instead of a floating point
 /// value. To calculate the frame rate as FPS divide the `numerator` by the `denominator`.
@@ -697,7 +697,7 @@ pub struct FrameRate {
     pub denominator: u64,
 }
 
-/// Video resolution for an [`AvCaptureInput`].
+/// Video resolution for an [`AvCaptureInputV2`].
 #[derive(Serialize)]
 pub struct Resolution {
     /// Video width.

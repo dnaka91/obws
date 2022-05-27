@@ -12,10 +12,10 @@ async fn main() -> Result<()> {
 
     let client = Client::connect("localhost", 4455, env::var("OBS_PASSWORD").ok()).await?;
 
-    let version = client.general().get_version().await?;
+    let version = client.general().version().await?;
     println!("{:#?}", version);
 
-    let scene_list = client.scenes().get_scene_list().await?.scenes;
+    let scene_list = client.scenes().list().await?.scenes;
     println!("{:#?}", scene_list);
 
     Ok(())

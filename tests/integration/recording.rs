@@ -14,77 +14,77 @@ async fn recording() -> Result<()> {
 
     tokio::pin!(events);
 
-    client.get_record_status().await?;
+    client.status().await?;
 
-    client.start_record().await?;
+    client.start().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.pause_record().await?;
+    client.pause().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Paused,
+            state: OutputState::Paused,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.resume_record().await?;
+    client.resume().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Resumed,
+            state: OutputState::Resumed,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.stop_record().await?;
+    client.stop().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
 
-    client.toggle_record().await?;
+    client.toggle().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.toggle_record_pause().await?;
+    client.toggle_pause().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Paused,
+            state: OutputState::Paused,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.toggle_record_pause().await?;
+    client.toggle_pause().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Resumed,
+            state: OutputState::Resumed,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
-    client.toggle_record().await?;
+    client.toggle().await?;
     wait_for!(
         events,
         Event::RecordStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );

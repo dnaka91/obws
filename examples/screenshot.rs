@@ -15,12 +15,12 @@ async fn main() -> Result<()> {
 
     let screenshot = client
         .sources()
-        .get_source_screenshot(GetSourceScreenshot {
-            source_name: "OBWS-TEST-Scene",
-            image_width: None,
-            image_height: None,
-            image_compression_quality: None,
-            image_format: "png",
+        .take_screenshot(GetSourceScreenshot {
+            source: "OBWS-TEST-Scene",
+            width: None,
+            height: None,
+            compression_quality: None,
+            format: "png",
         })
         .await?;
 

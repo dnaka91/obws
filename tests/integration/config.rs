@@ -26,31 +26,20 @@ async fn config() -> Result<()> {
         .await?;
 
     let SceneCollections {
-        current_scene_collection_name,
-        scene_collections,
-    } = client.get_scene_collection_list().await?;
-    let other = scene_collections
-        .iter()
-        .find(|sc| *sc != &current_scene_collection_name)
-        .unwrap();
+        current,
+        collections,
+    } = client.list_scene_collections().await?;
+    let other = collections.iter().find(|sc| *sc != &current).unwrap();
     client.set_current_scene_collection(other).await?;
     time::sleep(Duration::from_secs(1)).await;
-    client
-        .set_current_scene_collection(&current_scene_collection_name)
-        .await?;
+    client.set_current_scene_collection(&current).await?;
     time::sleep(Duration::from_secs(1)).await;
 
-    let Profiles {
-        current_profile_name,
-        profiles,
-    } = client.get_profile_list().await?;
-    let other = profiles
-        .iter()
-        .find(|p| *p != &current_profile_name)
-        .unwrap();
+    let Profiles { current, profiles } = client.list_profiles().await?;
+    let other = profiles.iter().find(|p| *p != &current).unwrap();
     client.set_current_profile(other).await?;
     time::sleep(Duration::from_secs(1)).await;
-    client.set_current_profile(&current_profile_name).await?;
+    client.set_current_profile(&current).await?;
     time::sleep(Duration::from_secs(1)).await;
     client.create_profile("OBWS-TEST-New-Profile").await?;
     client.remove_profile("OBWS-TEST-New-Profile").await?;
@@ -58,33 +47,30 @@ async fn config() -> Result<()> {
     client.get_profile_parameter("General", "Name").await?;
     client
         .set_profile_parameter(SetProfileParameter {
-            parameter_category: "OBWS",
-            parameter_name: "Test",
-            parameter_value: Some("Value"),
+            category: "OBWS",
+            name: "Test",
+            value: Some("Value"),
         })
         .await?;
     client
         .set_profile_parameter(SetProfileParameter {
-            parameter_category: "OBWS",
-            parameter_name: "Test",
-            parameter_value: None,
+            category: "OBWS",
+            name: "Test",
+            value: None,
         })
         .await?;
 
-    let settings = client.get_video_settings().await?;
+    let settings = client.video_settings().await?;
     client.set_video_settings(settings.into()).await?;
 
     let settings = client
-        .get_stream_service_settings::<serde_json::Value>()
+        .stream_service_settings::<serde_json::Value>()
         .await?;
     client
-        .set_stream_service_settings(
-            &settings.stream_service_type,
-            &settings.stream_service_settings,
-        )
+        .set_stream_service_settings(&settings.r#type, &settings.settings)
         .await?;
 
-    client.get_record_directory().await?;
+    client.record_directory().await?;
 
     Ok(())
 }

@@ -14,7 +14,7 @@ pub mod custom;
 mod ser;
 
 pub(crate) enum ClientRequest<'a> {
-    /// Response to [`Hello`](crate::responses::ServerMessage::Hello) message, should contain
+    /// Response to [`crate::responses::ServerMessage::Hello`] message, should contain
     /// authentication string if authentication is required, along with Pub-sub subscriptions and
     /// other session parameters.
     Identify(Identify),
@@ -67,7 +67,7 @@ impl<'a> Serialize for ClientRequest<'a> {
     }
 }
 
-/// Response to [`Hello`](crate::responses::ServerMessage::Hello) message, should contain
+/// Response to [`crate::responses::ServerMessage::Hello`] message, should contain
 /// authentication string if authentication is required, along with Pub-sub subscriptions and other
 /// session parameters.
 #[skip_serializing_none]
@@ -109,7 +109,7 @@ pub(crate) struct RequestBatch<'a> {
     pub request_id: &'a str,
     /// When true, the processing of requests will be halted on first failure. Returns only the
     /// processed requests in
-    /// [`RequestBatchResponse`](crate::responses::ServerMessage::RequestBatchResponse).
+    /// [`crate::responses::ServerMessage::RequestBatchResponse`].
     pub halt_on_failure: Option<bool>,
     pub requests: &'a [RequestType<'a>],
     pub execution_type: Option<ExecutionType>,
@@ -212,38 +212,39 @@ pub(crate) enum RequestType<'a> {
     },
     SetPersistentData(SetPersistentData<'a>),
     GetSceneCollectionList,
-    #[serde(rename_all = "camelCase")]
     SetCurrentSceneCollection {
         /// Name of the scene collection to switch to.
-        scene_collection_name: &'a str,
+        #[serde(rename = "sceneCollectionName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     CreateSceneCollection {
         /// Name for the new scene collection.
-        scene_collection_name: &'a str,
+        #[serde(rename = "sceneCollectionName")]
+        name: &'a str,
     },
     GetProfileList,
-    #[serde(rename_all = "camelCase")]
     SetCurrentProfile {
         /// Name of the profile to switch to.
-        profile_name: &'a str,
+        #[serde(rename = "profileName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     CreateProfile {
         /// Name for the new profile.
-        profile_name: &'a str,
+        #[serde(rename = "profileName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     RemoveProfile {
         /// Name of the profile to remove.
-        profile_name: &'a str,
+        #[serde(rename = "profileName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     GetProfileParameter {
         /// Category of the parameter to get.
-        parameter_category: &'a str,
+        #[serde(rename = "parameterCategory")]
+        category: &'a str,
         /// Name of the parameter to get.
-        parameter_name: &'a str,
+        #[serde(rename = "parameterName")]
+        name: &'a str,
     },
     SetProfileParameter(SetProfileParameter<'a>),
     GetVideoSettings,
@@ -252,9 +253,11 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     SetStreamServiceSettings {
         /// Type of stream service to apply. Example: `rtmp_common` or `rtmp_custom`.
-        stream_service_type: &'a str,
+        #[serde(rename = "streamServiceType")]
+        r#type: &'a str,
         /// Settings to apply to the service.
-        stream_service_settings: serde_json::Value,
+        #[serde(rename = "streamServiceSettings")]
+        settings: serde_json::Value,
     },
     GetRecordDirectory,
     // --------------------------------
@@ -271,20 +274,22 @@ pub(crate) enum RequestType<'a> {
         filter_kind: &'a str,
     },
     CreateSourceFilter(CreateSourceFilterInternal<'a>),
-    #[serde(rename_all = "camelCase")]
     RemoveSourceFilter {
         /// Name of the source the filter is on.
-        source_name: &'a str,
+        #[serde(rename = "sourceName")]
+        source: &'a str,
         /// Name of the filter to remove.
-        filter_name: &'a str,
+        #[serde(rename = "filterName")]
+        filter: &'a str,
     },
     SetSourceFilterName(SetSourceFilterName<'a>),
-    #[serde(rename_all = "camelCase")]
     GetSourceFilter {
         /// Name of the source.
-        source_name: &'a str,
+        #[serde(rename = "sourceName")]
+        source: &'a str,
         /// Name of the filter.
-        filter_name: &'a str,
+        #[serde(rename = "filterName")]
+        filter: &'a str,
     },
     SetSourceFilterIndex(SetSourceFilterIndex<'a>),
     SetSourceFilterSettings(SetSourceFilterSettingsInternal<'a>),
@@ -304,121 +309,131 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByName {
         /// Name of the hotkey to trigger.
-        hotkey_name: &'a str,
+        #[serde(rename = "hotkeyName")]
+        name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     TriggerHotkeyByKeySequence {
         /// The OBS key ID to use.
-        key_id: &'a str,
+        #[serde(rename = "keyId")]
+        id: &'a str,
         /// Object containing key modifiers to apply.
-        key_modifiers: KeyModifiers,
+        #[serde(rename = "keyModifiers")]
+        modifiers: KeyModifiers,
     },
     // TODO: Sleep
     // --------------------------------
     // Inputs
     // --------------------------------
-    #[serde(rename_all = "camelCase")]
     GetInputList {
         /// Restrict the array to only inputs of the specified kind.
-        #[serde(skip_serializing_if = "Option::is_none")]
-        input_kind: Option<&'a str>,
+        #[serde(rename = "inputKind", skip_serializing_if = "Option::is_none")]
+        kind: Option<&'a str>,
     },
     GetInputKindList {
         /// Return all kinds as unversioned or with version suffixes (if available).
         unversioned: bool,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputDefaultSettings {
         /// Input kind to get the default settings for.
-        input_kind: &'a str,
+        #[serde(rename = "inputKind")]
+        kind: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputSettings {
         /// Name of the input to get the settings of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
     SetInputSettings(SetInputSettingsInternal<'a>),
-    #[serde(rename_all = "camelCase")]
     GetInputMute {
         /// Name of input to get the mute state of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     SetInputMute {
         /// Name of the input to set the mute state of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
         /// Whether to mute the input.
-        input_muted: bool,
+        #[serde(rename = "inputMuted")]
+        muted: bool,
     },
-    #[serde(rename_all = "camelCase")]
     ToggleInputMute {
         /// Name of the input to toggle the mute state of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputVolume {
         /// Name of the input to get the volume of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     SetInputVolume {
         /// Name of the input to set the volume of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
         /// Volume settings in either mul or dB.
         #[serde(flatten)]
-        input_volume: Volume,
+        volume: Volume,
     },
-    #[serde(rename_all = "camelCase")]
     SetInputName {
         /// Current input name.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
         /// New name for the input.
-        new_input_name: &'a str,
+        #[serde(rename = "newInputName")]
+        new: &'a str,
     },
     CreateInput(CreateInputInternal<'a>),
-    #[serde(rename_all = "camelCase")]
     RemoveInput {
         /// Name of the input to remove.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputAudioSyncOffset {
         /// Name of the input to get the audio sync offset of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     SetInputAudioSyncOffset {
         /// Name of the input to set the audio sync offset of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
         /// New audio sync offset in milliseconds.
-        #[serde(serialize_with = "ser::duration_millis")]
-        input_audio_sync_offset: Duration,
+        #[serde(
+            rename = "inputAudioSyncOffset",
+            serialize_with = "ser::duration_millis"
+        )]
+        offset: Duration,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputAudioMonitorType {
         /// Name of the input to get the audio monitor type of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     SetInputAudioMonitorType {
         /// Name of the input to set the audio monitor type of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        name: &'a str,
         /// Audio monitor type.
+        #[serde(rename = "monitorType")]
         monitor_type: MonitorType,
     },
-    #[serde(rename_all = "camelCase")]
     GetInputPropertiesListPropertyItems {
         /// Name of the input.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        input: &'a str,
         /// Name of the list property to get the items of.
-        property_name: &'a str,
+        #[serde(rename = "propertyName")]
+        property: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     PressInputPropertiesButton {
         /// Name of the input.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        input: &'a str,
         /// Name of the button property to press.
-        property_name: &'a str,
+        #[serde(rename = "propertyName")]
+        property: &'a str,
     },
     // --------------------------------
     // Media inputs
@@ -480,62 +495,76 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     GetSceneItemList {
         /// Name of the scene to get the items of.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetGroupSceneItemList {
         /// Name of the group to get the items of.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
     },
     GetSceneItemId(GetSceneItemId<'a>),
     CreateSceneItem(CreateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     RemoveSceneItem {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     DuplicateSceneItem(DuplicateSceneItem<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemTransform {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     SetSceneItemTransform(SetSceneItemTransform<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemEnabled {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     SetSceneItemEnabled(SetSceneItemEnabled<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemLocked {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     SetSceneItemLocked(SetSceneItemLocked<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemIndex {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     #[serde(rename_all = "camelCase")]
     SetSceneItemIndex(SetSceneItemIndex<'a>),
     #[serde(rename_all = "camelCase")]
     GetSceneItemPrivateSettings {
         /// Name of the scene the item is in.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
         /// Numeric ID of the scene item.
-        scene_item_id: i64,
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
     },
     #[serde(rename_all = "camelCase")]
     SetSceneItemPrivateSettings(SetSceneItemPrivateSettingsInternal<'a>),
@@ -559,19 +588,23 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     SetSceneName {
         /// Name of the scene to be renamed.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        name: &'a str,
         /// New name for the scene.
-        new_scene_name: &'a str,
+        #[serde(rename = "newSceneName")]
+        new: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     CreateScene {
         /// Name for the new scene.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     RemoveScene {
         /// Name of the scene to remove.
-        scene_name: &'a str,
+        #[serde(rename = "sceneName")]
+        name: &'a str,
     },
     #[serde(rename_all = "camelCase")]
     GetSceneSceneTransitionOverride {
@@ -585,7 +618,8 @@ pub(crate) enum RequestType<'a> {
     #[serde(rename_all = "camelCase")]
     GetSourceActive {
         /// Name of the source to get the active state of.
-        source_name: &'a str,
+        #[serde(rename = "sourceName")]
+        name: &'a str,
     },
     GetSourceScreenshot(GetSourceScreenshot<'a>),
     SaveSourceScreenshot(SaveSourceScreenshot<'a>),
@@ -607,21 +641,21 @@ pub(crate) enum RequestType<'a> {
     GetTransitionKindList,
     GetSceneTransitionList,
     GetCurrentSceneTransition,
-    #[serde(rename_all = "camelCase")]
     SetCurrentSceneTransition {
         /// Name of the transition to make active.
-        transition_name: &'a str,
+        #[serde(rename = "transitionName")]
+        name: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     SetCurrentSceneTransitionDuration {
         /// Duration in milliseconds.
-        #[serde(serialize_with = "ser::duration_millis")]
-        transition_duration: Duration,
+        #[serde(rename = "transitionDuration", serialize_with = "ser::duration_millis")]
+        duration: Duration,
     },
     #[serde(rename_all = "camelCase")]
     SetCurrentSceneTransitionSettings {
         /// Settings object to apply to the transition.
-        transition_settings: serde_json::Value,
+        #[serde(rename = "transitionSettings")]
+        settings: serde_json::Value,
         /// Whether to overlay over the current settings or replace them.
         #[serde(skip_serializing_if = "Option::is_none")]
         overlay: Option<bool>,
@@ -641,31 +675,31 @@ pub(crate) enum RequestType<'a> {
     // UI
     // --------------------------------
     GetStudioModeEnabled,
-    #[serde(rename_all = "camelCase")]
     SetStudioModeEnabled {
         /// Enable or disable the studio mode.
-        studio_mode_enabled: bool,
+        #[serde(rename = "studioModeEnabled")]
+        enabled: bool,
     },
-    #[serde(rename_all = "camelCase")]
     OpenInputPropertiesDialog {
         /// Name of the input to open the dialog of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        input: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     OpenInputFiltersDialog {
         /// Name of the input to open the dialog of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        input: &'a str,
     },
-    #[serde(rename_all = "camelCase")]
     OpenInputInteractDialog {
         /// Name of the input to open the dialog of.
-        input_name: &'a str,
+        #[serde(rename = "inputName")]
+        input: &'a str,
     },
     GetMonitorList,
 }
 
-/// Request information for [`get_persistent_data`](crate::client::Config::get_persistent_data) and
-/// [`set_persistent_data`](crate::client::Config::set_persistent_data) as part of
+/// Request information for [`crate::client::Config::get_persistent_data`] and
+/// [`crate::client::Config::set_persistent_data`] as part of
 /// [`SetPersistentData`].
 #[derive(Clone, Copy, Serialize)]
 pub enum Realm {
@@ -677,7 +711,7 @@ pub enum Realm {
     Profile,
 }
 
-/// Request information for [`set_persistent_data`](crate::client::Config::set_persistent_data).
+/// Request information for [`crate::client::Config::set_persistent_data`].
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetPersistentData<'a> {
@@ -689,20 +723,22 @@ pub struct SetPersistentData<'a> {
     pub slot_value: &'a serde_json::Value,
 }
 
-/// Request information for [`set_profile_parameter`](crate::client::Config::set_profile_parameter).
+/// Request information for [`crate::client::Config::set_profile_parameter`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SetProfileParameter<'a> {
     /// Category of the parameter to set.
-    pub parameter_category: &'a str,
+    #[serde(rename = "parameterCategory")]
+    pub category: &'a str,
     /// Name of the parameter to set.
-    pub parameter_name: &'a str,
+    #[serde(rename = "parameterName")]
+    pub name: &'a str,
     /// Value of the parameter to set. Use [`None`] to delete.
-    pub parameter_value: Option<&'a str>,
+    #[serde(rename = "parameterValue")]
+    pub value: Option<&'a str>,
 }
 
-/// Request information for [`set_video_settings`](crate::client::Config::set_video_settings).
+/// Request information for [`crate::client::Config::set_video_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -734,104 +770,107 @@ impl From<crate::responses::VideoSettings> for SetVideoSettings {
     }
 }
 
-/// Request information for [`create_source_filter`](crate::client::Filters::create_source_filter).
+/// Request information for [`crate::client::Filters::create`].
 pub struct CreateSourceFilter<'a, T> {
     /// Name of the source to add the filter to.
-    pub source_name: &'a str,
+    pub source: &'a str,
     /// Name of the new filter to be created.
-    pub filter_name: &'a str,
+    pub filter: &'a str,
     /// The kind of filter to be created.
-    pub filter_kind: &'a str,
+    pub kind: &'a str,
     /// Settings object to initialize the filter with.
-    pub filter_settings: Option<T>,
+    pub settings: Option<T>,
 }
 
-/// Request information for [`create_source_filter`](crate::client::Filters::create_source_filter).
+/// Request information for [`crate::client::Filters::create_source_filter`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct CreateSourceFilterInternal<'a> {
     /// Name of the source to add the filter to.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Name of the new filter to be created.
-    pub filter_name: &'a str,
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
     /// The kind of filter to be created.
-    pub filter_kind: &'a str,
+    #[serde(rename = "filterKind")]
+    pub kind: &'a str,
     /// Settings object to initialize the filter with.
-    pub filter_settings: Option<serde_json::Value>,
+    #[serde(rename = "filterSettings")]
+    pub settings: Option<serde_json::Value>,
 }
 
-/// Request information for
-/// [`set_source_filter_name`](crate::client::Filters::set_source_filter_name).
+/// Request information for [`crate::client::Filters::set_name`].
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterName<'a> {
     /// Name of the source the filter is on.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Current name of the filter.
-    pub filter_name: &'a str,
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
     /// New name for the filter.
-    pub new_filter_name: &'a str,
+    #[serde(rename = "newFilterName")]
+    pub new_name: &'a str,
 }
 
-/// Request information for
-/// [`set_source_filter_index`](crate::client::Filters::set_source_filter_index).
+/// Request information for [`crate::client::Filters::set_index`].
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterIndex<'a> {
     /// Name of the source the filter is on.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Name of the filter.
-    pub filter_name: &'a str,
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
     /// New index position of the filter.
-    pub filter_index: u32,
+    #[serde(rename = "filterIndex")]
+    pub index: u32,
 }
 
-/// Request information for
-/// [`set_source_filter_settings`](crate::client::Filters::set_source_filter_settings).
-#[skip_serializing_none]
-#[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
+/// Request information for [`crate::client::Filters::set_settings`].
 pub struct SetSourceFilterSettings<'a, T> {
     /// Name of the source the filter is on.
-    pub source_name: &'a str,
+    pub source: &'a str,
     /// Name of the filter to set the settings of.
-    pub filter_name: &'a str,
+    pub filter: &'a str,
     /// Object of settings to apply.
-    pub filter_settings: T,
+    pub settings: T,
     /// Whether to overlay over the current settings or replace them.
     pub overlay: Option<bool>,
 }
 
-/// Request information for
-/// [`set_source_filter_settings`](crate::client::Filters::set_source_filter_settings).
+/// Request information for [`crate::client::Filters::set_settings`].
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct SetSourceFilterSettingsInternal<'a> {
     /// Name of the source the filter is on.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Name of the filter to set the settings of.
-    pub filter_name: &'a str,
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
     /// Object of settings to apply.
-    pub filter_settings: serde_json::Value,
+    #[serde(rename = "filterSettings")]
+    pub settings: serde_json::Value,
     /// Whether to overlay over the current settings or replace them.
     pub overlay: Option<bool>,
 }
 
-/// Request information for
-/// [`set_source_filter_enabled`](crate::client::Filters::set_source_filter_enabled).
+/// Request information for [`crate::client::Filters::set_enabled`].
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SetSourceFilterEnabled<'a> {
     /// Name of the source the filter is on.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Name of the filter.
-    pub filter_name: &'a str,
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
     /// New enable state of the filter.
-    pub filter_enabled: bool,
+    #[serde(rename = "filterEnabled")]
+    pub enabled: bool,
 }
 
-/// Request information for [`call_vendor_request`](crate::client::General::call_vendor_request).
+/// Request information for [`crate::client::General::call_vendor_request`].
 pub struct CallVendorRequest<'a, T> {
     /// Name of the vendor to use.
     pub vendor_name: &'a str,
@@ -841,7 +880,7 @@ pub struct CallVendorRequest<'a, T> {
     pub request_data: &'a T,
 }
 
-/// Request information for [`call_vendor_request`](crate::client::General::call_vendor_request).
+/// Request information for [`crate::client::General::call_vendor_request`].
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CallVendorRequestInternal<'a> {
@@ -854,7 +893,7 @@ pub(crate) struct CallVendorRequestInternal<'a> {
 }
 
 /// Request information for
-/// [`trigger_hotkey_by_key_sequence`](crate::client::General::trigger_hotkey_by_key_sequence).
+/// [`crate::client::General::trigger_hotkey_by_key_sequence`].
 #[derive(Default, Serialize)]
 pub struct KeyModifiers {
     /// Press Shift.
@@ -867,32 +906,33 @@ pub struct KeyModifiers {
     pub command: bool,
 }
 
-/// Request information for [`set_input_settings`](crate::client::Inputs::set_input_settings).
+/// Request information for [`crate::client::Inputs::set_settings`].
 pub struct SetInputSettings<'a, T> {
     /// Name of the input to set the settings of.
-    pub input_name: &'a str,
+    pub input: &'a str,
     /// Object of settings to apply.
-    pub input_settings: &'a T,
+    pub settings: &'a T,
     /// Apply settings on top of existing ones or reset the input to its defaults, then apply
     /// settings.
     pub overlay: Option<bool>,
 }
 
-/// Request information for [`set_input_settings`](crate::client::Inputs::set_input_settings).
+/// Request information for [`crate::client::Inputs::set_input_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct SetInputSettingsInternal<'a> {
     /// Name of the input to set the settings of.
-    pub input_name: &'a str,
+    #[serde(rename = "inputName")]
+    pub input: &'a str,
     /// Object of settings to apply.
-    pub input_settings: serde_json::Value,
+    #[serde(rename = "inputSettings")]
+    pub settings: serde_json::Value,
     /// Apply settings on top of existing ones or reset the input to its defaults, then apply
     /// settings.
     pub overlay: Option<bool>,
 }
 
-/// Request information for [`set_input_volume`](crate::client::Inputs::set_input_volume).
+/// Request information for [`crate::client::Inputs::set_volume`].
 #[derive(Serialize)]
 pub enum Volume {
     /// Volume setting in mul.
@@ -903,264 +943,342 @@ pub enum Volume {
     Db(f32),
 }
 
-/// Request information for [`create_input`](crate::client::Inputs::create_input).
+/// Request information for [`crate::client::Inputs::create`].
 pub struct CreateInput<'a, T> {
     /// Name of the scene to add the input to as a scene item.
-    pub scene_name: &'a str,
+    pub scene: &'a str,
     /// Name of the new input to created.
-    pub input_name: &'a str,
+    pub input: &'a str,
     /// The kind of input to be created.
-    pub input_kind: &'a str,
+    pub kind: &'a str,
     /// Settings object to initialize the input with.
-    pub input_settings: Option<T>,
+    pub settings: Option<T>,
     /// Whether to set the created scene item to enabled or disabled.
-    pub scene_item_enabled: Option<bool>,
+    pub enabled: Option<bool>,
 }
 
-/// Request information for [`create_input`](crate::client::Inputs::create_input).
+/// Request information for [`crate::client::Inputs::create_input`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct CreateInputInternal<'a> {
-    pub scene_name: &'a str,
-    pub input_name: &'a str,
-    pub input_kind: &'a str,
-    pub input_settings: Option<serde_json::Value>,
-    pub scene_item_enabled: Option<bool>,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
+    #[serde(rename = "inputName")]
+    pub input: &'a str,
+    #[serde(rename = "inputKind")]
+    pub kind: &'a str,
+    #[serde(rename = "inputSettings")]
+    pub settings: Option<serde_json::Value>,
+    #[serde(rename = "sceneItemEnabled")]
+    pub enabled: Option<bool>,
 }
 
-/// Request information for [`get_scene_item_id`](crate::client::SceneItems::get_scene_item_id).
+/// Request information for [`crate::client::SceneItems::id`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSceneItemId<'a> {
     /// Name of the scene or group to search in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Name of the source to find.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Number of matches to skip during search.
     ///
     /// `>= 0` means first forward. `-1` means last (top) item.
     pub search_offset: Option<i32>,
 }
 
-/// Request information for [`create_scene_item`](crate::client::SceneItems::create_scene_item).
+/// Request information for [`crate::client::SceneItems::create`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateSceneItem<'a> {
     /// Name of the scene to create the new item in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Name of the source to add to the scene.
-    pub source_name: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
     /// Enable state to apply to the scene item on creation.
-    pub scene_item_enabled: Option<bool>,
+    #[serde(rename = "sceneItemEnabled")]
+    pub enabled: Option<bool>,
 }
 
-/// Request information for
-/// [`duplicate_scene_item`](crate::client::SceneItems::duplicate_scene_item).
+/// Request information for [`crate::client::SceneItems::duplicate`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DuplicateSceneItem<'a> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
     /// Name of the scene to create the duplicated item in.
-    pub destination_scene_name: Option<&'a str>,
+    #[serde(rename = "destinationSceneName")]
+    pub destination: Option<&'a str>,
 }
 
-/// Request information for
-/// [`set_scene_item_transform`](crate::client::SceneItems::set_scene_item_transform).
+/// Request information for [`crate::client::SceneItems::set_transform`].
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemTransform<'a> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
     /// Object containing scene item transform info to update.
-    pub scene_item_transform: SceneItemTransform,
+    #[serde(rename = "sceneItemTransform")]
+    pub transform: SceneItemTransform,
 }
 
-/// Request information for
-/// [`set_scene_item_transform`](crate::client::SceneItems::set_scene_item_transform) as part of
+/// Request information for [`crate::client::SceneItems::set_transform`] as part of
 /// [`SetSceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItemTransform {
-    /// The x position of the source from the left.
-    pub position_x: Option<f32>,
-    /// The y position of the source from the top.
-    pub position_y: Option<f32>,
+    #[serde(flatten)]
+    pub position: Option<Position>,
     /// The clockwise rotation of the scene item in degrees around the point of alignment.
     pub rotation: Option<f32>,
-    /// The x-scale factor of the source.
-    pub scale_x: Option<f32>,
-    /// The y-scale factor of the source.
-    pub scale_y: Option<f32>,
+    #[serde(flatten)]
+    pub scale: Option<Scale>,
     /// The point on the source that the item is manipulated from.
     pub alignment: Option<Alignment>,
-    /// Type of bounding box.
-    pub bounds_type: Option<BoundsType>,
-    /// Alignment of the bounding box.
-    pub bounds_alignment: Option<Alignment>,
-    /// Width of the bounding box.
-    pub bounds_width: Option<f32>,
-    /// Height of the bounding box.
-    pub bounds_height: Option<f32>,
-    /// The number of pixels cropped off the left of the source before scaling.
-    pub crop_left: Option<u32>,
-    /// The number of pixels cropped off the right of the source before scaling.
-    pub crop_right: Option<u32>,
-    /// The number of pixels cropped off the top of the source before scaling.
-    pub crop_top: Option<u32>,
-    /// The number of pixels cropped off the bottom of the source before scaling.
-    pub crop_bottom: Option<u32>,
+    #[serde(flatten)]
+    pub bounds: Option<Bounds>,
+    #[serde(flatten)]
+    pub crop: Option<Crop>,
 }
 
 impl From<crate::responses::SceneItemTransform> for SceneItemTransform {
     fn from(t: crate::responses::SceneItemTransform) -> Self {
         Self {
-            position_x: Some(t.position_x),
-            position_y: Some(t.position_y),
+            position: Some(Position {
+                x: Some(t.position_x),
+                y: Some(t.position_y),
+            }),
             rotation: Some(t.rotation),
-            scale_x: Some(t.scale_x),
-            scale_y: Some(t.scale_y),
+            scale: Some(Scale {
+                x: Some(t.scale_x),
+                y: Some(t.scale_y),
+            }),
             alignment: Some(t.alignment),
-            bounds_type: Some(t.bounds_type),
-            bounds_alignment: Some(t.bounds_alignment),
-            bounds_width: Some(t.bounds_width),
-            bounds_height: Some(t.bounds_height),
-            crop_left: Some(t.crop_left),
-            crop_right: Some(t.crop_right),
-            crop_top: Some(t.crop_top),
-            crop_bottom: Some(t.crop_bottom),
+            bounds: Some(Bounds {
+                r#type: Some(t.bounds_type),
+                alignment: Some(t.bounds_alignment),
+                width: Some(t.bounds_width),
+                height: Some(t.bounds_height),
+            }),
+            crop: Some(Crop {
+                left: Some(t.crop_left),
+                right: Some(t.crop_right),
+                top: Some(t.crop_top),
+                bottom: Some(t.crop_bottom),
+            }),
         }
     }
 }
 
-/// Request information for
-/// [`set_scene_item_enabled`](crate::client::SceneItems::set_scene_item_enabled).
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SetSceneItemEnabled<'a> {
-    /// Name of the scene the item is in.
-    pub scene_name: &'a str,
-    /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
-    /// New enable state of the scene item.
-    pub scene_item_enabled: bool,
+pub struct Position {
+    /// The x position of the source from the left.
+    #[serde(rename = "positionX")]
+    pub x: Option<f32>,
+    /// The y position of the source from the top.
+    #[serde(rename = "positionY")]
+    pub y: Option<f32>,
 }
 
-/// Request information for
-/// [`set_scene_item_locked`](crate::client::SceneItems::set_scene_item_locked).
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+pub struct Scale {
+    /// The x-scale factor of the source.
+    #[serde(rename = "scaleX")]
+    pub x: Option<f32>,
+    /// The y-scale factor of the source.
+    #[serde(rename = "scaleY")]
+    pub y: Option<f32>,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+pub struct Bounds {
+    /// Type of bounding box.
+    #[serde(rename = "boundsType")]
+    pub r#type: Option<BoundsType>,
+    /// Alignment of the bounding box.
+    #[serde(rename = "boundsAlignment")]
+    pub alignment: Option<Alignment>,
+    /// Width of the bounding box.
+    #[serde(rename = "boundsWidth")]
+    pub width: Option<f32>,
+    /// Height of the bounding box.
+    #[serde(rename = "boundsHeight")]
+    pub height: Option<f32>,
+}
+
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+pub struct Crop {
+    /// The number of pixels cropped off the left of the source before scaling.
+    #[serde(rename = "cropLeft")]
+    pub left: Option<u32>,
+    /// The number of pixels cropped off the right of the source before scaling.
+    #[serde(rename = "cropRight")]
+    pub right: Option<u32>,
+    /// The number of pixels cropped off the top of the source before scaling.
+    #[serde(rename = "cropTop")]
+    pub top: Option<u32>,
+    /// The number of pixels cropped off the bottom of the source before scaling.
+    #[serde(rename = "cropBottom")]
+    pub bottom: Option<u32>,
+}
+
+/// Request information for [`crate::client::SceneItems::set_enabled`].
+#[derive(Default, Serialize)]
+pub struct SetSceneItemEnabled<'a> {
+    /// Name of the scene the item is in.
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+    /// New enable state of the scene item.
+    #[serde(rename = "sceneItemEnabled")]
+    pub enabled: bool,
+}
+
+/// Request information for [`crate::client::SceneItems::set_locked`].
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemLocked<'a> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
     /// New lock state of the scene item.
-    pub scene_item_locked: bool,
+    #[serde(rename = "sceneItemLocked")]
+    pub locked: bool,
 }
 
-/// Request information for
-/// [`set_scene_item_index`](crate::client::SceneItems::set_scene_item_index).
+/// Request information for [`crate::client::SceneItems::set_index`].
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneItemIndex<'a> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
     /// New index position of the scene item.
-    pub scene_item_index: u32,
+    #[serde(rename = "sceneItemIndex")]
+    pub index: u32,
 }
 
-/// Request information for
-/// [`set_scene_item_private_settings`](crate::client::SceneItems::set_scene_item_private_settings).
+/// Request information for [`crate::client::SceneItems::set_private_settings`].
 pub struct SetSceneItemPrivateSettings<'a, T> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    pub item_id: i64,
     /// Object of settings to apply.
-    pub scene_item_settings: &'a T,
+    pub settings: &'a T,
 }
 
 /// Request information for
-/// [`set_scene_item_private_settings`](crate::client::SceneItems::set_scene_item_private_settings).
+/// [`crate::client::SceneItems::set_scene_item_private_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SetSceneItemPrivateSettingsInternal<'a> {
     /// Name of the scene the item is in.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Numeric ID of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
     /// Object of settings to apply.
-    pub scene_item_settings: serde_json::Value,
+    #[serde(rename = "sceneItemSettings")]
+    pub settings: serde_json::Value,
 }
 
-/// Request information for
-/// [`set_scene_scene_transition_override`](crate::client::Scenes::set_scene_scene_transition_override).
+/// Request information for [`crate::client::Scenes::set_transition_override`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SetSceneSceneTransitionOverride<'a> {
     /// Name of the scene.
-    pub scene_name: &'a str,
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
     /// Name of the scene transition to use as override.
-    pub transition_name: Option<&'a str>,
+    #[serde(rename = "transitionName")]
+    pub transition: Option<&'a str>,
     /// Duration to use for any overridden transition.
-    #[serde(serialize_with = "ser::duration_millis_opt")]
-    pub transition_duration: Option<Duration>,
+    #[serde(
+        rename = "transitionDuration",
+        serialize_with = "ser::duration_millis_opt"
+    )]
+    pub duration: Option<Duration>,
 }
 
-/// Request information for
-/// [`get_source_screenshot`](crate::client::Sources::get_source_screenshot).
+/// Request information for [`crate::client::Sources::take_screenshot`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSourceScreenshot<'a> {
     /// Name of the source to take a screenshot of.
-    pub source_name: &'a str,
-    /// Image compression format to use. Use [`get_version`] to get compatible image formats.
-    ///
-    /// [`get_version`]: crate::client::General::get_version
-    pub image_format: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
+    /// Image compression format to use. Use [`crate::client::General::version`] to get compatible
+    /// image formats.
+    #[serde(rename = "imageFormat")]
+    pub format: &'a str,
     /// Width to scale the screenshot to.
-    pub image_width: Option<u32>,
+    #[serde(rename = "imageWidth")]
+    pub width: Option<u32>,
     /// Height to scale the screenshot to.
-    pub image_height: Option<u32>,
+    #[serde(rename = "imageHeight")]
+    pub height: Option<u32>,
     /// Compression quality to use. 0 for high compression, 100 for uncompressed. -1 to use
     /// "default".
-    pub image_compression_quality: Option<i32>,
+    #[serde(rename = "imageCompressionQuality")]
+    pub compression_quality: Option<i32>,
 }
 
-/// Request information for
-/// [`save_source_screenshot`](crate::client::Sources::save_source_screenshot).
+/// Request information for [`crate::client::Sources::save_screenshot`].
 #[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SaveSourceScreenshot<'a> {
     /// Name of the source to take a screenshot of.
-    pub source_name: &'a str,
-    /// Image compression format to use. Use [`get_version`] to get compatible image formats.
-    ///
-    /// [`get_version`]: crate::client::General::get_version
-    pub image_format: &'a str,
+    #[serde(rename = "sourceName")]
+    pub source: &'a str,
+    /// Image compression format to use. Use [`crate::client::General::version`] to get compatible
+    /// image formats.
+    #[serde(rename = "imageFormat")]
+    pub format: &'a str,
     /// Width to scale the screenshot to.
-    pub image_width: Option<u32>,
+    #[serde(rename = "imageWidth")]
+    pub width: Option<u32>,
     /// Height to scale the screenshot to.
-    pub image_height: Option<u32>,
+    #[serde(rename = "imageHeight")]
+    pub height: Option<u32>,
     /// Compression quality to use. 0 for high compression, 100 for uncompressed. -1 to use
     /// "default".
-    pub image_compression_quality: Option<i32>,
+    #[serde(rename = "imageCompressionQuality")]
+    pub compression_quality: Option<i32>,
     /// Path to save the screenshot file to. For example `C:\Users\user\Desktop\screenshot.png`.
-    pub image_file_path: &'a Path,
+    #[serde(rename = "imageFilePath")]
+    pub file_path: &'a Path,
 }

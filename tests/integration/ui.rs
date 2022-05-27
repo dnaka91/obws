@@ -7,7 +7,7 @@ async fn ui() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.ui();
 
-    let enabled = client.get_studio_mode_enabled().await?;
+    let enabled = client.studio_mode_enabled().await?;
     client.set_studio_mode_enabled(!enabled).await?;
     client.set_studio_mode_enabled(enabled).await?;
 

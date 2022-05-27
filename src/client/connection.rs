@@ -33,18 +33,18 @@ impl ReceiverList {
     /// Notify a waiting receiver with the response to a request.
     pub async fn notify(&self, response: RequestResponse) -> Result<(), InnerError> {
         let RequestResponse {
-            request_type: _,
-            request_id,
-            request_status,
-            response_data,
+            r#type: _,
+            id,
+            status,
+            data,
         } = response;
 
-        let request_id = request_id
+        let id = id
             .parse()
-            .map_err(|e| InnerError::InvalidRequestId(e, request_id))?;
+            .map_err(|e| InnerError::InvalidRequestId(e, id))?;
 
-        if let Some(tx) = self.0.lock().await.remove(&request_id) {
-            tx.send((request_status, response_data)).ok();
+        if let Some(tx) = self.0.lock().await.remove(&id) {
+            tx.send((status, data)).ok();
         }
 
         Ok(())

@@ -12,14 +12,14 @@ async fn general() -> Result<()> {
 
     tokio::pin!(events);
 
-    client.get_version().await?;
+    client.version().await?;
     client
         .broadcast_custom_event(&CustomEvent { hello: "world!" })
         .await?;
     wait_for!(events, Event::CustomEvent(_));
-    client.get_stats().await?;
+    client.stats().await?;
 
-    client.get_hotkey_list().await?;
+    client.list_hotkeys().await?;
     client.trigger_hotkey_by_name("ReplayBuffer.Save").await?;
     client
         .trigger_hotkey_by_key_sequence("OBS_KEY_P", KeyModifiers::default())

@@ -16,13 +16,13 @@ async fn outputs() -> Result<()> {
 
     tokio::pin!(events);
 
-    client.get_virtual_cam_status().await?;
+    client.virtual_cam_status().await?;
 
     client.toggle_virtual_cam().await?;
     wait_for!(
         events,
         Event::VirtualcamStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
@@ -31,7 +31,7 @@ async fn outputs() -> Result<()> {
     wait_for!(
         events,
         Event::VirtualcamStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );
@@ -40,7 +40,7 @@ async fn outputs() -> Result<()> {
     wait_for!(
         events,
         Event::VirtualcamStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
@@ -49,19 +49,19 @@ async fn outputs() -> Result<()> {
     wait_for!(
         events,
         Event::VirtualcamStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
 
-    client.get_replay_buffer_status().await?;
+    client.replay_buffer_status().await?;
 
     client.toggle_replay_buffer().await?;
     wait_for!(
         events,
         Event::ReplayBufferStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
@@ -70,7 +70,7 @@ async fn outputs() -> Result<()> {
     wait_for!(
         events,
         Event::ReplayBufferStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );
@@ -79,18 +79,18 @@ async fn outputs() -> Result<()> {
     wait_for!(
         events,
         Event::ReplayBufferStateChanged {
-            output_state: OutputState::Started,
+            state: OutputState::Started,
             ..
         }
     );
     time::sleep(Duration::from_secs(1)).await;
     client.save_replay_buffer().await?;
-    client.get_last_replay_buffer_replay().await?;
+    client.last_replay_buffer_replay().await?;
     client.stop_replay_buffer().await?;
     wait_for!(
         events,
         Event::ReplayBufferStateChanged {
-            output_state: OutputState::Stopped,
+            state: OutputState::Stopped,
             ..
         }
     );

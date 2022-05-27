@@ -20,7 +20,7 @@
 //!     println!("{:#?}", version);
 //!
 //!     /// Get a list of available scenes and print them out.
-//!     let scene_list = client.scenes().get_scene_list().await?;
+//!     let scene_list = client.scenes().get_list().await?;
 //!     println!("{:#?}", scene_list);
 //!
 //!     Ok(())

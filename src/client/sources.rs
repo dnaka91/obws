@@ -11,24 +11,22 @@ pub struct Sources<'a> {
 
 impl<'a> Sources<'a> {
     /// Gets the active and show state of a source.
-    ///
-    /// - `source_name`: Name of the source to get the active state of.
-    pub async fn get_source_active(&self, source_name: &str) -> Result<responses::SourceActive> {
+    pub async fn active(&self, name: &str) -> Result<responses::SourceActive> {
         self.client
-            .send_message(RequestType::GetSourceActive { source_name })
+            .send_message(RequestType::GetSourceActive { name })
             .await
     }
 
     /// Gets a Base64-encoded screenshot of a source.
     ///
-    /// The [`image_width`] and [`image_height`] parameters are treated as "scale to inner", meaning
+    /// The [`width`] and [`height`] parameters are treated as "scale to inner", meaning
     /// the smallest ratio will be used and the aspect ratio of the original resolution is kept. If
-    /// [`image_width`] and [`image_height`] are not specified, the compressed image will use the
+    /// [`width`] and [`height`] are not specified, the compressed image will use the
     /// full resolution of the source.
     ///
-    /// [`image_width`]: GetSourceScreenshot::image_width
-    /// [`image_height`]: GetSourceScreenshot::image_height
-    pub async fn get_source_screenshot(&self, settings: GetSourceScreenshot<'_>) -> Result<String> {
+    /// [`width`]: GetSourceScreenshot::width
+    /// [`height`]: GetSourceScreenshot::height
+    pub async fn take_screenshot(&self, settings: GetSourceScreenshot<'_>) -> Result<String> {
         self.client
             .send_message::<responses::ImageData>(RequestType::GetSourceScreenshot(settings))
             .await
@@ -37,14 +35,14 @@ impl<'a> Sources<'a> {
 
     /// Saves a screenshot of a source to the file system.
     ///
-    /// The [`image_width`] and [`image_height`] parameters are treated as "scale to inner", meaning
+    /// The [`width`] and [`height`] parameters are treated as "scale to inner", meaning
     /// the smallest ratio will be used and the aspect ratio of the original resolution is kept. If
-    /// [`image_width`] and [`image_height`] are not specified, the compressed image will use the
+    /// [`width`] and [`height`] are not specified, the compressed image will use the
     /// full resolution of the source.
     ///
-    /// [`image_width`]: SaveSourceScreenshot::image_width
-    /// [`image_height`]: SaveSourceScreenshot::image_height
-    pub async fn save_source_screenshot(&self, settings: SaveSourceScreenshot<'_>) -> Result<()> {
+    /// [`width`]: SaveSourceScreenshot::width
+    /// [`height`]: SaveSourceScreenshot::height
+    pub async fn save_screenshot(&self, settings: SaveSourceScreenshot<'_>) -> Result<()> {
         self.client
             .send_message(RequestType::SaveSourceScreenshot(settings))
             .await

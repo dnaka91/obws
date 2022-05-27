@@ -7,7 +7,7 @@ async fn streaming() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.streaming();
 
-    client.get_stream_status().await?;
+    client.status().await?;
 
     // TODO: Dangerous to run as it would make us live stream.
     // client.start_stream().await?;

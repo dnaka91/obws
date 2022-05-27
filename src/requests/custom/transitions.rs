@@ -1,5 +1,4 @@
-//! Additional structs for use with
-//! [`Inputs::set_input_settings`](crate::client::Inputs::set_input_settings).
+//! Additional structs for use with [`crate::client::Inputs::set_settings`].
 
 use std::path::Path;
 

@@ -113,21 +113,23 @@ pub(crate) struct Identified {
 
 /// `obs-websocket` is responding to a request coming from a client.
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct RequestResponse {
     #[allow(dead_code)]
-    pub request_type: String,
-    pub request_id: String,
-    pub request_status: Status,
-    #[serde(default)]
-    pub response_data: serde_json::Value,
+    #[serde(rename = "requestType")]
+    pub r#type: String,
+    #[serde(rename = "requestId")]
+    pub id: String,
+    #[serde(rename = "requestStatus")]
+    pub status: Status,
+    #[serde(rename = "responseData", default)]
+    pub data: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct RequestBatchResponse {
     #[allow(dead_code)]
-    pub request_id: String,
+    #[serde(rename = "requestId")]
+    pub id: String,
     #[allow(dead_code)]
     pub results: Vec<serde_json::Value>,
 }
@@ -242,38 +244,39 @@ pub enum StatusCode {
     CannotAct = 703,
 }
 
-/// Response value for
-/// [`get_scene_collection_list`](crate::client::Config::get_scene_collection_list).
+/// Response value for [`crate::client::Config::list_scene_collections`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SceneCollections {
     /// The name of the current scene collection.
-    pub current_scene_collection_name: String,
+    #[serde(rename = "currentSceneCollectionName")]
+    pub current: String,
     /// Array of all available scene collections.
-    pub scene_collections: Vec<String>,
+    #[serde(rename = "sceneCollections")]
+    pub collections: Vec<String>,
 }
 
-/// Response value for [`get_profile_list`](crate::client::Config::get_profile_list).
+/// Response value for [`crate::client::Config::list_profiles`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Profiles {
     /// The name of the current profile.
-    pub current_profile_name: String,
+    #[serde(rename = "currentProfileName")]
+    pub current: String,
     /// Array of all available profiles.
     pub profiles: Vec<String>,
 }
 
-/// Response value for [`get_profile_parameter`](crate::client::Config::get_profile_parameter).
+/// Response value for [`crate::client::Config::get_profile_parameter`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ProfileParameter {
     /// Value associated with the parameter.
-    pub parameter_value: Option<String>,
+    #[serde(rename = "parameterValue")]
+    pub value: Option<String>,
     /// Default value associated with the parameter.
-    pub default_parameter_value: Option<String>,
+    #[serde(rename = "defaultParameterValue")]
+    pub default_value: Option<String>,
 }
 
-/// Response value for [`get_video_settings`](crate::client::Config::get_video_settings).
+/// Response value for [`crate::client::Config::video_settings`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VideoSettings {
@@ -291,18 +294,19 @@ pub struct VideoSettings {
     pub output_height: u32,
 }
 
-/// Response value for
-/// [`get_stream_service_settings`](crate::client::Config::get_stream_service_settings).
+/// Response value for [`crate::client::Config::stream_service_settings`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamServiceSettings<T> {
     /// Stream service type, like `rtmp_custom` or `rtmp_common`.
-    pub stream_service_type: String,
+    #[serde(rename = "streamServiceType")]
+    pub r#type: String,
     /// Stream service settings.
-    pub stream_service_settings: T,
+    #[serde(rename = "streamServiceSettings")]
+    pub settings: T,
 }
 
-/// Response value for [`get_source_filter_list`](crate::client::Filters::get_source_filter_list).
+/// Response value for [`crate::client::Filters::get_source_filter_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Filters {
@@ -310,26 +314,28 @@ pub(crate) struct Filters {
     pub filters: Vec<SourceFilter>,
 }
 
-/// Response value for [`get_source_filter_list`](crate::client::Filters::get_source_filter_list)
-/// and [`get_source_filter`](crate::client::Filters::get_source_filter).
+/// Response value for [`crate::client::Filters::list`] and [`crate::client::Filters::get`].
 #[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SourceFilter {
     /// Whether the filter is enabled.
-    pub filter_enabled: bool,
+    #[serde(rename = "filterEnabled")]
+    pub enabled: bool,
     /// Index of the filter in the list, beginning at 0.
-    pub filter_index: u32,
+    #[serde(rename = "filterIndex")]
+    pub index: u32,
     /// The kind of filter.
-    pub filter_kind: String,
+    #[serde(rename = "filterKind")]
+    pub kind: String,
     /// name of the filter.
-    #[serde(default)]
-    pub filter_name: String,
+    #[serde(rename = "filterName", default)]
+    pub name: String,
     /// Settings object associated with the filter.
-    pub filter_settings: serde_json::Value,
+    #[serde(rename = "filterSettings")]
+    pub settings: serde_json::Value,
 }
 
 /// Response value for
-/// [`get_source_filter_default_settings`](crate::client::Filters::get_source_filter_default_settings).
+/// [`crate::client::Filters::get_source_filter_default_settings`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct DefaultFilterSettings<T> {
@@ -337,7 +343,7 @@ pub(crate) struct DefaultFilterSettings<T> {
     pub default_filter_settings: T,
 }
 
-/// Response value for [`get_version`](crate::client::General::get_version).
+/// Response value for [`crate::client::General::version`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
@@ -358,7 +364,7 @@ pub struct Version {
     pub platform_description: String,
 }
 
-/// Response value for [`get_stats`](crate::client::General::get_stats).
+/// Response value for [`crate::client::General::stats`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Stats {
@@ -386,7 +392,7 @@ pub struct Stats {
     pub web_socket_session_outgoing_messages: u64,
 }
 
-/// Response value for [`get_hotkey_list`](crate::client::General::get_hotkey_list).
+/// Response value for [`crate::client::General::get_hotkey_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Hotkeys {
@@ -394,15 +400,16 @@ pub(crate) struct Hotkeys {
     pub hotkeys: Vec<String>,
 }
 
-/// Response value for [`get_studio_mode_enabled`](crate::client::Ui::get_studio_mode_enabled).
+/// Response value for [`crate::client::Ui::get_studio_mode_enabled`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct StudioModeEnabled {
     /// Whether studio mode is enabled.
-    pub studio_mode_enabled: bool,
+    #[serde(rename = "studioModeEnabled")]
+    pub enabled: bool,
 }
 
-/// Response value for [`call_vendor_request`](crate::client::General::call_vendor_request).
+/// Response value for [`crate::client::General::call_vendor_request`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CallVendorResponse<T> {
@@ -410,7 +417,7 @@ pub(crate) struct CallVendorResponse<T> {
     pub response_data: T,
 }
 
-/// Response value for [`get_input_list`](crate::client::Inputs::get_input_list).
+/// Response value for [`crate::client::Inputs::get_input_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Inputs {
@@ -418,19 +425,21 @@ pub(crate) struct Inputs {
     pub inputs: Vec<Input>,
 }
 
-/// Response value for [`get_input_list`](crate::client::Inputs::get_input_list).
+/// Response value for [`crate::client::Inputs::list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Input {
     /// Name of the input source.
-    pub input_name: String,
+    #[serde(rename = "inputName")]
+    pub name: String,
     /// Version input kind.
-    pub input_kind: String,
+    #[serde(rename = "inputKind")]
+    pub kind: String,
     /// Kind of input, without the version part.
-    pub unversioned_input_kind: String,
+    #[serde(rename = "unversionedInputKind")]
+    pub unversioned_kind: String,
 }
 
-/// Response value for [`get_input_kind_list`](crate::client::Inputs::get_input_kind_list).
+/// Response value for [`crate::client::Inputs::get_input_kind_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct InputKinds {
@@ -439,7 +448,7 @@ pub(crate) struct InputKinds {
 }
 
 /// Response value for
-/// [`get_input_default_settings`](crate::client::Inputs::get_input_default_settings).
+/// [`crate::client::Inputs::get_input_default_settings`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct DefaultInputSettings<T> {
@@ -447,53 +456,58 @@ pub(crate) struct DefaultInputSettings<T> {
     pub default_input_settings: T,
 }
 
-/// Response value for [`get_input_settings`](crate::client::Inputs::get_input_settings).
+/// Response value for [`crate::client::Inputs::settings`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InputSettings<T> {
     /// Object of settings for the input.
-    pub input_settings: T,
+    #[serde(rename = "inputSettings")]
+    pub settings: T,
     /// The kind of the input.
-    pub input_kind: String,
+    #[serde(rename = "inputKind")]
+    pub kind: String,
 }
 
-/// Response value for [`get_input_mute`](crate::client::Inputs::get_input_mute) and
-/// [`toggle_input_mute`](crate::client::Inputs::toggle_input_mute).
+/// Response value for [`crate::client::Inputs::get_input_mute`] and
+/// [`crate::client::Inputs::toggle_input_mute`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct InputMuted {
     /// Whether the input is muted.
-    pub input_muted: bool,
+    #[serde(rename = "inputMuted")]
+    pub muted: bool,
 }
 
-/// Response value for [`get_input_volume`](crate::client::Inputs::get_input_volume).
+/// Response value for [`crate::client::Inputs::volume`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct InputVolume {
     /// Volume setting in mul.
-    pub input_volume_mul: f32,
+    #[serde(rename = "inputVolumeMul")]
+    pub mul: f32,
     /// Volume setting in dB.
-    pub input_volume_db: f32,
+    #[serde(rename = "inputVolumeDb")]
+    pub db: f32,
 }
 
-/// Response value for
-/// [`get_media_input_status`](crate::client::MediaInputs::get_media_input_status).
+/// Response value for [`crate::client::MediaInputs::status`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct MediaStatus {
     /// State of the media input.
-    pub media_state: MediaState,
+    #[serde(rename = "mediaState")]
+    pub state: MediaState,
     /// Total duration of the playing media. [`None`] if not playing.
-    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
-    pub media_duration: Option<Duration>,
+    #[serde(
+        rename = "mediaDuration",
+        deserialize_with = "crate::de::duration_millis_opt"
+    )]
+    pub duration: Option<Duration>,
     /// Position of the cursor. [`None`] if not playing.
-    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
-    pub media_cursor: Option<Duration>,
+    #[serde(
+        rename = "mediaCursor",
+        deserialize_with = "crate::de::duration_millis_opt"
+    )]
+    pub cursor: Option<Duration>,
 }
 
-/// Response value for
-/// [`get_media_input_status`](crate::client::MediaInputs::get_media_input_status) as part of
-/// [`MediaStatus`].
+/// Response value for [`crate::client::MediaInputs::status`] as part of [`MediaStatus`].
 #[derive(Copy, Clone, Debug, Deserialize)]
 pub enum MediaState {
     /// No state.
@@ -525,35 +539,45 @@ pub enum MediaState {
     Unknown,
 }
 
-/// Response value for [`get_record_status`](crate::client::Recording::get_record_status).
+/// Response value for [`crate::client::Recording::status`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct RecordStatus {
     /// Whether the output is active.
-    pub output_active: bool,
+    #[serde(rename = "outputActive")]
+    pub active: bool,
     /// Whether the output is paused.
-    pub output_paused: bool,
+    #[serde(rename = "outputPaused")]
+    pub paused: bool,
     /// Current formatted time code string for the output.
-    #[serde(deserialize_with = "crate::de::duration_timecode")]
-    pub output_timecode: Duration,
+    #[serde(
+        rename = "outputTimecode",
+        deserialize_with = "crate::de::duration_timecode"
+    )]
+    pub timecode: Duration,
     /// Current duration in milliseconds for the output.
-    #[serde(deserialize_with = "crate::de::duration_millis")]
-    pub output_duration: Duration,
+    #[serde(
+        rename = "outputDuration",
+        deserialize_with = "crate::de::duration_millis"
+    )]
+    pub duration: Duration,
     /// Number of bytes sent by the output.
-    pub output_bytes: u64,
+    #[serde(rename = "outputBytes")]
+    pub bytes: u64,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct OutputActive {
     /// New state of the stream output.
-    pub output_active: bool,
+    #[serde(rename = "outputActive")]
+    pub active: bool,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct OutputPaused {
-    pub output_paused: bool,
+    #[serde(rename = "outputPaused")]
+    pub paused: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -577,15 +601,14 @@ pub(crate) struct SceneItemId {
 }
 
 /// Response value for
-/// [`get_scene_item_transform`](crate::client::SceneItems::get_scene_item_transform).
+/// [`crate::client::SceneItems::get_scene_item_transform`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct GetSceneItemTransform {
     pub scene_item_transform: SceneItemTransform,
 }
 
-/// Response value for
-/// [`get_scene_item_transform`](crate::client::SceneItems::get_scene_item_transform).
+/// Response value for [`crate::client::SceneItems::transform`].
 #[derive(Clone, Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItemTransform {
@@ -629,8 +652,7 @@ pub struct SceneItemTransform {
     pub crop_bottom: u32,
 }
 
-/// Response value for
-/// [`get_scene_item_enabled`](crate::client::SceneItems::get_scene_item_enabled).
+/// Response value for [`crate::client::SceneItems::get_enabled`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemEnabled {
@@ -638,7 +660,7 @@ pub(crate) struct SceneItemEnabled {
     pub scene_item_enabled: bool,
 }
 
-/// Response value for [`get_scene_item_locked`](crate::client::SceneItems::get_scene_item_locked).
+/// Response value for [`crate::client::SceneItems::get_locked`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemLocked {
@@ -646,7 +668,7 @@ pub(crate) struct SceneItemLocked {
     pub scene_item_locked: bool,
 }
 
-/// Response value for [`get_scene_item_index`](crate::client::SceneItems::get_scene_item_index).
+/// Response value for [`crate::client::SceneItems::get_index`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemIndex {
@@ -654,16 +676,14 @@ pub(crate) struct SceneItemIndex {
     pub scene_item_index: u32,
 }
 
-/// Response value for
-/// [`get_scene_item_private_settings`](crate::client::SceneItems::get_scene_item_private_settings).
+/// Response value for [`crate::client::SceneItems::get_private_settings`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemSettings<T> {
     pub scene_item_settings: T,
 }
 
-/// Response value for
-/// [`get_input_audio_sync_offset`](crate::client::Inputs::get_input_audio_sync_offset).
+/// Response value for [`crate::client::Inputs::get_audio_sync_offset`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioSyncOffset {
@@ -672,8 +692,7 @@ pub(crate) struct AudioSyncOffset {
     pub input_audio_sync_offset: Duration,
 }
 
-/// Response value for
-/// [`get_input_audio_monitor_type`](crate::client::Inputs::get_input_audio_monitor_type).
+/// Response value for [`crate::client::Inputs::get_audio_monitor_type`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioMonitorType {
@@ -681,8 +700,7 @@ pub(crate) struct AudioMonitorType {
     pub monitor_type: MonitorType,
 }
 
-/// Response value for
-/// [`get_input_properties_list_property_items`](crate::client::Inputs::get_input_properties_list_property_items).
+/// Response value for [`crate::client::Inputs::get_properties_list_property_items`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ListPropertyItems {
@@ -690,21 +708,22 @@ pub(crate) struct ListPropertyItems {
     pub property_items: Vec<ListPropertyItem>,
 }
 
-/// Response value for
-/// [`get_input_properties_list_property_items`](crate::client::Inputs::get_input_properties_list_property_items).
+/// Response value for [`crate::client::Inputs::properties_list_property_items`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ListPropertyItem {
     /// Name of the item.
-    pub item_name: String,
+    #[serde(rename = "itemName")]
+    pub name: String,
     /// Whether this item is enabled in the UI.
-    pub item_enabled: bool,
+    #[serde(rename = "itemEnabled")]
+    pub enabled: bool,
     /// Content of the item, depending on what it represents.
-    pub item_value: serde_json::Value,
+    #[serde(rename = "itemValue")]
+    pub value: serde_json::Value,
 }
 
-/// Response value for [`get_scene_item_list`](crate::client::SceneItems::get_scene_item_list) and
-/// [`get_group_scene_item_list`](crate::client::SceneItems::get_group_scene_item_list).
+/// Response value for [`crate::client::SceneItems::get_list`] and
+/// [`crate::client::SceneItems::get_group_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SceneItemList {
@@ -712,15 +731,17 @@ pub(crate) struct SceneItemList {
     pub scene_items: Vec<SceneItem>,
 }
 
-/// Response value for [`get_scene_item_list`](crate::client::SceneItems::get_scene_item_list) and
-/// [`get_group_scene_item_list`](crate::client::SceneItems::get_group_scene_item_list).
+/// Response value for [`crate::client::SceneItems::list`] and
+/// [`crate::client::SceneItems::list_group`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneItem {
     /// Identifier of the scene item.
-    pub scene_item_id: i64,
+    #[serde(rename = "sceneItemId")]
+    pub id: i64,
     /// Positional index within a scene.
-    pub scene_item_index: u32,
+    #[serde(rename = "sceneItemIndex")]
+    pub index: u32,
     /// Name of this source.
     pub source_name: String,
     /// The kind of source this item represents.
@@ -748,7 +769,7 @@ pub enum SourceType {
     Scene,
 }
 
-/// Response value for [`get_scene_list`](crate::client::Scenes::get_scene_list).
+/// Response value for [`crate::client::Scenes::list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scenes {
@@ -760,18 +781,19 @@ pub struct Scenes {
     pub scenes: Vec<Scene>,
 }
 
-/// Response value for [`get_scene_list`](crate::client::Scenes::get_scene_list) as part of
-/// [`Scenes`].
+/// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Scene {
     /// Name of the scene.
-    pub scene_name: String,
+    #[serde(rename = "sceneName")]
+    pub name: String,
     /// Positional index in the list of scenes.
-    pub scene_index: usize,
+    #[serde(rename = "sceneIndex")]
+    pub index: usize,
 }
 
-/// Response value for [`get_group_list`](crate::client::Scenes::get_group_list).
+/// Response value for [`crate::client::Scenes::get_group_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct Groups {
@@ -780,7 +802,7 @@ pub(crate) struct Groups {
 }
 
 /// Response value for
-/// [`get_current_program_scene`](crate::client::Scenes::get_current_program_scene).
+/// [`crate::client::Scenes::get_current_program_scene`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentProgramScene {
@@ -789,7 +811,7 @@ pub(crate) struct CurrentProgramScene {
 }
 
 /// Response value for
-/// [`get_current_preview_scene`](crate::client::Scenes::get_current_preview_scene).
+/// [`crate::client::Scenes::get_current_preview_scene`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentPreviewScene {
@@ -797,29 +819,33 @@ pub(crate) struct CurrentPreviewScene {
     pub current_preview_scene_name: String,
 }
 
-/// Response value for
-/// [`get_scene_scene_transition_override`](crate::client::Scenes::get_scene_scene_transition_override).
+/// Response value for [`crate::client::Scenes::transition_override`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SceneTransitionOverride {
     /// Name of the overridden scene transition.
-    pub transition_name: Option<String>,
+    #[serde(rename = "transitionName")]
+    pub name: Option<String>,
     /// Duration of the overridden scene transition.
-    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
-    pub transition_duration: Option<Duration>,
+    #[serde(
+        rename = "transitionDuration",
+        deserialize_with = "crate::de::duration_millis_opt"
+    )]
+    pub duration: Option<Duration>,
 }
 
-/// Response value for [`get_source_active`](crate::client::Sources::get_source_active).
+/// Response value for [`crate::client::Sources::active`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SourceActive {
     /// Whether the source is showing in program.
-    pub video_active: bool,
+    #[serde(rename = "videoActive")]
+    pub active: bool,
     /// Whether the source is showing in the UI (preview, projector, properties).
-    pub video_showing: bool,
+    #[serde(rename = "videoShowing")]
+    pub showing: bool,
 }
 
-/// Response value for [`get_source_screenshot`](crate::client::Sources::get_source_screenshot).
+/// Response value for [`crate::client::Sources::get_screenshot`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct ImageData {
@@ -827,30 +853,41 @@ pub(crate) struct ImageData {
     pub image_data: String,
 }
 
-/// Response value for [`get_stream_status`](crate::client::Streaming::get_stream_status).
+/// Response value for [`crate::client::Streaming::status`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamStatus {
     /// Whether the output is active.
-    pub output_active: bool,
+    #[serde(rename = "outputActive")]
+    pub active: bool,
     /// Whether the output is currently reconnecting.
-    pub output_reconnecting: bool,
+    #[serde(rename = "outputReconnecting")]
+    pub reconnecting: bool,
     /// Current time code for the output.
-    #[serde(deserialize_with = "crate::de::duration_timecode")]
-    pub output_timecode: Duration,
+    #[serde(
+        rename = "outputTimecode",
+        deserialize_with = "crate::de::duration_timecode"
+    )]
+    pub timecode: Duration,
     /// Current duration for the output.
-    #[serde(deserialize_with = "crate::de::duration_millis")]
-    pub output_duration: Duration,
+    #[serde(
+        rename = "outputDuration",
+        deserialize_with = "crate::de::duration_millis"
+    )]
+    pub duration: Duration,
     /// Number of bytes sent by the output.
-    pub output_bytes: u64,
+    #[serde(rename = "outputBytes")]
+    pub bytes: u64,
     /// Number of frames skipped by the output's process.
-    pub output_skipped_frames: u32,
+    #[serde(rename = "outputSkippedFrames")]
+    pub skipped_frames: u32,
     /// Total number of frames delivered by the output's process.
-    pub output_total_frames: u32,
+    #[serde(rename = "outputTotalFrames")]
+    pub total_frames: u32,
 }
 
 /// Response value for
-/// [`get_transition_kind_list`](crate::client::Transitions::get_transition_kind_list).
+/// [`crate::client::Transitions::get_transition_kind_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct TransitionKinds {
@@ -858,8 +895,7 @@ pub(crate) struct TransitionKinds {
     pub transition_kinds: Vec<String>,
 }
 
-/// Response value for
-/// [`get_scene_transition_list`](crate::client::Transitions::get_scene_transition_list).
+/// Response value for [`crate::client::Transitions::list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SceneTransitionList {
@@ -871,44 +907,51 @@ pub struct SceneTransitionList {
     pub transitions: Vec<Transition>,
 }
 
-/// Response value for
-/// [`get_scene_transition_list`](crate::client::Transitions::get_scene_transition_list) as part of
-/// [`SceneTransitionList`].
+/// Response value for [`crate::client::Transitions::list`] as part of [`SceneTransitionList`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Transition {
     /// Name of the transition.
-    pub transition_name: String,
+    #[serde(rename = "transitionName")]
+    pub name: String,
     /// Kind of the transition.
-    pub transition_kind: String,
+    #[serde(rename = "transitionKind")]
+    pub kind: String,
     /// Whether the transition uses a fixed (non-configurable) duration.
-    pub transition_fixed: bool,
+    #[serde(rename = "transitionFixed")]
+    pub fixed: bool,
     /// Whether the transition supports being configured.
-    pub transition_configurable: bool,
+    #[serde(rename = "transitionConfigurable")]
+    pub configurable: bool,
 }
 
-/// Response value for
-/// [`get_current_scene_transition`](crate::client::Transitions::get_current_scene_transition).
+/// Response value for [`crate::client::Transitions::current`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct CurrentSceneTransition {
     /// Name of the transition.
-    pub transition_name: String,
+    #[serde(rename = "transitionName")]
+    pub name: String,
     /// Kind of the transition.
-    pub transition_kind: String,
+    #[serde(rename = "transitionKind")]
+    pub kind: String,
     /// Whether the transition uses a fixed (non-configurable) duration.
-    pub transition_fixed: bool,
+    #[serde(rename = "transitionFixed")]
+    pub fixed: bool,
     /// Configured transition duration in milliseconds.
-    #[serde(deserialize_with = "crate::de::duration_millis_opt")]
-    pub transition_duration: Option<Duration>,
+    #[serde(
+        rename = "transitionDuration",
+        deserialize_with = "crate::de::duration_millis_opt"
+    )]
+    pub duration: Option<Duration>,
     /// Whether the transition supports being configured.
-    pub transition_configurable: bool,
+    #[serde(rename = "transitionConfigurable")]
+    pub configurable: bool,
     /// Object of settings for the transition.
-    pub transition_settings: Option<serde_json::Value>,
+    #[serde(rename = "transitionSettings")]
+    pub settings: Option<serde_json::Value>,
 }
 
 /// Response value for
-/// [`get_current_scene_transition_cursor`](crate::client::Transitions::get_current_scene_transition_cursor).
+/// [`crate::client::Transitions::get_current_scene_transition_cursor`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct TransitionCursor {
@@ -916,25 +959,43 @@ pub(crate) struct TransitionCursor {
     pub transition_cursor: f32,
 }
 
-/// Response value for [`get_monitor_list`](crate::client::Ui::get_monitor_list).
+/// Response value for [`crate::client::Ui::get_monitor_list`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct MonitorList {
     pub monitors: Vec<Monitor>,
 }
 
-/// Response value for [`get_monitor_list`](crate::client::Ui::get_monitor_list).
+/// Response value for [`crate::client::Ui::list_monitors`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Monitor {
     /// Name of this monitor.
-    pub monitor_name: String,
+    #[serde(rename = "monitorName")]
+    pub name: String,
+    /// Pixel size.
+    #[serde(flatten)]
+    pub size: MonitorSize,
+    /// Position on the screen.
+    #[serde(flatten)]
+    pub position: MonitorPosition,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MonitorSize {
     /// Pixel width.
-    pub monitor_width: u16,
+    #[serde(rename = "monitorWidth")]
+    pub width: u16,
     /// Pixel height.
-    pub monitor_height: u16,
+    #[serde(rename = "monitorHeight")]
+    pub height: u16,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct MonitorPosition {
     /// Horizontal position on the screen.
-    pub monitor_position_x: u16,
+    #[serde(rename = "monitorPositionX")]
+    pub x: u16,
     /// Vertical position on the screen.
-    pub monitor_position_y: u16,
+    #[serde(rename = "monitorPositionY")]
+    pub y: u16,
 }
