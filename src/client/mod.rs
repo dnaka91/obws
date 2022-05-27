@@ -290,7 +290,11 @@ impl Client {
     }
 
     async fn verify_versions(&self) -> Result<()> {
-        let version = self.general().get_version().await?;
+        let mut version = self.general().get_version().await?;
+        // TODO: remove this after the official v5 release.
+        // Current builds have prerelease info (like 5.0.0-91cabe1-git).
+        // That causes the version check to fail, so we remove it for now.
+        version.obs_web_socket_version.pre = Prerelease::EMPTY;
 
         if !OBS_STUDIO_VERSION.matches(&version.obs_version) {
             return Err(Error::ObsStudioVersion(
