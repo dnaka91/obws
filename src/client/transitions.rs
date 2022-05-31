@@ -2,7 +2,7 @@ use serde::Serialize;
 use time::Duration;
 
 use super::Client;
-use crate::{requests::RequestType, responses, Error, Result};
+use crate::{requests::transitions::Request, responses, Error, Result};
 
 /// API functions related to transitions.
 pub struct Transitions<'a> {
@@ -13,7 +13,7 @@ impl<'a> Transitions<'a> {
     /// Gets an array of all available transition kinds.
     pub async fn list_kinds(&self) -> Result<Vec<String>> {
         self.client
-            .send_message::<responses::TransitionKinds>(RequestType::GetTransitionKindList)
+            .send_message::<_, responses::TransitionKinds>(Request::GetTransitionKindList)
             .await
             .map(|tk| tk.transition_kinds)
     }
@@ -21,14 +21,14 @@ impl<'a> Transitions<'a> {
     /// Gets an array of all scene transitions in OBS.
     pub async fn list(&self) -> Result<responses::SceneTransitionList> {
         self.client
-            .send_message(RequestType::GetSceneTransitionList)
+            .send_message(Request::GetSceneTransitionList)
             .await
     }
 
     /// Gets information about the current scene transition.
     pub async fn current(&self) -> Result<responses::CurrentSceneTransition> {
         self.client
-            .send_message(RequestType::GetCurrentSceneTransition)
+            .send_message(Request::GetCurrentSceneTransition)
             .await
     }
 
@@ -38,14 +38,14 @@ impl<'a> Transitions<'a> {
     /// uniqueness is not a guarantee as it is with other resources like inputs.
     pub async fn set_current(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::SetCurrentSceneTransition { name })
+            .send_message(Request::SetCurrentSceneTransition { name })
             .await
     }
 
     /// Sets the duration of the current scene transition, if it is not fixed.
     pub async fn set_current_duration(&self, duration: Duration) -> Result<()> {
         self.client
-            .send_message(RequestType::SetCurrentSceneTransitionDuration { duration })
+            .send_message(Request::SetCurrentSceneTransitionDuration { duration })
             .await
     }
 
@@ -55,7 +55,7 @@ impl<'a> Transitions<'a> {
         T: Serialize,
     {
         self.client
-            .send_message(RequestType::SetCurrentSceneTransitionSettings {
+            .send_message(Request::SetCurrentSceneTransitionSettings {
                 settings: serde_json::to_value(&settings).map_err(Error::SerializeCustomData)?,
                 overlay,
             })
@@ -67,8 +67,8 @@ impl<'a> Transitions<'a> {
     /// **Note:** `transitionCursor` will return `1.0` when the transition is inactive.
     pub async fn current_cursor(&self) -> Result<f32> {
         self.client
-            .send_message::<responses::TransitionCursor>(
-                RequestType::GetCurrentSceneTransitionCursor,
+            .send_message::<_, responses::TransitionCursor>(
+                Request::GetCurrentSceneTransitionCursor,
             )
             .await
             .map(|tc| tc.transition_cursor)
@@ -78,7 +78,7 @@ impl<'a> Transitions<'a> {
     /// studio mode.
     pub async fn trigger(&self) -> Result<()> {
         self.client
-            .send_message(RequestType::TriggerStudioModeTransition)
+            .send_message(Request::TriggerStudioModeTransition)
             .await
     }
 
@@ -88,7 +88,7 @@ impl<'a> Transitions<'a> {
     /// `obs-websocket`.
     pub async fn set_tbar_position(&self, position: f32, release: Option<bool>) -> Result<()> {
         self.client
-            .send_message(RequestType::SetTbarPosition { position, release })
+            .send_message(Request::SetTbarPosition { position, release })
             .await
     }
 }

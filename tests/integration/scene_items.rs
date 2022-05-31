@@ -1,9 +1,9 @@
 use anyhow::Result;
 use obws::{
     common::BoundsType,
-    requests::{
-        Bounds, CreateSceneItem, DuplicateSceneItem, GetSceneItemId, SceneItemTransform,
-        SetSceneItemEnabled, SetSceneItemIndex, SetSceneItemLocked, SetSceneItemTransform,
+    requests::scene_items::{
+        Bounds, CreateSceneItem, Duplicate, Id, SceneItemTransform, SetEnabled, SetIndex,
+        SetLocked, SetTransform,
     },
 };
 
@@ -18,7 +18,7 @@ async fn scene_items() -> Result<()> {
     client.list_group(TEST_GROUP).await?;
 
     let test_text_id = client
-        .id(GetSceneItemId {
+        .id(Id {
             scene: TEST_SCENE,
             source: TEST_TEXT,
             search_offset: None,
@@ -26,7 +26,7 @@ async fn scene_items() -> Result<()> {
         .await?;
 
     let id = client
-        .duplicate(DuplicateSceneItem {
+        .duplicate(Duplicate {
             scene: TEST_SCENE,
             item_id: test_text_id,
             destination: Some(TEST_SCENE_2),
@@ -45,7 +45,7 @@ async fn scene_items() -> Result<()> {
 
     let transform = client.transform(TEST_SCENE, test_text_id).await?;
     client
-        .set_transform(SetSceneItemTransform {
+        .set_transform(SetTransform {
             scene: TEST_SCENE,
             item_id: test_text_id,
             transform: SceneItemTransform {
@@ -58,7 +58,7 @@ async fn scene_items() -> Result<()> {
         })
         .await?;
     client
-        .set_transform(SetSceneItemTransform {
+        .set_transform(SetTransform {
             scene: TEST_SCENE,
             item_id: test_text_id,
             transform: SceneItemTransform {
@@ -73,14 +73,14 @@ async fn scene_items() -> Result<()> {
 
     let enabled = client.enabled(TEST_SCENE, test_text_id).await?;
     client
-        .set_enabled(SetSceneItemEnabled {
+        .set_enabled(SetEnabled {
             scene: TEST_SCENE,
             item_id: test_text_id,
             enabled: !enabled,
         })
         .await?;
     client
-        .set_enabled(SetSceneItemEnabled {
+        .set_enabled(SetEnabled {
             scene: TEST_SCENE,
             item_id: test_text_id,
             enabled,
@@ -89,14 +89,14 @@ async fn scene_items() -> Result<()> {
 
     let locked = client.locked(TEST_SCENE, test_text_id).await?;
     client
-        .set_locked(SetSceneItemLocked {
+        .set_locked(SetLocked {
             scene: TEST_SCENE,
             item_id: test_text_id,
             locked: !locked,
         })
         .await?;
     client
-        .set_locked(SetSceneItemLocked {
+        .set_locked(SetLocked {
             scene: TEST_SCENE,
             item_id: test_text_id,
             locked,
@@ -105,14 +105,14 @@ async fn scene_items() -> Result<()> {
 
     let index = client.index(TEST_SCENE, test_text_id).await?;
     client
-        .set_index(SetSceneItemIndex {
+        .set_index(SetIndex {
             scene: TEST_SCENE,
             item_id: test_text_id,
             index: 0,
         })
         .await?;
     client
-        .set_index(SetSceneItemIndex {
+        .set_index(SetIndex {
             scene: TEST_SCENE,
             item_id: test_text_id,
             index,

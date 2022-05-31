@@ -1,5 +1,5 @@
 use anyhow::Result;
-use obws::{events::Event, requests::KeyModifiers};
+use obws::{events::Event, requests::general::KeyModifiers};
 use serde::Serialize;
 
 use crate::{common, wait_for};

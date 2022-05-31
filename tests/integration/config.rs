@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use anyhow::Result;
 use obws::{
-    requests::{Realm, SetPersistentData, SetProfileParameter},
+    requests::config::{Realm, SetPersistentData, SetProfileParameter},
     responses::{Profiles, SceneCollections},
 };
 use tokio::time;

@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use obws::{requests::GetSourceScreenshot, Client};
+use obws::{requests::sources::TakeScreenshot, Client};
 use tokio::fs;
 
 #[tokio::main]
@@ -15,7 +15,7 @@ async fn main() -> Result<()> {
 
     let screenshot = client
         .sources()
-        .take_screenshot(GetSourceScreenshot {
+        .take_screenshot(TakeScreenshot {
             source: "OBWS-TEST-Scene",
             width: None,
             height: None,

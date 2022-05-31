@@ -980,6 +980,7 @@ pub struct Monitor {
     pub position: MonitorPosition,
 }
 
+/// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
 #[derive(Debug, Deserialize)]
 pub struct MonitorSize {
     /// Pixel width.
@@ -990,6 +991,7 @@ pub struct MonitorSize {
     pub height: u16,
 }
 
+/// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
 #[derive(Debug, Deserialize)]
 pub struct MonitorPosition {
     /// Horizontal position on the screen.

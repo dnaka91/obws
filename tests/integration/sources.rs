@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use obws::requests::{GetSourceScreenshot, SaveSourceScreenshot};
+use obws::requests::sources::{TakeScreenshot, SaveScreenshot};
 
 use crate::common::{self, TEST_TEXT};
 
@@ -12,7 +12,7 @@ async fn sources() -> Result<()> {
 
     client.active(TEST_TEXT).await?;
     client
-        .take_screenshot(GetSourceScreenshot {
+        .take_screenshot(TakeScreenshot {
             source: TEST_TEXT,
             width: Some(100),
             height: Some(100),
@@ -23,7 +23,7 @@ async fn sources() -> Result<()> {
 
     let file = env::temp_dir().join("obws-test-image.png");
     client
-        .save_screenshot(SaveSourceScreenshot {
+        .save_screenshot(SaveScreenshot {
             source: TEST_TEXT,
             file_path: &file,
             width: None,

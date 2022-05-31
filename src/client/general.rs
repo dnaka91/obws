@@ -2,7 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::{CallVendorRequest, CallVendorRequestInternal, KeyModifiers, RequestType},
+    requests::general::{CallVendorRequest, CallVendorRequestInternal, KeyModifiers, Request},
     responses, Error, Result,
 };
 
@@ -14,12 +14,12 @@ pub struct General<'a> {
 impl<'a> General<'a> {
     /// Gets data about the current plugin and RPC version.
     pub async fn version(&self) -> Result<responses::Version> {
-        self.client.send_message(RequestType::GetVersion).await
+        self.client.send_message(Request::Version).await
     }
 
     /// Gets statistics about OBS, obs-websocket, and the current session.
     pub async fn stats(&self) -> Result<responses::Stats> {
-        self.client.send_message(RequestType::GetStats).await
+        self.client.send_message(Request::Stats).await
     }
 
     /// Broadcasts a custom event to all web-socket clients. Receivers are clients which are
@@ -34,7 +34,7 @@ impl<'a> General<'a> {
         }
 
         self.client
-            .send_message(RequestType::BroadcastCustomEvent { event_data })
+            .send_message(Request::BroadcastCustomEvent { event_data })
             .await
     }
 
@@ -49,7 +49,7 @@ impl<'a> General<'a> {
         R: DeserializeOwned,
     {
         self.client
-            .send_message::<responses::CallVendorResponse<R>>(RequestType::CallVendorRequest(
+            .send_message::<_, responses::CallVendorResponse<R>>(Request::CallVendorRequest(
                 CallVendorRequestInternal {
                     vendor_name: request.vendor_name,
                     request_type: request.request_type,
@@ -64,7 +64,7 @@ impl<'a> General<'a> {
     /// Gets an array of all hotkey names in OBS.
     pub async fn list_hotkeys(&self) -> Result<Vec<String>> {
         self.client
-            .send_message::<responses::Hotkeys>(RequestType::GetHotkeyList)
+            .send_message::<_, responses::Hotkeys>(Request::ListHotkeys)
             .await
             .map(|h| h.hotkeys)
     }
@@ -72,7 +72,7 @@ impl<'a> General<'a> {
     /// Triggers a hotkey using its name. See [`General::list_hotkeys`].
     pub async fn trigger_hotkey_by_name(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::TriggerHotkeyByName { name })
+            .send_message(Request::TriggerHotkeyByName { name })
             .await
     }
 
@@ -83,7 +83,7 @@ impl<'a> General<'a> {
         modifiers: KeyModifiers,
     ) -> Result<()> {
         self.client
-            .send_message(RequestType::TriggerHotkeyByKeySequence { id, modifiers })
+            .send_message(Request::TriggerHotkeyByKeySequence { id, modifiers })
             .await
     }
 }

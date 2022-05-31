@@ -1,7 +1,7 @@
 use anyhow::Result;
 use obws::{
     common::MonitorType,
-    requests::{SetInputSettings, Volume},
+    requests::inputs::{SetSettings, Volume},
 };
 use time::Duration;
 
@@ -23,7 +23,7 @@ async fn inputs() -> Result<()> {
         .await?
         .settings;
     client
-        .set_settings(SetInputSettings {
+        .set_settings(SetSettings {
             input: TEST_BROWSER,
             settings: &settings,
             overlay: Some(false),

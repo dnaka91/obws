@@ -4,9 +4,8 @@ use time::Duration;
 use super::Client;
 use crate::{
     common::MonitorType,
-    requests::{
-        CreateInput, CreateInputInternal, RequestType, SetInputSettings, SetInputSettingsInternal,
-        Volume,
+    requests::inputs::{
+        Create, CreateInputInternal, Request, SetSettings, SetSettingsInternal, Volume,
     },
     responses, Error, Result,
 };
@@ -20,7 +19,7 @@ impl<'a> Inputs<'a> {
     /// Gets an array of all inputs in OBS.
     pub async fn list(&self, kind: Option<&str>) -> Result<Vec<responses::Input>> {
         self.client
-            .send_message::<responses::Inputs>(RequestType::GetInputList { kind })
+            .send_message::<_, responses::Inputs>(Request::List { kind })
             .await
             .map(|i| i.inputs)
     }
@@ -28,7 +27,7 @@ impl<'a> Inputs<'a> {
     /// Gets an array of all available input kinds in OBS.
     pub async fn list_kinds(&self, unversioned: bool) -> Result<Vec<String>> {
         self.client
-            .send_message::<responses::InputKinds>(RequestType::GetInputKindList { unversioned })
+            .send_message::<_, responses::InputKinds>(Request::ListKinds { unversioned })
             .await
             .map(|ik| ik.input_kinds)
     }
@@ -39,9 +38,9 @@ impl<'a> Inputs<'a> {
         T: DeserializeOwned,
     {
         self.client
-            .send_message::<responses::DefaultInputSettings<T>>(
-                RequestType::GetInputDefaultSettings { kind },
-            )
+            .send_message::<_, responses::DefaultInputSettings<T>>(Request::DefaultSettings {
+                kind,
+            })
             .await
             .map(|dis| dis.default_input_settings)
     }
@@ -54,18 +53,16 @@ impl<'a> Inputs<'a> {
     where
         T: DeserializeOwned,
     {
-        self.client
-            .send_message(RequestType::GetInputSettings { name })
-            .await
+        self.client.send_message(Request::Settings { name }).await
     }
 
     /// Sets the settings of an input.
-    pub async fn set_settings<T>(&self, settings: SetInputSettings<'_, T>) -> Result<()>
+    pub async fn set_settings<T>(&self, settings: SetSettings<'_, T>) -> Result<()>
     where
         T: Serialize,
     {
         self.client
-            .send_message(RequestType::SetInputSettings(SetInputSettingsInternal {
+            .send_message(Request::SetSettings(SetSettingsInternal {
                 input: settings.input,
                 settings: serde_json::to_value(&settings.settings)
                     .map_err(Error::SerializeCustomData)?,
@@ -77,7 +74,7 @@ impl<'a> Inputs<'a> {
     /// Gets the audio mute state of an input.
     pub async fn muted(&self, name: &str) -> Result<bool> {
         self.client
-            .send_message::<responses::InputMuted>(RequestType::GetInputMute { name })
+            .send_message::<_, responses::InputMuted>(Request::Muted { name })
             .await
             .map(|im| im.muted)
     }
@@ -85,46 +82,44 @@ impl<'a> Inputs<'a> {
     /// Sets the audio mute state of an input.
     pub async fn set_muted(&self, name: &str, muted: bool) -> Result<()> {
         self.client
-            .send_message(RequestType::SetInputMute { name, muted })
+            .send_message(Request::SetMuted { name, muted })
             .await
     }
 
     /// Toggles the audio mute state of an input.
     pub async fn toggle_mute(&self, name: &str) -> Result<bool> {
         self.client
-            .send_message::<responses::InputMuted>(RequestType::ToggleInputMute { name })
+            .send_message::<_, responses::InputMuted>(Request::ToggleMute { name })
             .await
             .map(|im| im.muted)
     }
 
     /// Gets the current volume setting of an input.
     pub async fn volume(&self, name: &str) -> Result<responses::InputVolume> {
-        self.client
-            .send_message(RequestType::GetInputVolume { name })
-            .await
+        self.client.send_message(Request::Volume { name }).await
     }
 
     /// Sets the volume setting of an input.
     pub async fn set_volume(&self, name: &str, volume: Volume) -> Result<()> {
         self.client
-            .send_message(RequestType::SetInputVolume { name, volume })
+            .send_message(Request::SetVolume { name, volume })
             .await
     }
 
     /// Sets the name of an input (rename).
     pub async fn set_name(&self, name: &str, new: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::SetInputName { name, new })
+            .send_message(Request::SetName { name, new })
             .await
     }
 
     /// Creates a new input, adding it as a scene item to the specified scene.
-    pub async fn create<T>(&self, input: CreateInput<'_, T>) -> Result<i64>
+    pub async fn create<T>(&self, input: Create<'_, T>) -> Result<i64>
     where
         T: Serialize,
     {
         self.client
-            .send_message::<responses::SceneItemId>(RequestType::CreateInput(CreateInputInternal {
+            .send_message::<_, responses::SceneItemId>(Request::Create(CreateInputInternal {
                 scene: input.scene,
                 input: input.input,
                 kind: input.kind,
@@ -144,9 +139,7 @@ impl<'a> Inputs<'a> {
     ///
     /// **Note:** Will immediately remove all associated scene items.
     pub async fn remove(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(RequestType::RemoveInput { name })
-            .await
+        self.client.send_message(Request::Remove { name }).await
     }
 
     /// Gets the audio sync offset of an input.
@@ -154,9 +147,7 @@ impl<'a> Inputs<'a> {
     /// **Note:** The audio sync offset can be negative too!
     pub async fn audio_sync_offset(&self, name: &str) -> Result<Duration> {
         self.client
-            .send_message::<responses::AudioSyncOffset>(RequestType::GetInputAudioSyncOffset {
-                name,
-            })
+            .send_message::<_, responses::AudioSyncOffset>(Request::AudioSyncOffset { name })
             .await
             .map(|aso| aso.input_audio_sync_offset)
     }
@@ -164,16 +155,14 @@ impl<'a> Inputs<'a> {
     /// Sets the audio sync offset of an input.
     pub async fn set_audio_sync_offset(&self, name: &str, offset: Duration) -> Result<()> {
         self.client
-            .send_message(RequestType::SetInputAudioSyncOffset { name, offset })
+            .send_message(Request::SetAudioSyncOffset { name, offset })
             .await
     }
 
     /// Gets the audio monitor type of input.
     pub async fn audio_monitor_type(&self, name: &str) -> Result<MonitorType> {
         self.client
-            .send_message::<responses::AudioMonitorType>(RequestType::GetInputAudioMonitorType {
-                name,
-            })
+            .send_message::<_, responses::AudioMonitorType>(Request::AudioMonitorType { name })
             .await
             .map(|amt| amt.monitor_type)
     }
@@ -185,7 +174,7 @@ impl<'a> Inputs<'a> {
         monitor_type: MonitorType,
     ) -> Result<()> {
         self.client
-            .send_message(RequestType::SetInputAudioMonitorType { name, monitor_type })
+            .send_message(Request::SetAudioMonitorType { name, monitor_type })
             .await
     }
 
@@ -199,9 +188,10 @@ impl<'a> Inputs<'a> {
         property: &str,
     ) -> Result<Vec<responses::ListPropertyItem>> {
         self.client
-            .send_message::<responses::ListPropertyItems>(
-                RequestType::GetInputPropertiesListPropertyItems { input, property },
-            )
+            .send_message::<_, responses::ListPropertyItems>(Request::PropertiesListPropertyItems {
+                input,
+                property,
+            })
             .await
             .map(|lpi| lpi.property_items)
     }
@@ -213,7 +203,7 @@ impl<'a> Inputs<'a> {
     /// button.
     pub async fn press_properties_button(&self, input: &str, property: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::PressInputPropertiesButton { input, property })
+            .send_message(Request::PressPropertiesButton { input, property })
             .await
     }
 }

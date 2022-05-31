@@ -1,5 +1,5 @@
 use anyhow::Result;
-use obws::requests::SetSceneSceneTransitionOverride;
+use obws::requests::scenes::SetTransitionOverride;
 use time::Duration;
 
 use crate::common::{self, TEST_SCENE, TEST_SCENE_CREATE, TEST_SCENE_RENAME, TEST_TRANSITION};
@@ -33,14 +33,14 @@ async fn scenes() -> Result<()> {
 
     let to = client.transition_override(TEST_SCENE).await?;
     client
-        .set_transition_override(SetSceneSceneTransitionOverride {
+        .set_transition_override(SetTransitionOverride {
             scene: TEST_SCENE,
             transition: Some(TEST_TRANSITION),
             duration: Some(Duration::seconds(5)),
         })
         .await?;
     client
-        .set_transition_override(SetSceneSceneTransitionOverride {
+        .set_transition_override(SetTransitionOverride {
             scene: TEST_SCENE,
             transition: to.name.as_deref(),
             duration: to.duration,

@@ -1,7 +1,7 @@
 use time::Duration;
 
 use super::Client;
-use crate::{common::MediaAction, requests::RequestType, responses, Result};
+use crate::{common::MediaAction, requests::media_inputs::Request, responses, Result};
 
 /// API functions related to media inputs.
 pub struct MediaInputs<'a> {
@@ -10,47 +10,32 @@ pub struct MediaInputs<'a> {
 
 impl<'a> MediaInputs<'a> {
     /// Gets the status of a media input.
-    pub async fn status(&self, input_name: &str) -> Result<responses::MediaStatus> {
-        self.client
-            .send_message(RequestType::GetMediaInputStatus { input_name })
-            .await
+    pub async fn status(&self, input: &str) -> Result<responses::MediaStatus> {
+        self.client.send_message(Request::Status { input }).await
     }
 
     /// Sets the cursor position of a media input.
     ///
     /// This request does not perform bounds checking of the cursor position.
-    pub async fn set_cursor(&self, input_name: &str, media_cursor: Duration) -> Result<()> {
+    pub async fn set_cursor(&self, input: &str, cursor: Duration) -> Result<()> {
         self.client
-            .send_message(RequestType::SetMediaInputCursor {
-                input_name,
-                media_cursor,
-            })
+            .send_message(Request::SetCursor { input, cursor })
             .await
     }
 
     /// Offsets the current cursor position of a media input by the specified value.
     ///
     /// This request does not perform bounds checking of the cursor position.
-    pub async fn offset_cursor(
-        &self,
-        input_name: &str,
-        media_cursor_offset: Duration,
-    ) -> Result<()> {
+    pub async fn offset_cursor(&self, input: &str, offset: Duration) -> Result<()> {
         self.client
-            .send_message(RequestType::OffsetMediaInputCursor {
-                input_name,
-                media_cursor_offset,
-            })
+            .send_message(Request::OffsetCursor { input, offset })
             .await
     }
 
     /// Triggers an action on a media input.
-    pub async fn trigger_action(&self, input_name: &str, media_action: MediaAction) -> Result<()> {
+    pub async fn trigger_action(&self, input: &str, action: MediaAction) -> Result<()> {
         self.client
-            .send_message(RequestType::TriggerMediaInputAction {
-                input_name,
-                media_action,
-            })
+            .send_message(Request::TriggerAction { input, action })
             .await
     }
 }

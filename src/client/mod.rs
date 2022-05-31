@@ -294,7 +294,7 @@ impl Client {
     }
 
     async fn verify_versions(&self) -> Result<()> {
-        let mut version = self.general().get_version().await?;
+        let mut version = self.general().version().await?;
         // TODO: remove this after the official v5 release.
         // Current builds have prerelease info (like 5.0.0-91cabe1-git).
         // That causes the version check to fail, so we remove it for now.
@@ -324,42 +324,52 @@ impl Client {
         Ok(())
     }
 
-    async fn send_message<T>(&self, req: RequestType<'_>) -> Result<T>
+    async fn send_message<'a, R, T>(&self, req: R) -> Result<T>
     where
+        R: Into<RequestType<'a>>,
         T: DeserializeOwned,
     {
-        let id = self.id_counter.fetch_add(1, Ordering::SeqCst);
-        let id_str = id.to_string();
-        let req = ClientRequest::Request(Request {
-            request_id: &id_str,
-            ty: req,
-        });
-        let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
-
-        let rx = self.receivers.add(id).await;
-
-        trace!(%json, "sending message");
-        let write_result = self
-            .write
-            .lock()
-            .await
-            .send(Message::Text(json))
-            .await
-            .map_err(Error::Send);
-
-        if let Err(e) = write_result {
-            self.receivers.remove(id).await;
-            return Err(e);
-        }
-
-        let (status, resp) = rx.await.map_err(Error::ReceiveMessage)?;
-        if !status.result {
-            return Err(Error::Api {
-                code: status.code,
-                message: status.comment,
+        async fn send<'a>(
+            id_counter: &AtomicU64,
+            receivers: &Arc<ReceiverList>,
+            write: &Mutex<MessageWriter>,
+            req: RequestType<'a>,
+        ) -> Result<serde_json::Value> {
+            let id = id_counter.fetch_add(1, Ordering::SeqCst);
+            let id_str = id.to_string();
+            let req = ClientRequest::Request(Request {
+                request_id: &id_str,
+                ty: req,
             });
+            let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
+
+            let rx = receivers.add(id).await;
+
+            trace!(%json, "sending message");
+            let write_result = write
+                .lock()
+                .await
+                .send(Message::Text(json))
+                .await
+                .map_err(Error::Send);
+
+            if let Err(e) = write_result {
+                receivers.remove(id).await;
+                return Err(e);
+            }
+
+            let (status, resp) = rx.await.map_err(Error::ReceiveMessage)?;
+            if !status.result {
+                return Err(Error::Api {
+                    code: status.code,
+                    message: status.comment,
+                });
+            }
+
+            Ok(resp)
         }
 
+        let resp = send(&self.id_counter, &self.receivers, &self.write, req.into()).await?;
         serde_json::from_value(resp).map_err(Error::DeserializeResponse)
     }
 

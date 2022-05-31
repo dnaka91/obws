@@ -2,7 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::{Realm, RequestType, SetPersistentData, SetProfileParameter, SetVideoSettings},
+    requests::config::{Realm, Request, SetPersistentData, SetProfileParameter, SetVideoSettings},
     responses, Error, Result,
 };
 
@@ -19,22 +19,20 @@ impl<'a> Config<'a> {
         slot_name: &str,
     ) -> Result<serde_json::Value> {
         self.client
-            .send_message(RequestType::GetPersistentData { realm, slot_name })
+            .send_message(Request::GetPersistentData { realm, slot_name })
             .await
     }
 
     /// Sets the value of a "slot" from the selected persistent data realm.
     pub async fn set_persistent_data(&self, data: SetPersistentData<'_>) -> Result<()> {
         self.client
-            .send_message(RequestType::SetPersistentData(data))
+            .send_message(Request::SetPersistentData(data))
             .await
     }
 
     /// Gets an array of all scene collections.
     pub async fn list_scene_collections(&self) -> Result<responses::SceneCollections> {
-        self.client
-            .send_message(RequestType::GetSceneCollectionList)
-            .await
+        self.client.send_message(Request::ListSceneColletions).await
     }
 
     /// Switches to a scene collection.
@@ -42,7 +40,7 @@ impl<'a> Config<'a> {
     /// **Note:** This will block until the collection has finished changing.
     pub async fn set_current_scene_collection(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::SetCurrentSceneCollection { name })
+            .send_message(Request::SetCurrentSceneCollection { name })
             .await
     }
 
@@ -51,26 +49,26 @@ impl<'a> Config<'a> {
     /// **Note:** This will block until the collection has finished changing.
     pub async fn create_scene_collection(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::CreateSceneCollection { name })
+            .send_message(Request::CreateSceneCollection { name })
             .await
     }
 
     /// Gets an array of all profiles.
     pub async fn list_profiles(&self) -> Result<responses::Profiles> {
-        self.client.send_message(RequestType::GetProfileList).await
+        self.client.send_message(Request::ListProfiles).await
     }
 
     /// Switches to a profile.
     pub async fn set_current_profile(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::SetCurrentProfile { name })
+            .send_message(Request::SetCurrentProfile { name })
             .await
     }
 
     /// Creates a new profile, switching to it in the process.
     pub async fn create_profile(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::CreateProfile { name })
+            .send_message(Request::CreateProfile { name })
             .await
     }
 
@@ -78,7 +76,7 @@ impl<'a> Config<'a> {
     /// first.
     pub async fn remove_profile(&self, name: &str) -> Result<()> {
         self.client
-            .send_message(RequestType::RemoveProfile { name })
+            .send_message(Request::RemoveProfile { name })
             .await
     }
 
@@ -89,14 +87,14 @@ impl<'a> Config<'a> {
         name: &str,
     ) -> Result<responses::ProfileParameter> {
         self.client
-            .send_message(RequestType::GetProfileParameter { category, name })
+            .send_message(Request::GetProfileParameter { category, name })
             .await
     }
 
     /// Sets the value of a parameter in the current profile's configuration.
     pub async fn set_profile_parameter(&self, parameter: SetProfileParameter<'_>) -> Result<()> {
         self.client
-            .send_message(RequestType::SetProfileParameter(parameter))
+            .send_message(Request::SetProfileParameter(parameter))
             .await
     }
 
@@ -105,9 +103,7 @@ impl<'a> Config<'a> {
     /// **Note:** To get the true FPS value, divide the FPS numerator by the FPS denominator.
     /// Example: `60000/1001`.
     pub async fn video_settings(&self) -> Result<responses::VideoSettings> {
-        self.client
-            .send_message(RequestType::GetVideoSettings)
-            .await
+        self.client.send_message(Request::VideoSettings).await
     }
 
     /// Sets the current video settings.
@@ -117,7 +113,7 @@ impl<'a> Config<'a> {
     /// [`SetVideoSettings::base_height`].
     pub async fn set_video_settings(&self, settings: SetVideoSettings) -> Result<()> {
         self.client
-            .send_message(RequestType::SetVideoSettings(settings))
+            .send_message(Request::SetVideoSettings(settings))
             .await
     }
 
@@ -127,7 +123,7 @@ impl<'a> Config<'a> {
         T: DeserializeOwned,
     {
         self.client
-            .send_message(RequestType::GetStreamServiceSettings)
+            .send_message(Request::StreamServiceSettings)
             .await
     }
 
@@ -140,7 +136,7 @@ impl<'a> Config<'a> {
         T: Serialize,
     {
         self.client
-            .send_message(RequestType::SetStreamServiceSettings {
+            .send_message(Request::SetStreamServiceSettings {
                 r#type,
                 settings: serde_json::to_value(settings).map_err(Error::SerializeCustomData)?,
             })
@@ -150,7 +146,7 @@ impl<'a> Config<'a> {
     /// Gets the current directory that the record output is set to.
     pub async fn record_directory(&self) -> Result<String> {
         self.client
-            .send_message::<responses::RecordDirectory>(RequestType::GetRecordDirectory)
+            .send_message::<_, responses::RecordDirectory>(Request::RecordDirectory)
             .await
             .map(|rd| rd.record_directory)
     }

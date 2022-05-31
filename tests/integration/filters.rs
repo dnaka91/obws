@@ -1,8 +1,5 @@
 use anyhow::Result;
-use obws::requests::{
-    CreateSourceFilter, SetSourceFilterEnabled, SetSourceFilterIndex, SetSourceFilterName,
-    SetSourceFilterSettings,
-};
+use obws::requests::filters::{Create, SetEnabled, SetIndex, SetName, SetSettings};
 
 use crate::common::{
     self, FILTER_COLOR, TEST_FILTER, TEST_FILTER_2, TEST_FILTER_RENAME, TEST_TEXT,
@@ -19,7 +16,7 @@ async fn filters() -> Result<()> {
         .default_settings::<serde_json::Value>(FILTER_COLOR)
         .await?;
     client
-        .create(CreateSourceFilter {
+        .create(Create {
             source: TEST_TEXT,
             filter: TEST_FILTER_2,
             kind: FILTER_COLOR,
@@ -29,14 +26,14 @@ async fn filters() -> Result<()> {
     client.remove(TEST_TEXT, TEST_FILTER_2).await?;
 
     client
-        .set_name(SetSourceFilterName {
+        .set_name(SetName {
             source: TEST_TEXT,
             filter: TEST_FILTER,
             new_name: TEST_FILTER_RENAME,
         })
         .await?;
     client
-        .set_name(SetSourceFilterName {
+        .set_name(SetName {
             source: TEST_TEXT,
             filter: TEST_FILTER_RENAME,
             new_name: TEST_FILTER,
@@ -46,14 +43,14 @@ async fn filters() -> Result<()> {
     client.get(TEST_TEXT, TEST_FILTER).await?;
 
     client
-        .set_index(SetSourceFilterIndex {
+        .set_index(SetIndex {
             source: TEST_TEXT,
             filter: TEST_FILTER,
             index: 0,
         })
         .await?;
     client
-        .set_settings(SetSourceFilterSettings {
+        .set_settings(SetSettings {
             source: TEST_TEXT,
             filter: TEST_FILTER,
             settings: serde_json::Map::new(),
@@ -61,14 +58,14 @@ async fn filters() -> Result<()> {
         })
         .await?;
     client
-        .set_enabled(SetSourceFilterEnabled {
+        .set_enabled(SetEnabled {
             source: TEST_TEXT,
             filter: TEST_FILTER,
             enabled: false,
         })
         .await?;
     client
-        .set_enabled(SetSourceFilterEnabled {
+        .set_enabled(SetEnabled {
             source: TEST_TEXT,
             filter: TEST_FILTER,
             enabled: true,
