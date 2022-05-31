@@ -2,7 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::config::{Realm, Request, SetPersistentData, SetProfileParameter, SetVideoSettings},
+    requests::config::{Realm, Request, SetPersistentData, SetVideoSettings},
     responses, Error, Result,
 };
 
@@ -27,74 +27,6 @@ impl<'a> Config<'a> {
     pub async fn set_persistent_data(&self, data: SetPersistentData<'_>) -> Result<()> {
         self.client
             .send_message(Request::SetPersistentData(data))
-            .await
-    }
-
-    /// Gets an array of all scene collections.
-    pub async fn list_scene_collections(&self) -> Result<responses::SceneCollections> {
-        self.client.send_message(Request::ListSceneColletions).await
-    }
-
-    /// Switches to a scene collection.
-    ///
-    /// **Note:** This will block until the collection has finished changing.
-    pub async fn set_current_scene_collection(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::SetCurrentSceneCollection { name })
-            .await
-    }
-
-    /// Creates a new scene collection, switching to it in the process.
-    ///
-    /// **Note:** This will block until the collection has finished changing.
-    pub async fn create_scene_collection(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::CreateSceneCollection { name })
-            .await
-    }
-
-    /// Gets an array of all profiles.
-    pub async fn list_profiles(&self) -> Result<responses::Profiles> {
-        self.client.send_message(Request::ListProfiles).await
-    }
-
-    /// Switches to a profile.
-    pub async fn set_current_profile(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::SetCurrentProfile { name })
-            .await
-    }
-
-    /// Creates a new profile, switching to it in the process.
-    pub async fn create_profile(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::CreateProfile { name })
-            .await
-    }
-
-    /// Removes a profile. If the current profile is chosen, it will change to a different profile
-    /// first.
-    pub async fn remove_profile(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::RemoveProfile { name })
-            .await
-    }
-
-    /// Gets a parameter from the current profile's configuration.
-    pub async fn get_profile_parameter(
-        &self,
-        category: &str,
-        name: &str,
-    ) -> Result<responses::ProfileParameter> {
-        self.client
-            .send_message(Request::GetProfileParameter { category, name })
-            .await
-    }
-
-    /// Sets the value of a parameter in the current profile's configuration.
-    pub async fn set_profile_parameter(&self, parameter: SetProfileParameter<'_>) -> Result<()> {
-        self.client
-            .send_message(Request::SetProfileParameter(parameter))
             .await
     }
 

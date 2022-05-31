@@ -30,8 +30,9 @@ use tracing::{debug, error, info, trace};
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
     config::Config, connection::HandshakeError, filters::Filters, general::General, inputs::Inputs,
-    media_inputs::MediaInputs, outputs::Outputs, recording::Recording, scene_items::SceneItems,
-    scenes::Scenes, sources::Sources, streaming::Streaming, transitions::Transitions, ui::Ui,
+    media_inputs::MediaInputs, outputs::Outputs, profiles::Profiles, recording::Recording,
+    scene_collections::SceneCollections, scene_items::SceneItems, scenes::Scenes, sources::Sources,
+    streaming::Streaming, transitions::Transitions, ui::Ui,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -48,7 +49,9 @@ mod general;
 mod inputs;
 mod media_inputs;
 mod outputs;
+mod profiles;
 mod recording;
+mod scene_collections;
 mod scene_items;
 mod scenes;
 mod sources;
@@ -476,9 +479,19 @@ impl Client {
         Outputs { client: self }
     }
 
+    /// Access API functions related to profiles.
+    pub fn profiles(&self) -> Profiles<'_> {
+        Profiles { client: self }
+    }
+
     /// Access API functions related to recording.
     pub fn recording(&self) -> Recording<'_> {
         Recording { client: self }
+    }
+
+    /// Access API functions related to scene collections.
+    pub fn scene_collections(&self) -> SceneCollections<'_> {
+        SceneCollections { client: self }
     }
 
     /// Access API functions related to scene items.

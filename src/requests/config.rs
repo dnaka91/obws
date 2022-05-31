@@ -17,51 +17,6 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "SetPersistentData")]
     SetPersistentData(SetPersistentData<'a>),
-    #[serde(rename = "GetSceneCollectionList")]
-    ListSceneColletions,
-    #[serde(rename = "SetCurrentSceneCollection")]
-    SetCurrentSceneCollection {
-        /// Name of the scene collection to switch to.
-        #[serde(rename = "sceneCollectionName")]
-        name: &'a str,
-    },
-    #[serde(rename = "CreateSceneCollection")]
-    CreateSceneCollection {
-        /// Name for the new scene collection.
-        #[serde(rename = "sceneCollectionName")]
-        name: &'a str,
-    },
-    #[serde(rename = "GetProfileList")]
-    ListProfiles,
-    #[serde(rename = "SetCurrentProfile")]
-    SetCurrentProfile {
-        /// Name of the profile to switch to.
-        #[serde(rename = "profileName")]
-        name: &'a str,
-    },
-    #[serde(rename = "CreateProfile")]
-    CreateProfile {
-        /// Name for the new profile.
-        #[serde(rename = "profileName")]
-        name: &'a str,
-    },
-    #[serde(rename = "RemoveProfile")]
-    RemoveProfile {
-        /// Name of the profile to remove.
-        #[serde(rename = "profileName")]
-        name: &'a str,
-    },
-    #[serde(rename = "GetProfileParameter")]
-    GetProfileParameter {
-        /// Category of the parameter to get.
-        #[serde(rename = "parameterCategory")]
-        category: &'a str,
-        /// Name of the parameter to get.
-        #[serde(rename = "parameterName")]
-        name: &'a str,
-    },
-    #[serde(rename = "SetProfileParameter")]
-    SetProfileParameter(SetProfileParameter<'a>),
     #[serde(rename = "GetVideoSettings")]
     VideoSettings,
     #[serde(rename = "SetVideoSettings")]
@@ -112,21 +67,6 @@ pub struct SetPersistentData<'a> {
     /// The value to apply to the slot.
     #[serde(rename = "slotValue")]
     pub slot_value: &'a serde_json::Value,
-}
-
-/// Request information for [`crate::client::Config::set_profile_parameter`].
-#[skip_serializing_none]
-#[derive(Default, Serialize)]
-pub struct SetProfileParameter<'a> {
-    /// Category of the parameter to set.
-    #[serde(rename = "parameterCategory")]
-    pub category: &'a str,
-    /// Name of the parameter to set.
-    #[serde(rename = "parameterName")]
-    pub name: &'a str,
-    /// Value of the parameter to set. Use [`None`] to delete.
-    #[serde(rename = "parameterValue")]
-    pub value: Option<&'a str>,
 }
 
 /// Request information for [`crate::client::Config::set_video_settings`].

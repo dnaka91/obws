@@ -119,7 +119,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_FILTER_RENAME
     );
 
-    let profiles = client.config().list_profiles().await?.profiles;
+    let profiles = client.profiles().list().await?.profiles;
     ensure!(
         profiles.iter().map(String::as_str).any(is_required_profile),
         "profile `{}` not found, required for profiles tests",

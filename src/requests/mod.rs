@@ -12,7 +12,9 @@ pub mod general;
 pub mod inputs;
 pub(crate) mod media_inputs;
 pub(crate) mod outputs;
+pub mod profiles;
 pub(crate) mod recording;
+pub(crate) mod scene_collections;
 pub mod scene_items;
 pub mod scenes;
 mod ser;
@@ -212,7 +214,9 @@ pub(crate) enum RequestType<'a> {
     Inputs(self::inputs::Request<'a>),
     MediaInputs(self::media_inputs::Request<'a>),
     Outputs(self::outputs::Request),
+    Profiles(self::profiles::Request<'a>),
     Recording(self::recording::Request),
+    SceneCollections(self::scene_collections::Request<'a>),
     SceneItems(self::scene_items::Request<'a>),
     Scenes(self::scenes::Request<'a>),
     Sources(self::sources::Request<'a>),
@@ -233,7 +237,9 @@ impl<'a> Serialize for RequestType<'a> {
             Self::Inputs(req) => req.serialize(serializer),
             Self::MediaInputs(req) => req.serialize(serializer),
             Self::Outputs(req) => req.serialize(serializer),
+            Self::Profiles(req) => req.serialize(serializer),
             Self::Recording(req) => req.serialize(serializer),
+            Self::SceneCollections(req) => req.serialize(serializer),
             Self::SceneItems(req) => req.serialize(serializer),
             Self::Scenes(req) => req.serialize(serializer),
             Self::Sources(req) => req.serialize(serializer),
