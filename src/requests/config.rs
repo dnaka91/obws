@@ -1,4 +1,4 @@
-//! Requests related to the config.
+//! Requests related to the OBS configuration.
 
 use serde::Serialize;
 use serde_with::skip_serializing_none;
