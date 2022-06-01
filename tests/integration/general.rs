@@ -1,5 +1,5 @@
 use anyhow::Result;
-use obws::{events::Event, requests::general::KeyModifiers};
+use obws::events::Event;
 use serde::Serialize;
 
 use crate::{common, wait_for};
@@ -18,12 +18,6 @@ async fn general() -> Result<()> {
         .await?;
     wait_for!(events, Event::CustomEvent(_));
     client.stats().await?;
-
-    client.list_hotkeys().await?;
-    client.trigger_hotkey_by_name("ReplayBuffer.Save").await?;
-    client
-        .trigger_hotkey_by_key_sequence("OBS_KEY_P", KeyModifiers::default())
-        .await?;
 
     Ok(())
 }

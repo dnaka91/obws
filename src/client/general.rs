@@ -2,7 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::general::{CallVendorRequest, CallVendorRequestInternal, KeyModifiers, Request},
+    requests::general::{CallVendorRequest, CallVendorRequestInternal, Request},
     responses, Error, Result,
 };
 
@@ -59,31 +59,5 @@ impl<'a> General<'a> {
             ))
             .await
             .map(|cvr| cvr.response_data)
-    }
-
-    /// Gets an array of all hotkey names in OBS.
-    pub async fn list_hotkeys(&self) -> Result<Vec<String>> {
-        self.client
-            .send_message::<_, responses::Hotkeys>(Request::ListHotkeys)
-            .await
-            .map(|h| h.hotkeys)
-    }
-
-    /// Triggers a hotkey using its name. See [`General::list_hotkeys`].
-    pub async fn trigger_hotkey_by_name(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::TriggerHotkeyByName { name })
-            .await
-    }
-
-    /// Triggers a hotkey using a sequence of keys.
-    pub async fn trigger_hotkey_by_key_sequence(
-        &self,
-        id: &str,
-        modifiers: KeyModifiers,
-    ) -> Result<()> {
-        self.client
-            .send_message(Request::TriggerHotkeyByKeySequence { id, modifiers })
-            .await
     }
 }

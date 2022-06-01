@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use obws::requests::sources::{TakeScreenshot, SaveScreenshot};
+use obws::requests::sources::{SaveScreenshot, TakeScreenshot};
 
 use crate::common::{self, TEST_TEXT};
 

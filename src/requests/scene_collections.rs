@@ -5,7 +5,7 @@ use serde::Serialize;
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
-   #[serde(rename = "GetSceneCollectionList")]
+    #[serde(rename = "GetSceneCollectionList")]
     List,
     #[serde(rename = "SetCurrentSceneCollection")]
     SetCurrent {

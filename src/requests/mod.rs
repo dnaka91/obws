@@ -9,6 +9,7 @@ pub mod config;
 pub mod custom;
 pub mod filters;
 pub mod general;
+pub mod hotkeys;
 pub mod inputs;
 pub(crate) mod media_inputs;
 pub(crate) mod outputs;
@@ -211,6 +212,7 @@ pub(crate) enum RequestType<'a> {
     Config(self::config::Request<'a>),
     Filters(self::filters::Request<'a>),
     General(self::general::Request<'a>),
+    Hotkeys(self::hotkeys::Request<'a>),
     Inputs(self::inputs::Request<'a>),
     MediaInputs(self::media_inputs::Request<'a>),
     Outputs(self::outputs::Request),
@@ -234,6 +236,7 @@ impl<'a> Serialize for RequestType<'a> {
             Self::Config(req) => req.serialize(serializer),
             Self::Filters(req) => req.serialize(serializer),
             Self::General(req) => req.serialize(serializer),
+            Self::Hotkeys(req) => req.serialize(serializer),
             Self::Inputs(req) => req.serialize(serializer),
             Self::MediaInputs(req) => req.serialize(serializer),
             Self::Outputs(req) => req.serialize(serializer),

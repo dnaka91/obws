@@ -29,10 +29,11 @@ use tracing::{debug, error, info, trace};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
-    config::Config, connection::HandshakeError, filters::Filters, general::General, inputs::Inputs,
-    media_inputs::MediaInputs, outputs::Outputs, profiles::Profiles, recording::Recording,
-    scene_collections::SceneCollections, scene_items::SceneItems, scenes::Scenes, sources::Sources,
-    streaming::Streaming, transitions::Transitions, ui::Ui,
+    config::Config, connection::HandshakeError, filters::Filters, general::General,
+    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
+    profiles::Profiles, recording::Recording, scene_collections::SceneCollections,
+    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
+    transitions::Transitions, ui::Ui,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -46,6 +47,7 @@ mod config;
 mod connection;
 mod filters;
 mod general;
+mod hotkeys;
 mod inputs;
 mod media_inputs;
 mod outputs;
@@ -462,6 +464,11 @@ impl Client {
     /// Access general API functions.
     pub fn general(&self) -> General<'_> {
         General { client: self }
+    }
+
+    /// Access API functions related to hotkeys.
+    pub fn hotkeys(&self) -> Hotkeys<'_> {
+        Hotkeys { client: self }
     }
 
     /// Access API functions related to inputs.

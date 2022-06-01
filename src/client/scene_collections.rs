@@ -24,17 +24,13 @@ impl<'a> SceneCollections<'a> {
     ///
     /// **Note:** This will block until the collection has finished changing.
     pub async fn set_current(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::SetCurrent { name })
-            .await
+        self.client.send_message(Request::SetCurrent { name }).await
     }
 
     /// Creates a new scene collection, switching to it in the process.
     ///
     /// **Note:** This will block until the collection has finished changing.
     pub async fn create(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::Create { name })
-            .await
+        self.client.send_message(Request::Create { name }).await
     }
 }

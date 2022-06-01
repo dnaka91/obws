@@ -25,24 +25,18 @@ impl<'a> Profiles<'a> {
 
     /// Switches to a profile.
     pub async fn set_current(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::SetCurrent { name })
-            .await
+        self.client.send_message(Request::SetCurrent { name }).await
     }
 
     /// Creates a new profile, switching to it in the process.
     pub async fn create(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::Create { name })
-            .await
+        self.client.send_message(Request::Create { name }).await
     }
 
     /// Removes a profile. If the current profile is chosen, it will change to a different profile
     /// first.
     pub async fn remove(&self, name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::Remove { name })
-            .await
+        self.client.send_message(Request::Remove { name }).await
     }
 
     /// Gets a parameter from the current profile's configuration.

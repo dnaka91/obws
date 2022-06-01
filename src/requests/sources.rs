@@ -8,15 +8,15 @@ use serde_with::skip_serializing_none;
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
-    #[serde(rename="GetSourceActive")]
+    #[serde(rename = "GetSourceActive")]
     Active {
         /// Name of the source to get the active state of.
         #[serde(rename = "sourceName")]
         name: &'a str,
     },
-    #[serde(rename="GetSourceScreenshot")]
+    #[serde(rename = "GetSourceScreenshot")]
     TakeScreenshot(TakeScreenshot<'a>),
-    #[serde(rename="SaveSourceScreenshot")]
+    #[serde(rename = "SaveSourceScreenshot")]
     SaveScreenshot(SaveScreenshot<'a>),
 }
 

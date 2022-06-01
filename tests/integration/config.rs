@@ -1,7 +1,5 @@
 use anyhow::Result;
-use obws::{
-    requests::config::{Realm, SetPersistentData},
-};
+use obws::requests::config::{Realm, SetPersistentData};
 
 use crate::common;
 

@@ -4,6 +4,7 @@ mod common;
 mod config;
 mod filters;
 mod general;
+mod hotkeys;
 mod inputs;
 mod media_inputs;
 mod outputs;
