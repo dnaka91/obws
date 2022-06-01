@@ -6,15 +6,15 @@ use serde::Serialize;
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetHotkeyList")]
-    ListHotkeys,
+    List,
     #[serde(rename = "TriggerHotkeyByName")]
-    TriggerHotkeyByName {
+    TriggerByName {
         /// Name of the hotkey to trigger.
         #[serde(rename = "hotkeyName")]
         name: &'a str,
     },
     #[serde(rename = "TriggerHotkeyByKeySequence")]
-    TriggerHotkeyByKeySequence {
+    TriggerBySequence {
         /// The OBS key ID to use.
         #[serde(rename = "keyId")]
         id: &'a str,
