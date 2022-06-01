@@ -4,7 +4,7 @@ use obws::requests::hotkeys::KeyModifiers;
 use crate::common;
 
 #[tokio::test]
-async fn general() -> Result<()> {
+async fn hotkeys() -> Result<()> {
     let client = common::new_client().await?;
     let client = client.hotkeys();
 

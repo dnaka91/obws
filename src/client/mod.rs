@@ -30,10 +30,10 @@ use tracing::{debug, error, info, trace};
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
     config::Config, connection::HandshakeError, filters::Filters, general::General,
-    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
-    profiles::Profiles, recording::Recording, scene_collections::SceneCollections,
+    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, profiles::Profiles,
+    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
     scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
-    transitions::Transitions, ui::Ui,
+    transitions::Transitions, ui::Ui, virtual_cam::VirtualCam,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -50,9 +50,9 @@ mod general;
 mod hotkeys;
 mod inputs;
 mod media_inputs;
-mod outputs;
 mod profiles;
 mod recording;
+mod replay_buffer;
 mod scene_collections;
 mod scene_items;
 mod scenes;
@@ -60,6 +60,7 @@ mod sources;
 mod streaming;
 mod transitions;
 mod ui;
+mod virtual_cam;
 
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
@@ -481,11 +482,6 @@ impl Client {
         MediaInputs { client: self }
     }
 
-    /// Access API functions related to outputs.
-    pub fn outputs(&self) -> Outputs<'_> {
-        Outputs { client: self }
-    }
-
     /// Access API functions related to profiles.
     pub fn profiles(&self) -> Profiles<'_> {
         Profiles { client: self }
@@ -494,6 +490,11 @@ impl Client {
     /// Access API functions related to recording.
     pub fn recording(&self) -> Recording<'_> {
         Recording { client: self }
+    }
+
+    /// Access API functions related to the replay buffer.
+    pub fn replay_buffer(&self) -> ReplayBuffer<'_> {
+        ReplayBuffer { client: self }
     }
 
     /// Access API functions related to scene collections.
@@ -529,6 +530,11 @@ impl Client {
     /// Access API functions related to the user interface.
     pub fn ui(&self) -> Ui<'_> {
         Ui { client: self }
+    }
+
+    /// Access API functions related to the virtual camera.
+    pub fn virtual_cam(&self) -> VirtualCam<'_> {
+        VirtualCam { client: self }
     }
 }
 

@@ -5,30 +5,22 @@ use serde::Serialize;
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request {
-    #[serde(rename = "GetVirtualCamStatus")]
-    VirtualCamStatus,
-    #[serde(rename = "ToggleVirtualCam")]
-    ToggleVirtualCam,
-    #[serde(rename = "StartVirtualCam")]
-    StartVirtualCam,
-    #[serde(rename = "StopVirtualCam")]
-    StopVirtualCam,
     #[serde(rename = "GetReplayBufferStatus")]
-    ReplayBufferStatus,
+    Status,
     #[serde(rename = "ToggleReplayBuffer")]
-    ToggleReplayBuffer,
+    Toggle,
     #[serde(rename = "StartReplayBuffer")]
-    StartReplayBuffer,
+    Start,
     #[serde(rename = "StopReplayBuffer")]
-    StopReplayBuffer,
+    Stop,
     #[serde(rename = "SaveReplayBuffer")]
-    SaveReplayBuffer,
+    Save,
     #[serde(rename = "GetLastReplayBufferReplay")]
-    LastReplayBufferReplay,
+    LastReplay,
 }
 
 impl<'a> From<Request> for super::RequestType<'a> {
     fn from(value: Request) -> Self {
-        super::RequestType::Outputs(value)
+        super::RequestType::ReplayBuffer(value)
     }
 }

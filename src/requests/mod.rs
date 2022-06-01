@@ -12,9 +12,9 @@ pub mod general;
 pub mod hotkeys;
 pub mod inputs;
 pub(crate) mod media_inputs;
-pub(crate) mod outputs;
 pub mod profiles;
 pub(crate) mod recording;
+pub(crate) mod replay_buffer;
 pub(crate) mod scene_collections;
 pub mod scene_items;
 pub mod scenes;
@@ -23,6 +23,7 @@ pub mod sources;
 pub(crate) mod streaming;
 pub(crate) mod transitions;
 pub(crate) mod ui;
+pub(crate) mod virtual_cam;
 
 pub(crate) enum ClientRequest<'a> {
     /// Response to [`crate::responses::ServerMessage::Hello`] message, should contain
@@ -215,9 +216,9 @@ pub(crate) enum RequestType<'a> {
     Hotkeys(self::hotkeys::Request<'a>),
     Inputs(self::inputs::Request<'a>),
     MediaInputs(self::media_inputs::Request<'a>),
-    Outputs(self::outputs::Request),
     Profiles(self::profiles::Request<'a>),
     Recording(self::recording::Request),
+    ReplayBuffer(self::replay_buffer::Request),
     SceneCollections(self::scene_collections::Request<'a>),
     SceneItems(self::scene_items::Request<'a>),
     Scenes(self::scenes::Request<'a>),
@@ -225,6 +226,7 @@ pub(crate) enum RequestType<'a> {
     Streaming(self::streaming::Request<'a>),
     Transitions(self::transitions::Request<'a>),
     Ui(self::ui::Request<'a>),
+    VirtualCam(self::virtual_cam::Request),
 }
 
 impl<'a> Serialize for RequestType<'a> {
@@ -239,9 +241,9 @@ impl<'a> Serialize for RequestType<'a> {
             Self::Hotkeys(req) => req.serialize(serializer),
             Self::Inputs(req) => req.serialize(serializer),
             Self::MediaInputs(req) => req.serialize(serializer),
-            Self::Outputs(req) => req.serialize(serializer),
             Self::Profiles(req) => req.serialize(serializer),
             Self::Recording(req) => req.serialize(serializer),
+            Self::ReplayBuffer(req) => req.serialize(serializer),
             Self::SceneCollections(req) => req.serialize(serializer),
             Self::SceneItems(req) => req.serialize(serializer),
             Self::Scenes(req) => req.serialize(serializer),
@@ -249,6 +251,7 @@ impl<'a> Serialize for RequestType<'a> {
             Self::Streaming(req) => req.serialize(serializer),
             Self::Transitions(req) => req.serialize(serializer),
             Self::Ui(req) => req.serialize(serializer),
+            Self::VirtualCam(req) => req.serialize(serializer),
         }
     }
 }
