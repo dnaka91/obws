@@ -95,7 +95,7 @@ mod tests {
                 Token::Str(""),
                 Token::StructEnd,
             ],
-            "EOF while parsing a value at line 1 column 0",
+            "failed deserializing JSON string",
         );
     }
 }
