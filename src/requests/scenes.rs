@@ -77,7 +77,7 @@ pub struct SetTransitionOverride<'a> {
     /// Duration to use for any overridden transition.
     #[serde(
         rename = "transitionDuration",
-        serialize_with = "super::ser::duration_millis_opt"
+        with = "crate::serde::duration_millis::option"
     )]
     pub duration: Option<Duration>,
 }

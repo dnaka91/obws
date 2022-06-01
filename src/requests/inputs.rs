@@ -102,7 +102,7 @@ pub(crate) enum Request<'a> {
         /// New audio sync offset in milliseconds.
         #[serde(
             rename = "inputAudioSyncOffset",
-            serialize_with = "super::ser::duration_millis"
+            with = "crate::serde::duration_millis"
         )]
         offset: Duration,
     },

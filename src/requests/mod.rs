@@ -18,7 +18,6 @@ pub(crate) mod replay_buffer;
 pub(crate) mod scene_collections;
 pub mod scene_items;
 pub mod scenes;
-mod ser;
 pub mod sources;
 pub(crate) mod streaming;
 pub(crate) mod transitions;

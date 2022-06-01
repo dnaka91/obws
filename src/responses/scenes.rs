@@ -62,7 +62,7 @@ pub struct SceneTransitionOverride {
     /// Duration of the overridden scene transition.
     #[serde(
         rename = "transitionDuration",
-        deserialize_with = "crate::de::duration_millis_opt"
+        with = "crate::serde::duration_millis::option"
     )]
     pub duration: Option<Duration>,
 }

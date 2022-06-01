@@ -89,12 +89,12 @@ pub struct SceneItemTransform {
     /// Scene item height (base source height multiplied by the vertical scaling factor).
     pub height: f32,
     /// The point on the source that the item is manipulated from.
-    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    #[serde(with = "crate::serde::bitflags_u8")]
     pub alignment: Alignment,
     /// Type of bounding box.
     pub bounds_type: BoundsType,
     /// Alignment of the bounding box.
-    #[serde(deserialize_with = "crate::de::bitflags_u8")]
+    #[serde(with = "crate::serde::bitflags_u8")]
     pub bounds_alignment: Alignment,
     /// Width of the bounding box.
     pub bounds_width: f32,

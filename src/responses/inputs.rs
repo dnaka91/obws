@@ -80,7 +80,7 @@ pub struct InputVolume {
 #[serde(rename_all = "camelCase")]
 pub(crate) struct AudioSyncOffset {
     /// Audio sync offset in milliseconds.
-    #[serde(deserialize_with = "crate::de::duration_millis")]
+    #[serde(with = "crate::serde::duration_millis")]
     pub input_audio_sync_offset: Duration,
 }
 

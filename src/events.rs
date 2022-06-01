@@ -239,7 +239,7 @@ pub enum Event {
         /// New sync offset in milliseconds.
         #[serde(
             rename = "inputAudioSyncOffset",
-            deserialize_with = "crate::de::duration_millis"
+            with = "crate::serde::duration_millis"
         )]
         offset: Duration,
     },
@@ -481,10 +481,7 @@ pub enum Event {
     /// The current scene transition duration has changed.
     CurrentSceneTransitionDurationChanged {
         /// Transition duration in milliseconds.
-        #[serde(
-            rename = "transitionDuration",
-            deserialize_with = "crate::de::duration_millis"
-        )]
+        #[serde(rename = "transitionDuration", with = "crate::serde::duration_millis")]
         duration: Duration,
     },
     /// A scene transition has started.

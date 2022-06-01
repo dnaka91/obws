@@ -20,7 +20,7 @@ pub(crate) enum Request<'a> {
         #[serde(rename = "inputName")]
         input: &'a str,
         /// New cursor position to set.
-        #[serde(rename = "mediaCursor", serialize_with = "super::ser::duration_millis")]
+        #[serde(rename = "mediaCursor", with = "crate::serde::duration_millis")]
         cursor: Duration,
     },
     #[serde(rename = "OffsetMediaInputCursor")]
@@ -29,10 +29,7 @@ pub(crate) enum Request<'a> {
         #[serde(rename = "inputName")]
         input: &'a str,
         /// Value to offset the current cursor position by.
-        #[serde(
-            rename = "mediaCursorOffset",
-            serialize_with = "super::ser::duration_millis"
-        )]
+        #[serde(rename = "mediaCursorOffset", with = "crate::serde::duration_millis")]
         offset: Duration,
     },
     #[serde(rename = "TriggerMediaInputAction")]

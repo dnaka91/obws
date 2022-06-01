@@ -13,16 +13,10 @@ pub struct RecordStatus {
     #[serde(rename = "outputPaused")]
     pub paused: bool,
     /// Current formatted time code string for the output.
-    #[serde(
-        rename = "outputTimecode",
-        deserialize_with = "crate::de::duration_timecode"
-    )]
+    #[serde(rename = "outputTimecode", with = "crate::serde::duration_timecode")]
     pub timecode: Duration,
     /// Current duration in milliseconds for the output.
-    #[serde(
-        rename = "outputDuration",
-        deserialize_with = "crate::de::duration_millis"
-    )]
+    #[serde(rename = "outputDuration", with = "crate::serde::duration_millis")]
     pub duration: Duration,
     /// Number of bytes sent by the output.
     #[serde(rename = "outputBytes")]

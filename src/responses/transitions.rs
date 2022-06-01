@@ -56,7 +56,7 @@ pub struct CurrentSceneTransition {
     /// Configured transition duration in milliseconds.
     #[serde(
         rename = "transitionDuration",
-        deserialize_with = "crate::de::duration_millis_opt"
+        with = "crate::serde::duration_millis::option"
     )]
     pub duration: Option<Duration>,
     /// Whether the transition supports being configured.

@@ -21,10 +21,7 @@ pub(crate) enum Request<'a> {
     #[serde(rename = "SetCurrentSceneTransitionDuration")]
     SetCurrentSceneTransitionDuration {
         /// Duration in milliseconds.
-        #[serde(
-            rename = "transitionDuration",
-            serialize_with = "super::ser::duration_millis"
-        )]
+        #[serde(rename = "transitionDuration", with = "crate::serde::duration_millis")]
         duration: Duration,
     },
     #[serde(rename = "SetCurrentSceneTransitionSettings")]

@@ -6,8 +6,6 @@ use rgb::RGBA8;
 use serde::Serialize;
 use serde_repr::Serialize_repr;
 
-use crate::requests::ser;
-
 /// Identifier for swipe transitions.
 pub const TYPE_SWIPE: &str = "swipe_transition";
 /// Identifier for slide transitions.
@@ -139,7 +137,7 @@ impl Default for AudioFadeStyle {
 #[derive(Serialize)]
 pub struct FadeToColor {
     /// Color to blend in/out.
-    #[serde(serialize_with = "ser::rgba8_inverse")]
+    #[serde(with = "crate::serde::rgba8_inverse")]
     pub color: RGBA8,
     /// The point at which the scenes are swapped. Maximum value is `100`.
     pub switch_point: u8,

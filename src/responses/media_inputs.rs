@@ -12,14 +12,11 @@ pub struct MediaStatus {
     /// Total duration of the playing media. [`None`] if not playing.
     #[serde(
         rename = "mediaDuration",
-        deserialize_with = "crate::de::duration_millis_opt"
+        with = "crate::serde::duration_millis::option"
     )]
     pub duration: Option<Duration>,
     /// Position of the cursor. [`None`] if not playing.
-    #[serde(
-        rename = "mediaCursor",
-        deserialize_with = "crate::de::duration_millis_opt"
-    )]
+    #[serde(rename = "mediaCursor", with = "crate::serde::duration_millis::option")]
     pub cursor: Option<Duration>,
 }
 

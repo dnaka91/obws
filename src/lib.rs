@@ -41,7 +41,7 @@ pub mod events;
 pub mod requests;
 pub mod responses;
 
-mod de;
+mod serde;
 
 /// Result type used throughout the crate that uses [`Error`] as default error.
 pub type Result<T, E = Error> = std::result::Result<T, E>;

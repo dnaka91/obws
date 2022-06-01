@@ -14,16 +14,10 @@ pub struct StreamStatus {
     #[serde(rename = "outputReconnecting")]
     pub reconnecting: bool,
     /// Current time code for the output.
-    #[serde(
-        rename = "outputTimecode",
-        deserialize_with = "crate::de::duration_timecode"
-    )]
+    #[serde(rename = "outputTimecode", with = "crate::serde::duration_timecode")]
     pub timecode: Duration,
     /// Current duration for the output.
-    #[serde(
-        rename = "outputDuration",
-        deserialize_with = "crate::de::duration_millis"
-    )]
+    #[serde(rename = "outputDuration", with = "crate::serde::duration_millis")]
     pub duration: Duration,
     /// Number of bytes sent by the output.
     #[serde(rename = "outputBytes")]

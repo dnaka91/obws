@@ -8,7 +8,7 @@ use serde::{ser::SerializeStruct, Serialize, Serializer};
 use serde_repr::Serialize_repr;
 use time::Duration;
 
-use crate::{common::FontFlags, requests::ser};
+use crate::common::FontFlags;
 
 /// Identifier for input capture sources.
 pub const SOURCE_COREAUDIO_INPUT_CAPTURE: &str = "coreaudio_input_capture";
@@ -100,7 +100,7 @@ impl<'a> Default for BrowserSource<'a> {
 #[derive(Serialize)]
 pub struct ColorSourceV3 {
     /// Color to display.
-    #[serde(serialize_with = "ser::rgba8_inverse")]
+    #[serde(with = "crate::serde::rgba8_inverse")]
     pub color: RGBA8,
     /// Source width in pixels.
     pub width: u32,
@@ -271,10 +271,10 @@ pub struct Slideshow<'a> {
     /// Swapping animation between current and next picture.
     pub transition: Transition,
     /// Time between Slides. Minimum value is `50ms`.
-    #[serde(serialize_with = "ser::duration_millis")]
+    #[serde(with = "crate::serde::duration_millis")]
     pub slide_time: Duration,
     /// Minimum value is `0ms`.
-    #[serde(serialize_with = "ser::duration_millis")]
+    #[serde(with = "crate::serde::duration_millis")]
     pub transition_speed: Duration,
     /// Whether to endlessly loop the slide-show images.
     #[serde(rename = "loop")]
@@ -472,10 +472,10 @@ pub struct TextFt2SourceV2<'a> {
     /// Draw the text with smoothed corners.
     pub antialiasing: bool,
     /// Top color of the text.
-    #[serde(serialize_with = "ser::rgba8_inverse")]
+    #[serde(with = "crate::serde::rgba8_inverse")]
     pub color1: RGBA8,
     /// Bottom color of the text.
-    #[serde(serialize_with = "ser::rgba8_inverse")]
+    #[serde(with = "crate::serde::rgba8_inverse")]
     pub color2: RGBA8,
     /// Custom width (seems to have no effect).
     pub custom_width: u32,
@@ -526,7 +526,7 @@ pub struct Font<'a> {
     /// Font face.
     pub face: &'a str,
     /// Flags for different display styles.
-    #[serde(serialize_with = "ser::bitflags_u8")]
+    #[serde(with = "crate::serde::bitflags_u8")]
     pub flags: FontFlags,
     /// Display size.
     pub size: u32,
@@ -562,7 +562,7 @@ pub struct VlcSource<'a> {
     /// List of files to play.
     pub playlist: &'a [SlideshowFile<'a>],
     /// Network caching time. Minimum value is `100ms`.
-    #[serde(serialize_with = "ser::duration_millis")]
+    #[serde(with = "crate::serde::duration_millis")]
     pub network_caching: Duration,
     /// Audio track. Minimum value is `1`.
     pub track: u32,
@@ -606,7 +606,7 @@ pub struct AvCaptureInputV2<'a> {
     /// Pre-configured setting. Only used if [`Self::use_preset`] is `true`).
     pub preset: AvPreset,
     /// Video resolution. Only used if [`Self::use_preset`] is `false`).
-    #[serde(serialize_with = "ser::json_string")]
+    #[serde(with = "crate::serde::json_string")]
     pub resolution: Resolution,
     /// Whether to use a setting preset.
     pub use_preset: bool,
