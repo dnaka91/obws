@@ -1,5 +1,4 @@
-//! Custom deserializers that are used in both the [`events`](crate::events) and
-//! [`responses`](crate::responses) modules.
+//! Custom deserializers that are used in both the `events` and `responses` modules.
 
 use std::{
     convert::TryFrom,

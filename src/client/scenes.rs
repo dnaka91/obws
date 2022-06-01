@@ -1,7 +1,8 @@
 use super::Client;
 use crate::{
     requests::scenes::{Request, SetTransitionOverride},
-    responses, Result,
+    responses::scenes as responses,
+    Result,
 };
 
 /// API functions related to scenes.

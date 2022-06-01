@@ -45,7 +45,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
     }
 }
 
-/// Request information for [`crate::client::Config::set_profile_parameter`].
+/// Request information for [`crate::client::Profiles::set_parameter`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SetParameter<'a> {

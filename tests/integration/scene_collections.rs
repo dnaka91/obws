@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::Result;
-use obws::responses::SceneCollections;
+use obws::responses::scene_collections::SceneCollections;
 use tokio::time;
 
 use crate::common;

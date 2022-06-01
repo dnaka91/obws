@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use anyhow::Result;
-use obws::{requests::profiles::SetParameter, responses::Profiles};
+use obws::{requests::profiles::SetParameter, responses::profiles::Profiles};
 use tokio::time;
 
 use crate::common;

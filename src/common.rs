@@ -1,5 +1,4 @@
-//! Common data structures shared between [`requests`](crate::requests),
-//! [`responses`](crate::responses) and [`events`](crate::events).
+//! Common data structures shared between requests, responses and events.
 
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};

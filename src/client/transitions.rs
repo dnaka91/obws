@@ -2,7 +2,7 @@ use serde::Serialize;
 use time::Duration;
 
 use super::Client;
-use crate::{requests::transitions::Request, responses, Error, Result};
+use crate::{requests::transitions::Request, responses::transitions as responses, Error, Result};
 
 /// API functions related to transitions.
 pub struct Transitions<'a> {

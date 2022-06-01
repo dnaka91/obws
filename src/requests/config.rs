@@ -93,8 +93,8 @@ pub struct SetVideoSettings {
     pub output_height: Option<u32>,
 }
 
-impl From<crate::responses::VideoSettings> for SetVideoSettings {
-    fn from(v: crate::responses::VideoSettings) -> Self {
+impl From<crate::responses::config::VideoSettings> for SetVideoSettings {
+    fn from(v: crate::responses::config::VideoSettings) -> Self {
         Self {
             fps_numerator: Some(v.fps_numerator),
             fps_denominator: Some(v.fps_denominator),

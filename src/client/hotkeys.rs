@@ -1,7 +1,8 @@
 use super::Client;
 use crate::{
     requests::hotkeys::{KeyModifiers, Request},
-    responses, Result,
+    responses::hotkeys as responses,
+    Result,
 };
 
 /// API functions related to hotkeys.
@@ -18,7 +19,7 @@ impl<'a> Hotkeys<'a> {
             .map(|h| h.hotkeys)
     }
 
-    /// Triggers a hotkey using its name. See [`General::list_hotkeys`].
+    /// Triggers a hotkey using its name. See [`Self::list`].
     pub async fn trigger_by_name(&self, name: &str) -> Result<()> {
         self.client
             .send_message(Request::TriggerByName { name })

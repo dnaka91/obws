@@ -1,7 +1,10 @@
 use time::Duration;
 
 use super::Client;
-use crate::{common::MediaAction, requests::media_inputs::Request, responses, Result};
+use crate::{
+    common::MediaAction, requests::media_inputs::Request, responses::media_inputs as responses,
+    Result,
+};
 
 /// API functions related to media inputs.
 pub struct MediaInputs<'a> {

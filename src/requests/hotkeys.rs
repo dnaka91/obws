@@ -32,7 +32,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 }
 
 /// Request information for
-/// [`crate::client::General::trigger_hotkey_by_key_sequence`].
+/// [`crate::client::Hotkeys::trigger_by_sequence`].
 #[derive(Default, Serialize)]
 pub struct KeyModifiers {
     /// Press Shift.

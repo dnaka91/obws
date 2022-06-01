@@ -1,5 +1,5 @@
 use super::Client;
-use crate::{requests::virtual_cam::Request, responses, Result};
+use crate::{requests::virtual_cam::Request, responses::virtual_cam as responses, Result};
 
 /// API functions related to the virtual camera.
 pub struct VirtualCam<'a> {

@@ -1,5 +1,7 @@
 use super::Client;
-use crate::{requests::scene_collections::Request, responses, Result};
+use crate::{
+    requests::scene_collections::Request, responses::scene_collections as responses, Result,
+};
 
 /// API functions related to scene collections.
 pub struct SceneCollections<'a> {

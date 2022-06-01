@@ -1,7 +1,8 @@
 use super::Client;
 use crate::{
     requests::profiles::{Request, SetParameter},
-    responses, Result,
+    responses::profiles as responses,
+    Result,
 };
 
 /// API functions related to profiles.

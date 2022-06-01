@@ -3,7 +3,8 @@ use serde::{de::DeserializeOwned, Serialize};
 use super::Client;
 use crate::{
     requests::general::{CallVendorRequest, CallVendorRequestInternal, Request},
-    responses, Error, Result,
+    responses::general as responses,
+    Error, Result,
 };
 
 /// General functions of the API.

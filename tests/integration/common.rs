@@ -2,7 +2,7 @@ use std::{env, sync::Once};
 
 use anyhow::{ensure, Result};
 use obws::{
-    responses::{Input, Scene, SourceFilter},
+    responses::{filters::SourceFilter, inputs::Input, scenes::Scene},
     Client,
 };
 

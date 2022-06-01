@@ -1,7 +1,8 @@
 use super::Client;
 use crate::{
     requests::sources::{Request, SaveScreenshot, TakeScreenshot},
-    responses, Result,
+    responses::sources as responses,
+    Result,
 };
 
 /// API functions related to sources.

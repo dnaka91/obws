@@ -1,5 +1,5 @@
 use super::Client;
-use crate::{requests::ui::Request, responses, Result};
+use crate::{requests::ui::Request, responses::ui as responses, Result};
 
 /// API functions related to the user interface.
 pub struct Ui<'a> {

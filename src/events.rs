@@ -7,7 +7,7 @@ use time::Duration;
 
 use crate::{
     common::{MediaAction, MonitorType},
-    responses::{SceneItemTransform, SourceFilter},
+    responses::{filters::SourceFilter, scene_items::SceneItemTransform},
 };
 
 /// All possible event types that can occur while the user interacts with OBS.

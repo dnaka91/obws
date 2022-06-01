@@ -7,7 +7,8 @@ use crate::{
     requests::inputs::{
         Create, CreateInputInternal, Request, SetSettings, SetSettingsInternal, Volume,
     },
-    responses, Error, Result,
+    responses::inputs as responses,
+    Error, Result,
 };
 
 /// API functions related to inputs.

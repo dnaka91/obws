@@ -6,7 +6,8 @@ use crate::{
         CreateSceneItem, Duplicate, Id, Request, SetEnabled, SetIndex, SetLocked,
         SetPrivateSettings, SetPrivateSettingsInternal, SetTransform,
     },
-    responses, Error, Result,
+    responses::scene_items as responses,
+    Error, Result,
 };
 
 /// API functions related to scene items.

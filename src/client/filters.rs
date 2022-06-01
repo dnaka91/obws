@@ -6,7 +6,8 @@ use crate::{
         Create, CreateInternal, Request, SetEnabled, SetIndex, SetName, SetSettings,
         SetSettingsInternal,
     },
-    responses, Error, Result,
+    responses::filters as responses,
+    Error, Result,
 };
 
 /// API functions related to filters.

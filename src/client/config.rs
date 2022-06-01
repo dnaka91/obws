@@ -3,7 +3,8 @@ use serde::{de::DeserializeOwned, Serialize};
 use super::Client;
 use crate::{
     requests::config::{Realm, Request, SetPersistentData, SetVideoSettings},
-    responses, Error, Result,
+    responses::config as responses,
+    Error, Result,
 };
 
 /// API functions related to OBS configuration.

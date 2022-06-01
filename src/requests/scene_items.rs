@@ -184,8 +184,8 @@ pub struct SceneItemTransform {
     pub crop: Option<Crop>,
 }
 
-impl From<crate::responses::SceneItemTransform> for SceneItemTransform {
-    fn from(t: crate::responses::SceneItemTransform) -> Self {
+impl From<crate::responses::scene_items::SceneItemTransform> for SceneItemTransform {
+    fn from(t: crate::responses::scene_items::SceneItemTransform) -> Self {
         Self {
             position: Some(Position {
                 x: Some(t.position_x),
