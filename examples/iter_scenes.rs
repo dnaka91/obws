@@ -5,7 +5,7 @@ use obws::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     env::set_var("RUST_LOG", "obws=debug");
     tracing_subscriber::fmt::init();

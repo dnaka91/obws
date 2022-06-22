@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "tungstenite"
+    ],
+    "files.watcherExclude": {
+        "**/target/**": true
+    }
+}

@@ -30,7 +30,7 @@ static INIT: Once = Once::new();
 
 pub async fn new_client() -> Result<Client> {
     INIT.call_once(|| {
-        dotenv::dotenv().ok();
+        dotenvy::dotenv().ok();
         tracing_subscriber::fmt::init();
     });
 
