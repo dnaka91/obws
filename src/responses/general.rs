@@ -54,7 +54,7 @@ pub struct Stats {
     #[serde(rename = "renderTotalFrames")]
     pub render_total_frames: u32,
     /// Number of frames skipped by OBS in the output thread.
-    #[serde(rename=""outputSkippedFrames)]
+    #[serde(rename = "outputSkippedFrames")]
     pub output_skipped_frames: u32,
     /// Total number of frames outputted by the output thread.
     #[serde(rename = "outputTotalFrames")]
