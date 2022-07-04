@@ -1,6 +1,9 @@
 use super::Client;
 use crate::{
-    requests::ui::{OpenSourceProjector, OpenVideoMixProjector, Request},
+    requests::ui::{
+        OpenSourceProjector, OpenSourceProjectorInternal, OpenVideoMixProjector,
+        OpenVideoMixProjectorInternal, Request,
+    },
     responses::ui as responses,
     Result,
 };
@@ -58,16 +61,24 @@ impl<'a> Ui<'a> {
     }
 
     /// Open a projector for a specific output video mix.
-    pub async fn open_video_mix_projector(&self, open: OpenVideoMixProjector<'a>) -> Result<()> {
+    pub async fn open_video_mix_projector(&self, open: OpenVideoMixProjector) -> Result<()> {
         self.client
-            .send_message(Request::OpenVideoMixProjector(open))
+            .send_message(Request::OpenVideoMixProjector(
+                OpenVideoMixProjectorInternal {
+                    r#type: open.r#type,
+                    location: open.location.map(Into::into),
+                },
+            ))
             .await
     }
 
     /// Opens a projector for a source.
     pub async fn open_source_projector(&self, open: OpenSourceProjector<'a>) -> Result<()> {
         self.client
-            .send_message(Request::OpenSourceProjector(open))
+            .send_message(Request::OpenSourceProjector(OpenSourceProjectorInternal {
+                source: open.source,
+                location: open.location.map(Into::into),
+            }))
             .await
     }
 }

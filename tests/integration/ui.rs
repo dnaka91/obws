@@ -1,5 +1,7 @@
 use anyhow::Result;
-use obws::requests::ui::{Location, OpenSourceProjector, OpenVideoMixProjector, VideoMixType};
+use obws::requests::ui::{
+    Location, OpenSourceProjector, OpenVideoMixProjector, QtGeometry, QtRect, VideoMixType,
+};
 
 use crate::common::{self, TEST_TEXT};
 
@@ -16,7 +18,15 @@ async fn ui() -> Result<()> {
     client
         .open_video_mix_projector(OpenVideoMixProjector {
             r#type: VideoMixType::Preview,
-            location: None,
+            location: Some(Location::ProjectorGeometry(QtGeometry {
+                rect: QtRect {
+                    left: 50,
+                    top: 150,
+                    right: 250,
+                    bottom: 350,
+                },
+                ..QtGeometry::default()
+            })),
         })
         .await?;
     client
