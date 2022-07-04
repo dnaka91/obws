@@ -39,7 +39,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemId>(Request::Id(get))
             .await
-            .map(|sii| sii.scene_item_id)
+            .map(|sii| sii.id)
     }
 
     /// Creates a new scene item using a source.
@@ -47,7 +47,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemId>(Request::Create(create))
             .await
-            .map(|sii| sii.scene_item_id)
+            .map(|sii| sii.id)
     }
 
     /// Removes a scene item from a scene.
@@ -62,7 +62,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemId>(Request::Duplicate(duplicate))
             .await
-            .map(|sii| sii.scene_item_id)
+            .map(|sii| sii.id)
     }
 
     /// Gets the transform and crop info of a scene item.
@@ -77,7 +77,7 @@ impl<'a> SceneItems<'a> {
                 item_id,
             })
             .await
-            .map(|gsit| gsit.scene_item_transform)
+            .map(|gsit| gsit.transform)
     }
 
     /// Sets the transform and crop info of a scene item.
@@ -92,7 +92,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemEnabled>(Request::Enabled { scene, item_id })
             .await
-            .map(|sie| sie.scene_item_enabled)
+            .map(|sie| sie.enabled)
     }
 
     /// Sets the enable state of a scene item.
@@ -105,7 +105,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemLocked>(Request::Locked { scene, item_id })
             .await
-            .map(|sil| sil.scene_item_locked)
+            .map(|sil| sil.locked)
     }
 
     /// Sets the lock state of a scene item.
@@ -120,7 +120,7 @@ impl<'a> SceneItems<'a> {
         self.client
             .send_message::<_, responses::SceneItemIndex>(Request::Index { scene, item_id })
             .await
-            .map(|sii| sii.scene_item_index)
+            .map(|sii| sii.index)
     }
 
     /// Sets the index position of a scene item in a scene.
@@ -139,7 +139,7 @@ impl<'a> SceneItems<'a> {
                 item_id,
             })
             .await
-            .map(|sis| sis.scene_item_settings)
+            .map(|sis| sis.settings)
     }
 
     /// Sets private scene item settings.

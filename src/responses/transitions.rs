@@ -6,21 +6,23 @@ use time::Duration;
 /// Response value for
 /// [`crate::client::Transitions::get_transition_kind_list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct TransitionKinds {
     /// Array of transition kinds.
+    #[serde(rename = "transitionKinds")]
     pub transition_kinds: Vec<String>,
 }
 
 /// Response value for [`crate::client::Transitions::list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SceneTransitionList {
     /// Name of the current scene transition.
+    #[serde(rename = "currentSceneTransitionName")]
     pub current_scene_transition_name: Option<String>,
     /// Kind of the current scene transition.
+    #[serde(rename = "currentSceneTransitionKind")]
     pub current_scene_transition_kind: Option<String>,
     /// Array of transitions.
+    #[serde(rename = "transitions")]
     pub transitions: Vec<Transition>,
 }
 
@@ -70,8 +72,8 @@ pub struct CurrentSceneTransition {
 /// Response value for
 /// [`crate::client::Transitions::get_current_scene_transition_cursor`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct TransitionCursor {
     /// Cursor position, between `0.0` and `1.0`.
+    #[serde(rename = "transitionCursor")]
     pub transition_cursor: f32,
 }

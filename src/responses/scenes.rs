@@ -5,19 +5,20 @@ use time::Duration;
 
 /// Response value for [`crate::client::Scenes::list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Scenes {
     /// Current program scene.
+    #[serde(rename = "currentProgramSceneName")]
     pub current_program_scene_name: Option<String>,
     /// Current preview scene. [`None`] if not in studio mode.
+    #[serde(rename = "currentPreviewSceneName")]
     pub current_preview_scene_name: Option<String>,
     /// Array of scenes in OBS.
+    #[serde(rename = "scenes")]
     pub scenes: Vec<Scene>,
 }
 
 /// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Scene {
     /// Name of the scene.
     #[serde(rename = "sceneName")]
@@ -29,27 +30,27 @@ pub struct Scene {
 
 /// Response value for [`crate::client::Scenes::get_group_list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Groups {
     /// Array of group names.
+    #[serde(rename = "groups")]
     pub groups: Vec<String>,
 }
 
 /// Response value for
 /// [`crate::client::Scenes::get_current_program_scene`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentProgramScene {
     /// Current program scene.
+    #[serde(rename = "currentProgramSceneName")]
     pub current_program_scene_name: String,
 }
 
 /// Response value for
 /// [`crate::client::Scenes::get_current_preview_scene`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct CurrentPreviewScene {
     /// Current preview scene.
+    #[serde(rename = "currentPreviewSceneName")]
     pub current_preview_scene_name: String,
 }
 

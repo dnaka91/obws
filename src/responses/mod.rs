@@ -106,23 +106,25 @@ impl<'de> Deserialize<'de> for ServerMessage {
 /// First message sent from the server immediately on client connection. Contains authentication
 /// information if authentication is required. Also contains RPC version for version negotiation.
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Hello {
     #[allow(dead_code)]
+    #[serde(rename = "obsWebSocketVersion")]
     pub obs_web_socket_version: semver::Version,
     /// version number which gets incremented on each **breaking change** to the obs-websocket
     /// protocol. Its usage in this context is to provide the current RPC version that the server
     /// would like to use.
+    #[serde(rename = "rpcVersion")]
     pub rpc_version: u32,
+    #[serde(rename = "authentication")]
     pub authentication: Option<Authentication>,
 }
 
 /// The identify request was received and validated, and the connection is now ready for normal
 /// operation.
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Identified {
     /// The RPC (remote procedure call) version to be used.
+    #[serde(rename = "negotiatedRpcVersion")]
     pub negotiated_rpc_version: u32,
 }
 

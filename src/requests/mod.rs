@@ -84,29 +84,31 @@ impl<'a> Serialize for ClientRequest<'a> {
 /// session parameters.
 #[skip_serializing_none]
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Identify {
     /// Version number that the client would like the obs-websocket server to use.
+    #[serde(rename = "rpcVersion")]
     pub rpc_version: u32,
+    #[serde(rename = "authentication")]
     pub authentication: Option<String>,
     /// Bit mask of event subscription items to subscribe to events and event categories at will. By
     /// default, all event categories are subscribed, except for events marked as high volume. High
     /// volume events must be explicitly subscribed to.
+    #[serde(rename = "eventSubscriptions")]
     pub event_subscriptions: Option<EventSubscription>,
 }
 
 /// Sent at any time after initial identification to update the provided session parameters.
 #[skip_serializing_none]
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Reidentify {
+    #[serde(rename = "eventSubscriptions")]
     pub event_subscriptions: Option<EventSubscription>,
 }
 
 /// Client is making a request to obs-websocket. For example get current scene, create source.
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Request<'a> {
+    #[serde(rename = "requestId")]
     pub request_id: &'a str,
     #[serde(flatten)]
     pub ty: RequestType<'a>,
@@ -116,14 +118,17 @@ pub(crate) struct Request<'a> {
 /// (in order) by the server.
 #[skip_serializing_none]
 #[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct RequestBatch<'a> {
+    #[serde(rename = "requestId")]
     pub request_id: &'a str,
     /// When true, the processing of requests will be halted on first failure. Returns only the
     /// processed requests in
     /// [`crate::responses::ServerMessage::RequestBatchResponse`].
+    #[serde(rename = "haltOnFailure")]
     pub halt_on_failure: Option<bool>,
+    #[serde(rename = "requests")]
     pub requests: &'a [RequestType<'a>],
+    #[serde(rename = "executionType")]
     pub execution_type: Option<ExecutionType>,
 }
 

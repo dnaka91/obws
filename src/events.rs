@@ -57,29 +57,34 @@ pub enum Event {
         name: String,
     },
     /// The profile list has changed.
-    #[serde(rename_all = "camelCase")]
     ProfileListChanged {
         /// Updated list of profiles.
+        #[serde(rename = "profiles")]
         profiles: Vec<String>,
     },
     // --------------------------------
     // Filters
     // --------------------------------
     /// A filter has been added to a source.
-    #[serde(rename_all = "camelCase")]
     SourceFilterCreated {
         /// Name of the source the filter was added to.
-        source_name: String,
+        #[serde(rename = "sourceName")]
+        source: String,
         /// Name of the filter.
-        filter_name: String,
+        #[serde(rename = "filterName")]
+        filter: String,
         /// The kind of the filter.
-        filter_kind: String,
+        #[serde(rename = "filterKind")]
+        kind: String,
         /// Index position of the filter.
-        filter_index: u32,
+        #[serde(rename = "filterIndex")]
+        index: u32,
         /// The settings configured to the filter when it was created.
-        filter_settings: serde_json::Value,
+        #[serde(rename = "filterSettings")]
+        settings: serde_json::Value,
         /// The default settings for the filter.
-        default_filter_settings: serde_json::Value,
+        #[serde(rename = "defaultFilterSettings")]
+        default_settings: serde_json::Value,
     },
     /// A filter has been removed from a source.
     SourceFilterRemoved {
@@ -137,31 +142,37 @@ pub enum Event {
     /// A vendor is a unique name registered by a third-party plugin or script, which allows for
     /// custom requests and events to be added to obs-websocket. If a plugin or script implements
     /// vendor requests or events, documentation is expected to be provided with them.
-    #[serde(rename_all = "camelCase")]
     VendorEvent {
         /// Name of the vendor emitting the event.
+        #[serde(rename = "vendorName")]
         vendor_name: String,
         /// Vendor-provided event type definition.
+        #[serde(rename = "eventType")]
         event_type: String,
         /// Vendor-provided event data. `{}` if event does not provide any data.
+        #[serde(rename = "eventData")]
         event_data: serde_json::Value,
     },
     // --------------------------------
     // Inputs
     // --------------------------------
     /// An input has been created.
-    #[serde(rename_all = "camelCase")]
     InputCreated {
         /// Name of the input.
-        input_name: String,
+        #[serde(rename = "inputName")]
+        name: String,
         /// The kind of the input.
-        input_kind: String,
+        #[serde(rename = "inputKind")]
+        kind: String,
         /// The unversioned kind of input (aka no `_v2` stuff).
-        unversioned_input_kind: String,
+        #[serde(rename = "unversionedInputKind")]
+        unversioned_kind: String,
         /// The settings configured to the input when it was created.
-        input_settings: serde_json::Value,
+        #[serde(rename = "inputSettings")]
+        settings: serde_json::Value,
         /// The default settings for the input.
-        default_input_settings: serde_json::Value,
+        #[serde(rename = "defaultInputSettings")]
+        default_settings: serde_json::Value,
     },
     /// An input has been removed.
     InputRemoved {
@@ -210,7 +221,6 @@ pub enum Event {
         muted: bool,
     },
     /// An input's volume level has changed.
-    #[serde(rename_all = "camelCase")]
     InputVolumeChanged {
         /// Name of the input.
         #[serde(rename = "inputName")]
@@ -262,9 +272,9 @@ pub enum Event {
         monitor_type: MonitorType,
     },
     /// A high-volume event providing volume levels of all active inputs every 50 milliseconds.
-    #[serde(rename_all = "camelCase")]
     InputVolumeMeters {
         /// Array of active inputs with their associated volume levels.
+        #[serde(rename = "inputs")]
         inputs: Vec<InputVolumeMeter>,
     },
     // --------------------------------

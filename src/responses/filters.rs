@@ -4,9 +4,9 @@ use serde::Deserialize;
 
 /// Response value for [`crate::client::Filters::get_source_filter_list`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct Filters {
     /// Array of filters.
+    #[serde(rename = "filters")]
     pub filters: Vec<SourceFilter>,
 }
 
@@ -33,8 +33,8 @@ pub struct SourceFilter {
 /// Response value for
 /// [`crate::client::Filters::get_source_filter_default_settings`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct DefaultFilterSettings<T> {
     /// Object of default settings for the filter kind.
+    #[serde(rename = "defaultFilterSettings")]
     pub default_filter_settings: T,
 }
