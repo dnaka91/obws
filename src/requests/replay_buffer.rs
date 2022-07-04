@@ -1,4 +1,4 @@
-//! Requests related to outputs.
+//! Requests related to the replay buffer.
 
 use serde::Serialize;
 

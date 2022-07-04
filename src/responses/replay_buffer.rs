@@ -3,7 +3,6 @@
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct OutputActive {
     /// New state of the stream output.
     #[serde(rename = "outputActive")]
@@ -11,7 +10,7 @@ pub(crate) struct OutputActive {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct SavedReplayPath {
+    #[serde(rename = "savedReplayPath")]
     pub saved_replay_path: String,
 }

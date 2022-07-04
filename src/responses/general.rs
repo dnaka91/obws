@@ -54,7 +54,11 @@ pub struct Stats {
 /// Response value for [`crate::client::General::call_vendor_request`].
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub(crate) struct CallVendorResponse<T> {
+pub struct VendorResponse<T> {
+    /// Name of the vendor.
+    pub vendor_name: String,
+    /// Type of request.
+    pub request_type: String,
     /// Object containing appropriate response data.
     pub response_data: T,
 }

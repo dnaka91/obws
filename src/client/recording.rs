@@ -26,8 +26,11 @@ impl<'a> Recording<'a> {
     }
 
     /// Stops the record output.
-    pub async fn stop(&self) -> Result<()> {
-        self.client.send_message(Request::Stop).await
+    pub async fn stop(&self) -> Result<String> {
+        self.client
+            .send_message::<_, responses::OutputStopped>(Request::Stop)
+            .await
+            .map(|os| os.path)
     }
 
     /// Toggles pause on the record output.

@@ -6,6 +6,7 @@ pub mod general;
 pub(crate) mod hotkeys;
 pub mod inputs;
 pub mod media_inputs;
+pub mod outputs;
 pub mod profiles;
 pub mod recording;
 pub(crate) mod replay_buffer;

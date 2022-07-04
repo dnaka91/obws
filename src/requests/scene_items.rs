@@ -79,7 +79,7 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "SetSceneItemIndex")]
     SetIndex(SetIndex<'a>),
-    #[serde(rename = "SetSceneItemIndex")]
+    #[serde(rename = "GetSceneItemPrivateSettings")]
     PrivateSettings {
         /// Name of the scene the item is in.
         #[serde(rename = "sceneName")]

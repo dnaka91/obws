@@ -12,6 +12,7 @@ pub mod general;
 pub mod hotkeys;
 pub mod inputs;
 pub(crate) mod media_inputs;
+pub(crate) mod outputs;
 pub mod profiles;
 pub(crate) mod recording;
 pub(crate) mod replay_buffer;
@@ -21,7 +22,7 @@ pub mod scenes;
 pub mod sources;
 pub(crate) mod streaming;
 pub(crate) mod transitions;
-pub(crate) mod ui;
+pub mod ui;
 pub(crate) mod virtual_cam;
 
 pub(crate) enum ClientRequest<'a> {
@@ -215,6 +216,7 @@ pub(crate) enum RequestType<'a> {
     Hotkeys(self::hotkeys::Request<'a>),
     Inputs(self::inputs::Request<'a>),
     MediaInputs(self::media_inputs::Request<'a>),
+    Outputs(self::outputs::Request<'a>),
     Profiles(self::profiles::Request<'a>),
     Recording(self::recording::Request),
     ReplayBuffer(self::replay_buffer::Request),
@@ -240,6 +242,7 @@ impl<'a> Serialize for RequestType<'a> {
             Self::Hotkeys(req) => req.serialize(serializer),
             Self::Inputs(req) => req.serialize(serializer),
             Self::MediaInputs(req) => req.serialize(serializer),
+            Self::Outputs(req) => req.serialize(serializer),
             Self::Profiles(req) => req.serialize(serializer),
             Self::Recording(req) => req.serialize(serializer),
             Self::ReplayBuffer(req) => req.serialize(serializer),

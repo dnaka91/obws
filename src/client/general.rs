@@ -44,21 +44,21 @@ impl<'a> General<'a> {
     /// A vendor is a unique name registered by a third-party plugin or script, which allows for
     /// custom requests and events to be added to obs-websocket. If a plugin or script implements
     /// vendor requests or events, documentation is expected to be provided with them.
-    pub async fn call_vendor_request<T, R>(&self, request: CallVendorRequest<'_, T>) -> Result<R>
+    pub async fn call_vendor_request<T, R>(
+        &self,
+        request: CallVendorRequest<'_, T>,
+    ) -> Result<responses::VendorResponse<R>>
     where
         T: Serialize,
         R: DeserializeOwned,
     {
         self.client
-            .send_message::<_, responses::CallVendorResponse<R>>(Request::CallVendorRequest(
-                CallVendorRequestInternal {
-                    vendor_name: request.vendor_name,
-                    request_type: request.request_type,
-                    request_data: serde_json::to_value(&request.request_data)
-                        .map_err(Error::SerializeCustomData)?,
-                },
-            ))
+            .send_message(Request::CallVendorRequest(CallVendorRequestInternal {
+                vendor_name: request.vendor_name,
+                request_type: request.request_type,
+                request_data: serde_json::to_value(&request.request_data)
+                    .map_err(Error::SerializeCustomData)?,
+            }))
             .await
-            .map(|cvr| cvr.response_data)
     }
 }

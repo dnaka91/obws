@@ -119,5 +119,20 @@ async fn scene_items() -> Result<()> {
         })
         .await?;
 
+    let _settings = client
+        .private_settings::<serde_json::Value>(TEST_SCENE, test_text_id)
+        .await?;
+
+    // TODO: Currently obs-websocket doesn't accept empty objects `{}`, and this fails as our
+    // test scene item doesn't have any private settings.
+    //
+    // client
+    //     .set_private_settings(SetPrivateSettings {
+    //         scene: TEST_SCENE,
+    //         item_id: test_text_id,
+    //         settings: &settings,
+    //     })
+    //     .await?;
+
     Ok(())
 }

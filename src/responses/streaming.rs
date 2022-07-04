@@ -5,7 +5,6 @@ use time::Duration;
 
 /// Response value for [`crate::client::Streaming::status`].
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct StreamStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]
@@ -19,6 +18,9 @@ pub struct StreamStatus {
     /// Current duration for the output.
     #[serde(rename = "outputDuration", with = "crate::serde::duration_millis")]
     pub duration: Duration,
+    /// Congestion of the output.
+    #[serde(rename = "outputCongestion")]
+    pub congestion: f32,
     /// Number of bytes sent by the output.
     #[serde(rename = "outputBytes")]
     pub bytes: u64,
@@ -31,7 +33,6 @@ pub struct StreamStatus {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct OutputActive {
     /// New state of the stream output.
     #[serde(rename = "outputActive")]

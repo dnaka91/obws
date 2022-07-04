@@ -1,5 +1,9 @@
 use super::Client;
-use crate::{requests::ui::Request, responses::ui as responses, Result};
+use crate::{
+    requests::ui::{OpenSourceProjector, OpenVideoMixProjector, Request},
+    responses::ui as responses,
+    Result,
+};
 
 /// API functions related to the user interface.
 pub struct Ui<'a> {
@@ -51,5 +55,19 @@ impl<'a> Ui<'a> {
             .send_message::<_, responses::MonitorList>(Request::GetMonitorList)
             .await
             .map(|ml| ml.monitors)
+    }
+
+    /// Open a projector for a specific output video mix.
+    pub async fn open_video_mix_projector(&self, open: OpenVideoMixProjector<'a>) -> Result<()> {
+        self.client
+            .send_message(Request::OpenVideoMixProjector(open))
+            .await
+    }
+
+    /// Opens a projector for a source.
+    pub async fn open_source_projector(&self, open: OpenSourceProjector<'a>) -> Result<()> {
+        self.client
+            .send_message(Request::OpenSourceProjector(open))
+            .await
     }
 }

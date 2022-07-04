@@ -30,10 +30,10 @@ use tracing::{debug, error, info, trace};
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
     config::Config, connection::HandshakeError, filters::Filters, general::General,
-    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, profiles::Profiles,
-    recording::Recording, replay_buffer::ReplayBuffer, scene_collections::SceneCollections,
-    scene_items::SceneItems, scenes::Scenes, sources::Sources, streaming::Streaming,
-    transitions::Transitions, ui::Ui, virtual_cam::VirtualCam,
+    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
+    profiles::Profiles, recording::Recording, replay_buffer::ReplayBuffer,
+    scene_collections::SceneCollections, scene_items::SceneItems, scenes::Scenes, sources::Sources,
+    streaming::Streaming, transitions::Transitions, ui::Ui, virtual_cam::VirtualCam,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
@@ -50,6 +50,7 @@ mod general;
 mod hotkeys;
 mod inputs;
 mod media_inputs;
+mod outputs;
 mod profiles;
 mod recording;
 mod replay_buffer;
@@ -247,6 +248,7 @@ impl Client {
                             trace!(
                                 id = %response.id,
                                 status = ?response.status,
+                                data = %response.data,
                                 "got request-response message",
                             );
                             receivers2.notify(response).await?;
@@ -480,6 +482,11 @@ impl Client {
     /// Access API functions related to media inputs.
     pub fn media_inputs(&self) -> MediaInputs<'_> {
         MediaInputs { client: self }
+    }
+
+    /// Access API functions related to outputs.
+    pub fn outputs(&self) -> Outputs<'_> {
+        Outputs { client: self }
     }
 
     /// Access API functions related to profiles.

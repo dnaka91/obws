@@ -1,4 +1,4 @@
-//! Requests related to media filters.
+//! Requests related to media inputs.
 
 use serde::Serialize;
 use time::Duration;

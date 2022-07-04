@@ -7,6 +7,7 @@ mod general;
 mod hotkeys;
 mod inputs;
 mod media_inputs;
+mod outputs;
 mod profiles;
 mod recording;
 mod replay_buffer;

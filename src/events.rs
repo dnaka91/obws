@@ -311,6 +311,9 @@ pub enum Event {
         /// The specific state of the output.
         #[serde(rename = "outputState")]
         state: OutputState,
+        /// File name for the saved recording, if record stopped.
+        #[serde(rename = "outputPath")]
+        path: Option<String>,
     },
     /// The state of the replay buffer output has changed.
     ReplayBufferStateChanged {

@@ -24,7 +24,6 @@ pub struct RecordStatus {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub(crate) struct OutputActive {
     /// New state of the stream output.
     #[serde(rename = "outputActive")]
@@ -32,7 +31,13 @@ pub(crate) struct OutputActive {
 }
 
 #[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
+pub(crate) struct OutputStopped {
+    /// File name for the saved recording.
+    #[serde(rename = "outputPath")]
+    pub path: String,
+}
+
+#[derive(Debug, Deserialize)]
 pub(crate) struct OutputPaused {
     #[serde(rename = "outputPaused")]
     pub paused: bool,

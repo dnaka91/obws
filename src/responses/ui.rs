@@ -24,6 +24,9 @@ pub struct Monitor {
     /// Name of this monitor.
     #[serde(rename = "monitorName")]
     pub name: String,
+    /// Positional index in the list of monitors.
+    #[serde(rename = "monitorIndex")]
+    pub index: u32,
     /// Pixel size.
     #[serde(flatten)]
     pub size: MonitorSize,
