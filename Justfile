@@ -28,6 +28,6 @@ upload-coverage: coverage
     rm -rf coverage coverage.json index.html style.css
     cp -R target/llvm-cov/html/ .
     git add -A coverage coverage.json index.html style.css
-    git commit -m "Coverage for $(git rev-parse --short v5-api)"
+    git commit -m "Coverage for $(git rev-parse --short main)"
     git push
-    git checkout v5-api
+    git checkout main
