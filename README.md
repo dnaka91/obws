@@ -20,12 +20,11 @@ Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 
 ## Usage
 
-Add `obws` to your project with `cargo add obws` (needs [cargo-edit]) or add it manually to your
-`Cargo.toml`:
+Add `obws` to your project with `cargo add obws` or add it manually to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-obws = { git = "https://github.com/dnaka91/obws.git", branch = "v5-api" }
+obws = "0.9.1"
 ```
 
 In addition, you will need to use the latest [tokio](https://tokio.rs) runtime to use this library
