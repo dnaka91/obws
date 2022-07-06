@@ -50,11 +50,11 @@ async fn main() -> Result<()> {
     let client = Client::connect("localhost", 4455, Some("password")).await?;
 
     /// Get and print out version information of OBS and obs-websocket.
-    let version = client.general().get_version().await?;
+    let version = client.general().version().await?;
     println!("{:#?}", version);
 
     /// Get a list of available scenes and print them out.
-    let scene_list = client.scenes().get_scene_list().await?;
+    let scene_list = client.scenes().list().await?;
     println!("{:#?}", scene_list);
 
     Ok(())
