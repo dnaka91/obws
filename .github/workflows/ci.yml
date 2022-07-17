@@ -12,9 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Rust
-        uses: taiki-e/github-actions/install-rust@main
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
       - name: Configure cache
         uses: Swatinem/rust-cache@v1
       - name: Install cargo-hack
@@ -32,7 +30,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Rust
-        uses: taiki-e/github-actions/install-rust@main
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
       - name: Configure cache
@@ -46,17 +44,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Rust (nightly)
-        uses: taiki-e/github-actions/install-rust@main
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          toolchain: nightly
-          component: rustfmt
+          components: rustfmt
       - name: Run rustfmt
         run: cargo fmt -- --check
       - name: Setup Rust (stable)
-        uses: taiki-e/github-actions/install-rust@main
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          component: clippy
+          components: clippy
       - name: Configure cache
         uses: Swatinem/rust-cache@v1
       - name: Run clippy
