@@ -86,7 +86,10 @@ impl ReidentifyReceiverList {
 #[derive(Debug, thiserror::Error)]
 pub enum HandshakeError {
     /// The connection to obs-websocket was interrupted while trying to read a message.
-    #[error("connection to obs-websocket was closed")]
+    #[error("connection to obs-websocket was closed: {}", match .0 {
+        Some(details) => &details.reason,
+        None => "no details provided",
+    })]
     ConnectionClosed(Option<CloseDetails>),
     /// Receiving a message did not succeed.
     #[error("failed reading websocket message")]
