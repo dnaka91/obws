@@ -2,6 +2,7 @@ use std::collections::{HashMap, VecDeque};
 
 use futures_util::{Sink, SinkExt, Stream, StreamExt};
 use tokio::sync::{oneshot, Mutex};
+pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::Message;
 use tracing::debug;
 
@@ -86,7 +87,7 @@ impl ReidentifyReceiverList {
 pub enum HandshakeError {
     /// The connection to obs-websocket was interrupted while trying to read a message.
     #[error("connection to obs-websocket was closed")]
-    ConnectionClosed,
+    ConnectionClosed(Option<CloseDetails>),
     /// Receiving a message did not succeed.
     #[error("failed reading websocket message")]
     Receive(#[source] tokio_tungstenite::tungstenite::Error),
@@ -110,6 +111,19 @@ pub enum HandshakeError {
     NoIdentified,
 }
 
+/// Description about the reason of why the web-socket connection was closed.
+#[derive(Debug)]
+pub struct CloseDetails {
+    /// Close code to precisely identify the reason.
+    ///
+    /// This can be turned into a [`u16`] and compared against the
+    /// [`WebSocketCloseCode`](crate::responses::WebSocketCloseCode) to further identify the close
+    /// reason, if related to `obs-websocket`.
+    pub code: CloseCode,
+    /// Textual representation of the close code, or additional details for it.
+    pub reason: String,
+}
+
 pub(super) async fn handshake(
     write: &mut (impl Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Unpin),
     read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
@@ -119,13 +133,22 @@ pub(super) async fn handshake(
     async fn read_message(
         read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
     ) -> Result<ServerMessage, HandshakeError> {
-        let message = read
+        let mut message = read
             .next()
             .await
-            .ok_or(HandshakeError::ConnectionClosed)?
-            .map_err(HandshakeError::Receive)?
-            .into_text()
-            .map_err(HandshakeError::IntoText)?;
+            .ok_or(HandshakeError::ConnectionClosed(None))?
+            .map_err(HandshakeError::Receive)?;
+
+        if let Message::Close(info) = &mut message {
+            return Err(HandshakeError::ConnectionClosed(info.take().map(|i| {
+                CloseDetails {
+                    code: i.code,
+                    reason: i.reason.into_owned(),
+                }
+            })));
+        }
+
+        let message = message.into_text().map_err(HandshakeError::IntoText)?;
 
         serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
     }
