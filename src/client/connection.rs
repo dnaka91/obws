@@ -108,6 +108,12 @@ pub enum HandshakeError {
     /// Didn't receive a `Identified` message from obs-websocket after authentication.
     #[error("didn't receive a `Identified` message")]
     NoIdentified,
+    /// Authentication to obs-websocket failed.
+    #[error("authentication to obs-websocket failed")]
+    AuthenticationFailed,
+    /// The obs-websocket API requires authentication but no password was given.
+    #[error("authentication required but no password provided")]
+    NoPassword,
 }
 
 pub(super) async fn handshake(
@@ -127,7 +133,13 @@ pub(super) async fn handshake(
             .into_text()
             .map_err(HandshakeError::IntoText)?;
 
-        serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
+        match message.as_ref() {
+            "Authentication failed." => Err(HandshakeError::AuthenticationFailed),
+            "Your payload's data is missing an `authentication` string, however authentication is required." => Err(HandshakeError::NoPassword),
+            message => {
+                serde_json::from_str::<ServerMessage>(message).map_err(HandshakeError::DeserializeMessage)
+            }
+        }
     }
 
     match read_message(read).await? {
