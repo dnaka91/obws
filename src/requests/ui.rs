@@ -131,8 +131,8 @@ pub enum VideoMixType {
     Multiview,
 }
 
-/// Request information for [`open_projector`](crate::client::General::open_projector) as part of
-/// [`Projector`].
+/// Request information for [`crate::client::Ui::open_video_mix_projector`] and
+/// [`crate::client::Ui::open_source_projector`] as part of [`Location`].
 #[derive(Debug)]
 pub struct QtGeometry {
     /// The screen number to display a widget or [`Self::DEFAULT_SCREEN`] to let OBS pick the
@@ -251,8 +251,8 @@ impl QtWindowState {
     }
 }
 
-/// Request information for [`open_projector`](crate::client::General::open_projector) as part of
-/// [`Projector`].
+/// Request information for [`crate::client::Ui::open_video_mix_projector`] and
+/// [`crate::client::Ui::open_source_projector`] as part of [`QtGeometry`].
 ///
 /// This describes a position on the screen starting from the top left corner with 0.
 ///
