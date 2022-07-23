@@ -1,7 +1,10 @@
 use std::collections::{HashMap, VecDeque};
 
 use futures_util::{Sink, SinkExt, Stream, StreamExt};
-use tokio::sync::{oneshot, Mutex};
+use tokio::{
+    sync::{oneshot, Mutex},
+    time::{timeout, Duration},
+};
 pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::Message;
 use tracing::debug;
@@ -156,7 +159,11 @@ pub(super) async fn handshake(
         serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
     }
 
-    match read_message(read).await? {
+    let server_message = timeout(Duration::from_secs(5), read_message(read))
+        .await
+        .map_err(|_| HandshakeError::NoHello)?;
+
+    match server_message? {
         ServerMessage::Hello(Hello {
             obs_web_socket_version: _,
             rpc_version,
