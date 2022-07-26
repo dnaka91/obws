@@ -3,7 +3,7 @@ use std::collections::{HashMap, VecDeque};
 use futures_util::{Sink, SinkExt, Stream, StreamExt};
 use tokio::{
     sync::{oneshot, Mutex},
-    time::{timeout, Duration},
+    time::{self, Duration},
 };
 pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::Message;
@@ -159,7 +159,7 @@ pub(super) async fn handshake(
         serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
     }
 
-    let server_message = timeout(Duration::from_secs(5), read_message(read))
+    let server_message = time::timeout(Duration::from_secs(5), read_message(read))
         .await
         .map_err(|_| HandshakeError::NoHello)?;
 
