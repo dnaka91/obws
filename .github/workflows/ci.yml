@@ -14,7 +14,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Configure cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
       - name: Install cargo-hack
         run: cargo install cargo-hack
       - name: Check feature combinations
@@ -34,7 +34,7 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
       - name: Configure cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
       - name: Test
         run: cargo test
   lint:
@@ -54,7 +54,7 @@ jobs:
         with:
           components: clippy
       - name: Configure cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
       - name: Run clippy
         run: cargo clippy -- -D warnings
   cargo-deny:
