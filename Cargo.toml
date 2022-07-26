@@ -30,7 +30,7 @@ serde_with = "2.0.0"
 sha2 = "0.10.2"
 thiserror = "1.0.31"
 time = "0.3.11"
-tokio = { version = "1.19.2", features = ["net", "rt", "sync"] }
+tokio = { version = "1.19.2", features = ["net", "rt", "sync", "time"] }
 tokio-tungstenite = "0.17.1"
 tracing = "0.1.35"
 
