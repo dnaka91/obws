@@ -33,6 +33,11 @@ impl<'a> Inputs<'a> {
             .map(|ik| ik.input_kinds)
     }
 
+    /// Gets the names of all special inputs.
+    pub async fn specials(&self) -> Result<responses::SpecialInputs> {
+        self.client.send_message(Request::Specials).await
+    }
+
     /// Gets the default settings for an input kind.
     pub async fn default_settings<T>(&self, kind: &str) -> Result<T>
     where
@@ -143,6 +148,21 @@ impl<'a> Inputs<'a> {
         self.client.send_message(Request::Remove { name }).await
     }
 
+    /// Gets the audio balance of an input.
+    pub async fn audio_balance(&self, name: &str) -> Result<f32> {
+        self.client
+            .send_message::<_, responses::AudioBalance>(Request::AudioBalance { name })
+            .await
+            .map(|ab| ab.audio_balance)
+    }
+
+    /// Sets the audio balance of an input.
+    pub async fn set_audio_balance(&self, name: &str, balance: f32) -> Result<()> {
+        self.client
+            .send_message(Request::SetAudioBalance { name, balance })
+            .await
+    }
+
     /// Gets the audio sync offset of an input.
     ///
     /// **Note:** The audio sync offset can be negative too!
@@ -176,6 +196,21 @@ impl<'a> Inputs<'a> {
     ) -> Result<()> {
         self.client
             .send_message(Request::SetAudioMonitorType { name, monitor_type })
+            .await
+    }
+
+    /// Gets the enable state of all audio tracks of an input.
+    pub async fn audio_tracks(&self, name: &str) -> Result<[bool; 6]> {
+        self.client
+            .send_message::<_, responses::AudioTracks>(Request::AudioTracks { name })
+            .await
+            .map(|at| at.audio_tracks)
+    }
+
+    /// Sets the enable state of audio tracks of an input.
+    pub async fn set_audio_tracks(&self, name: &str, tracks: [Option<bool>; 6]) -> Result<()> {
+        self.client
+            .send_message(Request::SetAudioTracks { name, tracks })
             .await
     }
 

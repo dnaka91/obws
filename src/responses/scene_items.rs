@@ -2,7 +2,7 @@
 
 use serde::Deserialize;
 
-use crate::common::{Alignment, BoundsType};
+use crate::common::{Alignment, BlendMode, BoundsType};
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemId {
@@ -128,7 +128,7 @@ pub struct SceneItemTransform {
     pub crop_bottom: u32,
 }
 
-/// Response value for [`crate::client::SceneItems::get_enabled`].
+/// Response value for [`crate::client::SceneItems::enabled`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemEnabled {
     /// Whether the scene item is enabled.
@@ -136,7 +136,7 @@ pub(crate) struct SceneItemEnabled {
     pub enabled: bool,
 }
 
-/// Response value for [`crate::client::SceneItems::get_locked`].
+/// Response value for [`crate::client::SceneItems::locked`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemLocked {
     /// Whether the scene item is locked.
@@ -144,7 +144,7 @@ pub(crate) struct SceneItemLocked {
     pub locked: bool,
 }
 
-/// Response value for [`crate::client::SceneItems::get_index`].
+/// Response value for [`crate::client::SceneItems::index`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemIndex {
     /// Index position of the scene item.
@@ -152,7 +152,14 @@ pub(crate) struct SceneItemIndex {
     pub index: u32,
 }
 
-/// Response value for [`crate::client::SceneItems::get_private_settings`].
+/// Response value for [`crate::client::SceneItems::blend_mode`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct SceneItemBlendMode {
+    #[serde(rename = "sceneItemBlendMode")]
+    pub blend_mode: BlendMode,
+}
+
+/// Response value for [`crate::client::SceneItems::private_settings`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemSettings<T> {
     #[serde(rename = "sceneItemSettings")]

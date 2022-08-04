@@ -3,7 +3,7 @@
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 
-use crate::common::{Alignment, BoundsType};
+use crate::common::{Alignment, BlendMode, BoundsType};
 
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
@@ -79,6 +79,17 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "SetSceneItemIndex")]
     SetIndex(SetIndex<'a>),
+    #[serde(rename = "GetSceneItemBlendMode")]
+    BlendMode {
+        /// Name of the scene the item is in.
+        #[serde(rename = "sceneName")]
+        scene: &'a str,
+        ///  Numeric ID of the scene item.
+        #[serde(rename = "sceneItemId")]
+        item_id: i64,
+    },
+    #[serde(rename = "SetSceneItemBlendMode")]
+    SetBlendMode(SetBlendMode<'a>),
     #[serde(rename = "GetSceneItemPrivateSettings")]
     PrivateSettings {
         /// Name of the scene the item is in.
@@ -317,6 +328,20 @@ pub struct SetIndex<'a> {
     /// New index position of the scene item.
     #[serde(rename = "sceneItemIndex")]
     pub index: u32,
+}
+
+/// Request information for [`crate::client::SceneItems::set_blend_mode`].
+#[derive(Serialize)]
+pub struct SetBlendMode<'a> {
+    /// Name of the scene the item is in.
+    #[serde(rename = "sceneName")]
+    pub scene: &'a str,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+    /// New blend mode.
+    #[serde(rename = "sceneItemBlendMode")]
+    pub mode: BlendMode,
 }
 
 /// Request information for [`crate::client::SceneItems::set_private_settings`].

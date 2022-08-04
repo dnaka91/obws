@@ -14,6 +14,7 @@ async fn inputs() -> Result<()> {
 
     client.list(None).await?;
     client.list_kinds(false).await?;
+    client.specials().await?;
     client
         .default_settings::<serde_json::Value>(INPUT_KIND_BROWSER)
         .await?;
@@ -44,6 +45,10 @@ async fn inputs() -> Result<()> {
     client.set_name(TEST_BROWSER, TEST_BROWSER_RENAME).await?;
     client.set_name(TEST_BROWSER_RENAME, TEST_BROWSER).await?;
 
+    let balance = client.audio_balance(TEST_MEDIA).await?;
+    client.set_audio_balance(TEST_MEDIA, balance / 2.0).await?;
+    client.set_audio_balance(TEST_MEDIA, balance).await?;
+
     let offset = client.audio_sync_offset(TEST_MEDIA).await?;
     client
         .set_audio_sync_offset(TEST_MEDIA, Duration::milliseconds(500))
@@ -56,6 +61,14 @@ async fn inputs() -> Result<()> {
         .await?;
     client
         .set_audio_monitor_type(TEST_MEDIA, monitor_type)
+        .await?;
+
+    let tracks = client.audio_tracks(TEST_MEDIA).await?;
+    client
+        .set_audio_tracks(TEST_MEDIA, [Some(!tracks[0]), None, None, None, None, None])
+        .await?;
+    client
+        .set_audio_tracks(TEST_MEDIA, [Some(tracks[0]), None, None, None, None, None])
         .await?;
 
     Ok(())

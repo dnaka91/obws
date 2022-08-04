@@ -21,6 +21,8 @@ pub(crate) enum Request<'a> {
         #[serde(rename = "unversioned")]
         unversioned: bool,
     },
+    #[serde(rename = "GetSpecialInputs")]
+    Specials,
     #[serde(rename = "GetInputDefaultSettings")]
     DefaultSettings {
         /// Input kind to get the default settings for.
@@ -88,6 +90,21 @@ pub(crate) enum Request<'a> {
         #[serde(rename = "inputName")]
         name: &'a str,
     },
+    #[serde(rename = "GetInputAudioBalance")]
+    AudioBalance {
+        /// Name of the input to get the audio balance of.
+        #[serde(rename = "inputName")]
+        name: &'a str,
+    },
+    #[serde(rename = "SetInputAudioBalance")]
+    SetAudioBalance {
+        /// Name of the input to set the audio balance of.
+        #[serde(rename = "inputName")]
+        name: &'a str,
+        /// New audio balance value. Must be in range of `0.0..=1.0`.
+        #[serde(rename = "inputAudioBalance")]
+        balance: f32,
+    },
     #[serde(rename = "GetInputAudioSyncOffset")]
     AudioSyncOffset {
         /// Name of the input to get the audio sync offset of.
@@ -120,6 +137,21 @@ pub(crate) enum Request<'a> {
         /// Audio monitor type.
         #[serde(rename = "monitorType")]
         monitor_type: MonitorType,
+    },
+    #[serde(rename = "GetInputAudioTracks")]
+    AudioTracks {
+        /// Name of the input.
+        #[serde(rename = "inputName")]
+        name: &'a str,
+    },
+    #[serde(rename = "SetInputAudioTracks")]
+    SetAudioTracks {
+        /// Name of the input.
+        #[serde(rename = "inputName")]
+        name: &'a str,
+        /// Track settings to apply.
+        #[serde(rename = "inputAudioTracks", with = "crate::serde::audio_tracks")]
+        tracks: [Option<bool>; 6],
     },
     #[serde(rename = "GetInputPropertiesListPropertyItems")]
     PropertiesListPropertyItems {

@@ -78,7 +78,7 @@ the equivalent function calls.
 | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
 | GetInputList                        | [`Inputs::list`](crate::client::Inputs::list)                                                     |
 | GetInputKindList                    | [`Inputs::list_kinds`](crate::client::Inputs::list_kinds)                                         |
-| GetSpecialInputs                    | -                                                                                                 |
+| GetSpecialInputs                    | [`Inputs::specials`](crate::client::Inputs::specials)                                             |  |
 | CreateInput                         | [`Inputs::create`](crate::client::Inputs::create)                                                 |
 | RemoveInput                         | [`Inputs::remove`](crate::client::Inputs::remove)                                                 |
 | SetInputName                        | [`Inputs::set_name`](crate::client::Inputs::set_name)                                             |
@@ -90,14 +90,14 @@ the equivalent function calls.
 | ToggleInputMute                     | [`Inputs::toggle_mute`](crate::client::Inputs::toggle_mute)                                       |
 | GetInputVolume                      | [`Inputs::volume`](crate::client::Inputs::volume)                                                 |
 | SetInputVolume                      | [`Inputs::set_volume`](crate::client::Inputs::set_volume)                                         |
-| GetInputAudioBalance                | -                                                                                                 |
-| SetInputAudioBalance                | -                                                                                                 |
+| GetInputAudioBalance                | [`Inputs::audio_balance](crate::client::Inputs::audio_balance)                                    |
+| SetInputAudioBalance                | [`Inputs::set_audio_balance](crate::client::Inputs::set_audio_balance)                            |
 | GetInputAudioSyncOffset             | [`Inputs::audio_sync_offset`](crate::client::Inputs::audio_sync_offset)                           |
 | SetInputAudioSyncOffset             | [`Inputs::set_audio_sync_offset`](crate::client::Inputs::set_audio_sync_offset)                   |
 | GetInputAudioMonitorType            | [`Inputs::audio_monitor_type`](crate::client::Inputs::audio_monitor_type)                         |
 | SetInputAudioMonitorType            | [`Inputs::set_audio_monitor_type`](crate::client::Inputs::set_audio_monitor_type)                 |
-| GetInputAudioTracks                 | -                                                                                                 |
-| SetInputAudioTracks                 | -                                                                                                 |
+| GetInputAudioTracks                 | [`Inputs::audio_tracks](crate::client::Inputs::audio_tracks)                                      |
+| SetInputAudioTracks                 | [`Inputs::set_audio_tracks](crate::client::Inputs::set_audio_tracks)                              |
 | GetInputPropertiesListPropertyItems | [`Inputs::properties_list_property_items`](crate::client::Inputs::properties_list_property_items) |
 | PressInputPropertiesButton          | [`Inputs::press_properties_button`](crate::client::Inputs::press_properties_button)               |
 
@@ -147,8 +147,8 @@ the equivalent function calls.
 | SetSceneItemLocked              | [`SceneItems::set_locked`](crate::client::SceneItems::set_locked)                     |
 | GetSceneItemIndex               | [`SceneItems::index`](crate::client::SceneItems::index)                               |
 | SetSceneItemIndex               | [`SceneItems::set_index`](crate::client::SceneItems::set_index)                       |
-| GetSceneItemBlendMode           | -                                                                                     |
-| SetSceneItemBlendMode           | -                                                                                     |
+| GetSceneItemBlendMode           | [`SceneItems::blend_mode`](crate::client::SceneItems::blend_mode)                     |
+| SetSceneItemBlendMode           | [`SceneItems::set_blend_mode`](crate::client::SceneItems::set_blend_mode)             |
 | GetSceneItemPrivateSettings[^2] | [`SceneItems::private_settings`](crate::client::SceneItems::private_settings)         |
 | SetSceneItemPrivateSettings[^2] | [`SceneItems::set_private_settings`](crate::client::SceneItems::set_private_settings) |
 

@@ -1,9 +1,9 @@
 use anyhow::Result;
 use obws::{
-    common::BoundsType,
+    common::{BlendMode, BoundsType},
     requests::scene_items::{
-        Bounds, CreateSceneItem, Duplicate, Id, SceneItemTransform, SetEnabled, SetIndex,
-        SetLocked, SetTransform,
+        Bounds, CreateSceneItem, Duplicate, Id, SceneItemTransform, SetBlendMode, SetEnabled,
+        SetIndex, SetLocked, SetTransform,
     },
 };
 
@@ -116,6 +116,23 @@ async fn scene_items() -> Result<()> {
             scene: TEST_SCENE,
             item_id: test_text_id,
             index,
+        })
+        .await?;
+
+    let mode = client.blend_mode(TEST_SCENE, test_text_id).await?;
+    assert_eq!(BlendMode::Normal, mode);
+    client
+        .set_blend_mode(SetBlendMode {
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+            mode: BlendMode::Multiply,
+        })
+        .await?;
+    client
+        .set_blend_mode(SetBlendMode {
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+            mode,
         })
         .await?;
 

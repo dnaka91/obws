@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::Error;
 
 /// Monitoring type for audio outputs.
-#[derive(Clone, Copy, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MonitorType {
     /// No monitoring.
     #[serde(rename = "OBS_MONITORING_TYPE_NONE")]
@@ -85,7 +85,7 @@ impl From<Alignment> for u8 {
 }
 
 /// Different kinds of bounds that can be applied to different items on the scene.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum BoundsType {
     /// No bounds.
     #[serde(rename = "OBS_BOUNDS_NONE")]
@@ -110,8 +110,8 @@ pub enum BoundsType {
     MaxOnly,
 }
 
-/// Different kind of media actions that can be performed (or happen in events).
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+/// Different kinds of media actions that can be performed (or happen in events).
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum MediaAction {
     /// No media action.
     #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NONE")]
@@ -134,4 +134,30 @@ pub enum MediaAction {
     /// Play the previous media in the list.
     #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_PREVIOUS")]
     Previous,
+}
+
+/// Different kinds of scene item blend modes.
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub enum BlendMode {
+    /// No blending, overlaying without mixing colors, except for transparency.
+    #[serde(rename = "OBS_BLEND_NORMAL")]
+    Normal,
+    /// Add the pixel values to the ones beneath.
+    #[serde(rename = "OBS_BLEND_ADDITIVE")]
+    Additive,
+    /// Subtract the pixel values from the ones beneath.
+    #[serde(rename = "OBS_BLEND_SUBTRACT")]
+    Subtract,
+    /// Brightening mode, similar to [`Self::Lighten`].
+    #[serde(rename = "OBS_BLEND_SCREEN")]
+    Screen,
+    /// Multiply the luminosity with the pixels beneath.
+    #[serde(rename = "OBS_BLEND_MULTIPLY")]
+    Multiply,
+    /// Select pixels based on the lightest luminance value.
+    #[serde(rename = "OBS_BLEND_LIGHTEN")]
+    Lighten,
+    /// Select pixels based on the darkest luminance value.
+    #[serde(rename = "OBS_BLEND_DARKEN")]
+    Darken,
 }

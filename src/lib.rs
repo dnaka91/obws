@@ -26,6 +26,11 @@
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ## Differences to obs-websocket API design
+//!
+//! You may notice that several functions are named differently from the original `obs-websocket`
+//! documentation. To help you find the right functions, have a look at [`docs::mapping`].
 
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
 

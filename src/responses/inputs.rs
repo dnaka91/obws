@@ -27,12 +27,35 @@ pub struct Input {
     pub unversioned_kind: String,
 }
 
-/// Response value for [`crate::client::Inputs::get_input_kind_list`].
+/// Response value for [`crate::client::Inputs::list_kinds`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct InputKinds {
     /// Array of input kinds.
     #[serde(rename = "inputKinds")]
     pub input_kinds: Vec<String>,
+}
+
+/// Response value for [`crate::client::Inputs::specials`].
+#[derive(Debug, Deserialize)]
+pub struct SpecialInputs {
+    /// Name of the Desktop Audio input.
+    #[serde(rename = "desktop1")]
+    pub desktop1: Option<String>,
+    /// Name of the Desktop Audio 2 input.
+    #[serde(rename = "desktop2")]
+    pub desktop2: Option<String>,
+    /// Name of the Mic/Auxiliary Audio input.
+    #[serde(rename = "mic1")]
+    pub mic1: Option<String>,
+    /// Name of the Mic/Auxiliary Audio 2 input.
+    #[serde(rename = "mic2")]
+    pub mic2: Option<String>,
+    /// Name of the Mic/Auxiliary Audio 3 input.
+    #[serde(rename = "mic3")]
+    pub mic3: Option<String>,
+    /// Name of the Mic/Auxiliary Audio 4 input.
+    #[serde(rename = "mic4")]
+    pub mic4: Option<String>,
 }
 
 /// Response value for
@@ -75,7 +98,14 @@ pub struct InputVolume {
     pub db: f32,
 }
 
-/// Response value for [`crate::client::Inputs::get_audio_sync_offset`].
+/// Response value for [`crate::client::Inputs::audio_balance`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct AudioBalance {
+    #[serde(rename = "inputAudioBalance")]
+    pub audio_balance: f32,
+}
+
+/// Response value for [`crate::client::Inputs::audio_sync_offset`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct AudioSyncOffset {
     /// Audio sync offset in milliseconds.
@@ -86,12 +116,20 @@ pub(crate) struct AudioSyncOffset {
     pub input_audio_sync_offset: Duration,
 }
 
-/// Response value for [`crate::client::Inputs::get_audio_monitor_type`].
+/// Response value for [`crate::client::Inputs::audio_monitor_type`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct AudioMonitorType {
     /// Audio monitor type.
     #[serde(rename = "monitorType")]
     pub monitor_type: MonitorType,
+}
+
+/// Response value for [`crate::client::Inputs::audio_tracks`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct AudioTracks {
+    /// Object of audio tracks and associated enable states.
+    #[serde(rename = "inputAudioTracks", with = "crate::serde::audio_tracks")]
+    pub audio_tracks: [bool; 6],
 }
 
 /// Response value for [`crate::client::Inputs::get_properties_list_property_items`].

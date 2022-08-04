@@ -2,8 +2,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
+    common::BlendMode,
     requests::scene_items::{
-        CreateSceneItem, Duplicate, Id, Request, SetEnabled, SetIndex, SetLocked,
+        CreateSceneItem, Duplicate, Id, Request, SetBlendMode, SetEnabled, SetIndex, SetLocked,
         SetPrivateSettings, SetPrivateSettingsInternal, SetTransform,
     },
     responses::scene_items as responses,
@@ -126,6 +127,19 @@ impl<'a> SceneItems<'a> {
     /// Sets the index position of a scene item in a scene.
     pub async fn set_index(&self, index: SetIndex<'_>) -> Result<()> {
         self.client.send_message(Request::SetIndex(index)).await
+    }
+
+    /// Gets the blend mode of a scene item.
+    pub async fn blend_mode(&self, scene: &str, item_id: i64) -> Result<BlendMode> {
+        self.client
+            .send_message::<_, responses::SceneItemBlendMode>(Request::BlendMode { scene, item_id })
+            .await
+            .map(|sibm| sibm.blend_mode)
+    }
+
+    /// Sets the blend mode of a scene item.
+    pub async fn set_blend_mode(&self, mode: SetBlendMode<'a>) -> Result<()> {
+        self.client.send_message(Request::SetBlendMode(mode)).await
     }
 
     /// Gets private scene item settings.
