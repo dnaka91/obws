@@ -36,6 +36,8 @@ pub use self::client::Client;
 
 pub mod client;
 pub mod common;
+#[cfg(doc)]
+pub mod docs;
 #[cfg(feature = "events")]
 pub mod events;
 pub mod requests;
