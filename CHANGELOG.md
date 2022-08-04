@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- **BREAKING CHANGE:** Update to the new obs-websocket v5 API, which is a complete rewrite, so
+  all APIs of this crate had to change as well. Expect all types and function calls to be slightly
+  different.
+  - In addition, I didn't agree with the new naming scheme in obs-websocket, as it includes a great
+    amount of naming repetition. Therefore, most function calls and data structures/fields are
+    named different to be more concise.
+  - Thank you to [@715209](https://github.com/715209) and [@Elinvynia](https://github.com/Elinvynia)
+    for testing out these changes pre-release ❤️. Your ideas and bug reports helped a lot!
+
 ## [0.9.1] - 2022-02-25
 
 ### Fixed
