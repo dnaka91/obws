@@ -154,10 +154,10 @@ pub enum BlendMode {
     /// Multiply the luminosity with the pixels beneath.
     #[serde(rename = "OBS_BLEND_MULTIPLY")]
     Multiply,
-    /// Select pixels based on the lightest luminance value.
+    /// Select pixels based on the lightest luminescence value.
     #[serde(rename = "OBS_BLEND_LIGHTEN")]
     Lighten,
-    /// Select pixels based on the darkest luminance value.
+    /// Select pixels based on the darkest luminescence value.
     #[serde(rename = "OBS_BLEND_DARKEN")]
     Darken,
 }

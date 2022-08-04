@@ -268,7 +268,7 @@ pub enum StatusCode {
 pub enum WebSocketCloseCode {
     /// Unknown reason, should never be used.
     UnknownReason = 4000,
-    /// The server was unable to decode the incoming websocket message.
+    /// The server was unable to decode the incoming web-socket message.
     MessageDecodeError = 4002,
     /// A data field is required but missing from the payload.
     MissingDataField = 4003,
@@ -278,7 +278,7 @@ pub enum WebSocketCloseCode {
     InvalidDataFieldValue = 4005,
     /// The specified `op` was invalid or missing.
     UnknownOpCode = 4006,
-    /// The client sent a websocket message without first sending `Identify` message.
+    /// The client sent a web-socket message without first sending `Identify` message.
     NotIdentified = 4007,
     /// The client sent an `Identify` message while already identified.
     ///
@@ -289,7 +289,7 @@ pub enum WebSocketCloseCode {
     AuthenticationFailed = 4009,
     /// The server detected the usage of an old version of the obs-websocket RPC protocol.
     UnsupportedRpcVersion = 4010,
-    /// The websocket session has been invalidated by the obs-websocket server.
+    /// The web-socket session has been invalidated by the obs-websocket server.
     ///
     /// **Note:** This is the code used by the `Kick` button in the UI Session List. If you receive
     /// this code, you must not automatically reconnect.
