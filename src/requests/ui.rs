@@ -278,6 +278,6 @@ pub struct QtRect {
     /// `right = 300` the width would be `200`.
     pub right: i32,
     /// Bottom side of a rectangle counted from the top. For example with `top = 100` and
-    //// `bottom = 300` the height would be `200`.
+    /// `bottom = 300` the height would be `200`.
     pub bottom: i32,
 }
