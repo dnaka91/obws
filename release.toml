@@ -9,6 +9,13 @@ dev-version = false
 file = "README.md"
 search = 'obws = "[a-z0-9\.-]+"'
 replace = 'obws = "{{version}}"'
+prerelease = true
+
+[[pre-release-replacements]]
+file = "README.md"
+search = '`cargo add obws@[a-z0-9\.-]+`'
+replace = '`cargo add obws@{{version}}`'
+prerelease = true
 
 [[pre-release-replacements]]
 file = "CHANGELOG.md"
