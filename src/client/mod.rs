@@ -137,7 +137,7 @@ where
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
     op: Op::GreaterEq,
-    major: 27,
+    major: 28,
     minor: None,
     patch: None,
     pre: Prerelease::EMPTY,
@@ -302,7 +302,7 @@ impl Client {
     }
 
     async fn verify_versions(&self) -> Result<()> {
-        let mut version = self.general().version().await?;
+        let version = self.general().version().await?;
 
         if !OBS_STUDIO_VERSION.matches(&version.obs_version) {
             return Err(Error::ObsStudioVersion(
