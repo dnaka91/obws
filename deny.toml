@@ -1,3 +1,6 @@
+[advisories]
+ignore = ["RUSTSEC-2021-0139"]
+
 [licenses]
 allow = [
     "MPL-2.0",
