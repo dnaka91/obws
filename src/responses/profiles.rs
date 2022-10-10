@@ -1,9 +1,9 @@
 //! Responses related to profiles.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::Profiles::list`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Profiles {
     /// The name of the current profile.
     #[serde(rename = "currentProfileName")]
@@ -13,7 +13,7 @@ pub struct Profiles {
 }
 
 /// Response value for [`crate::client::Profiles::parameter`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct ProfileParameter {
     /// Value associated with the parameter.
     #[serde(rename = "parameterValue")]

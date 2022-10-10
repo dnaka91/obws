@@ -1,6 +1,6 @@
 //! Responses related to outputs.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 #[derive(Debug, Deserialize)]
@@ -9,7 +9,7 @@ pub(crate) struct OutputList {
 }
 
 /// Response value for [`crate::client::Outputs::list`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Output {
     /// Name of this output.
     #[serde(rename = "outputName")]
@@ -32,7 +32,7 @@ pub struct Output {
 }
 
 /// Response value for [`crate::client::Outputs::list`] as part of [`Output`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct OutputFlags {
     /// Output supports audio.
     #[serde(rename = "OBS_OUTPUT_AUDIO")]
@@ -52,7 +52,7 @@ pub struct OutputFlags {
 }
 
 /// Response value for [`crate::client::Outputs::status`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct OutputStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

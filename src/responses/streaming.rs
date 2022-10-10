@@ -1,10 +1,10 @@
 //! Responses related to streaming.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 /// Response value for [`crate::client::Streaming::status`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct StreamStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

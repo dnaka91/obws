@@ -1,6 +1,6 @@
 //! Responses related to scene items.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::common::{Alignment, BlendMode, BoundsType};
 
@@ -22,7 +22,7 @@ pub(crate) struct SceneItemList {
 
 /// Response value for [`crate::client::SceneItems::list`] and
 /// [`crate::client::SceneItems::list_group`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SceneItem {
     /// Identifier of the scene item.
     #[serde(rename = "sceneItemId")]
@@ -45,7 +45,7 @@ pub struct SceneItem {
 }
 
 /// Kind of source that is represented by a [`SceneItem`].
-#[derive(Copy, Clone, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum SourceType {
     /// Input source from outside of OBS.
     #[serde(rename = "OBS_SOURCE_TYPE_INPUT")]
@@ -70,7 +70,7 @@ pub(crate) struct GetSceneItemTransform {
 }
 
 /// Response value for [`crate::client::SceneItems::transform`].
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct SceneItemTransform {
     /// Base width (without scaling) of the source.
     #[serde(rename = "sourceWidth")]

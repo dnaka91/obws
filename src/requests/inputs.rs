@@ -150,7 +150,10 @@ pub(crate) enum Request<'a> {
         #[serde(rename = "inputName")]
         name: &'a str,
         /// Track settings to apply.
-        #[serde(rename = "inputAudioTracks", with = "crate::serde::audio_tracks")]
+        #[serde(
+            rename = "inputAudioTracks",
+            with = "crate::serde::audio_tracks::option"
+        )]
         tracks: [Option<bool>; 6],
     },
     #[serde(rename = "GetInputPropertiesListPropertyItems")]

@@ -1,6 +1,6 @@
 //! Responses related to inputs.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 use crate::common::MonitorType;
@@ -14,7 +14,7 @@ pub(crate) struct Inputs {
 }
 
 /// Response value for [`crate::client::Inputs::list`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Input {
     /// Name of the input source.
     #[serde(rename = "inputName")]
@@ -36,7 +36,7 @@ pub(crate) struct InputKinds {
 }
 
 /// Response value for [`crate::client::Inputs::specials`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SpecialInputs {
     /// Name of the Desktop Audio input.
     #[serde(rename = "desktop1")]
@@ -68,7 +68,7 @@ pub(crate) struct DefaultInputSettings<T> {
 }
 
 /// Response value for [`crate::client::Inputs::settings`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct InputSettings<T> {
     /// Object of settings for the input.
     #[serde(rename = "inputSettings")]
@@ -88,7 +88,7 @@ pub(crate) struct InputMuted {
 }
 
 /// Response value for [`crate::client::Inputs::volume`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct InputVolume {
     /// Volume setting in mul.
     #[serde(rename = "inputVolumeMul")]
@@ -141,7 +141,7 @@ pub(crate) struct ListPropertyItems {
 }
 
 /// Response value for [`crate::client::Inputs::properties_list_property_items`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ListPropertyItem {
     /// Name of the item.
     #[serde(rename = "itemName")]

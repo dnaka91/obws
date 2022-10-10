@@ -1,10 +1,10 @@
 //! Responses related to media inputs.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 /// Response value for [`crate::client::MediaInputs::status`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct MediaStatus {
     /// State of the media input.
     #[serde(rename = "mediaState")]
@@ -21,9 +21,12 @@ pub struct MediaStatus {
 }
 
 /// Response value for [`crate::client::MediaInputs::status`] as part of [`MediaStatus`].
-#[derive(Copy, Clone, Debug, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
 pub enum MediaState {
     /// No state.
+    #[default]
     #[serde(rename = "OBS_MEDIA_STATE_NONE")]
     None,
     /// Media is playing.

@@ -11,21 +11,6 @@ enum Error<'a> {
     OutOfRange(&'a str),
 }
 
-pub fn serialize<S>(value: &[Option<bool>; 6], serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    let mut map = serializer.serialize_map(Some(value.iter().copied().flatten().count()))?;
-    for (k, v) in ["1", "2", "3", "4", "5", "6"]
-        .into_iter()
-        .zip(value)
-        .filter_map(|(k, v)| v.map(|v| (k, v)))
-    {
-        map.serialize_entry(k, &v)?;
-    }
-    map.end()
-}
-
 pub fn deserialize<'de, D>(deserializer: D) -> Result<[bool; 6], D::Error>
 where
     D: Deserializer<'de>,
@@ -61,6 +46,25 @@ impl<'de> Visitor<'de> for AudioTracksVisitor {
     }
 }
 
+pub mod option {
+    use super::*;
+
+    pub fn serialize<S>(value: &[Option<bool>; 6], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut map = serializer.serialize_map(Some(value.iter().copied().flatten().count()))?;
+        for (k, v) in ["1", "2", "3", "4", "5", "6"]
+            .into_iter()
+            .zip(value)
+            .filter_map(|(k, v)| v.map(|v| (k, v)))
+        {
+            map.serialize_entry(k, &v)?;
+        }
+        map.end()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use serde::{Deserialize, Serialize};
@@ -68,7 +72,7 @@ mod tests {
 
     #[derive(Debug, PartialEq, Serialize)]
     struct SimpleTracksSer {
-        #[serde(with = "super")]
+        #[serde(with = "super::option")]
         value: [Option<bool>; 6],
     }
 

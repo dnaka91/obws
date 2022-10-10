@@ -1,9 +1,9 @@
 //! General responses, not fitting into any category.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::General::version`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Version {
     /// Current OBS Studio version.
     #[serde(rename = "obsVersion")]
@@ -30,7 +30,7 @@ pub struct Version {
 }
 
 /// Response value for [`crate::client::General::stats`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct Stats {
     /// Current CPU usage in percent.
     #[serde(rename = "cpuUsage")]
@@ -68,7 +68,7 @@ pub struct Stats {
 }
 
 /// Response value for [`crate::client::General::call_vendor_request`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct VendorResponse<T> {
     /// Name of the vendor.
     #[serde(rename = "vendorName")]

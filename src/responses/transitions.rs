@@ -1,6 +1,6 @@
 //! Responses related to transitions.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 /// Response value for
@@ -13,7 +13,7 @@ pub(crate) struct TransitionKinds {
 }
 
 /// Response value for [`crate::client::Transitions::list`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SceneTransitionList {
     /// Name of the current scene transition.
     #[serde(rename = "currentSceneTransitionName")]
@@ -27,7 +27,7 @@ pub struct SceneTransitionList {
 }
 
 /// Response value for [`crate::client::Transitions::list`] as part of [`SceneTransitionList`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Transition {
     /// Name of the transition.
     #[serde(rename = "transitionName")]
@@ -44,7 +44,7 @@ pub struct Transition {
 }
 
 /// Response value for [`crate::client::Transitions::current`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct CurrentSceneTransition {
     /// Name of the transition.
     #[serde(rename = "transitionName")]

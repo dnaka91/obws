@@ -2,7 +2,7 @@
 
 use std::{collections::BTreeMap, path::PathBuf};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
 };
 
 /// All possible event types that can occur while the user interacts with OBS.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "eventType", content = "eventData")]
 pub enum Event {
     // --------------------------------
@@ -545,7 +545,7 @@ pub enum Event {
 }
 
 /// Volume meter information for a single input, describing the current volume level.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
 pub struct InputVolumeMeter {
     /// Name of this input.
     #[serde(rename = "inputName")]
@@ -556,7 +556,7 @@ pub struct InputVolumeMeter {
 }
 
 /// The output state describes the current status of any output (like recording, virtual-cam, ...).
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum OutputState {
     /// A request to start the output has been issued.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTING")]
@@ -582,7 +582,7 @@ pub enum OutputState {
 }
 
 /// A basic scene item, only describing identifier and position.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct BasicSceneItem {
     /// Identifier of this scene item.
     #[serde(rename = "sceneItemId")]
@@ -593,7 +593,7 @@ pub struct BasicSceneItem {
 }
 
 /// The scene describes basic details about a single scene setup in OBS.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scene {
     /// Name of this scene.
     #[serde(rename = "sceneName")]

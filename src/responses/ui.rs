@@ -1,6 +1,6 @@
 //! Responses related to the user interface.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::Ui::get_studio_mode_enabled`].
 #[derive(Debug, Deserialize)]
@@ -18,7 +18,7 @@ pub(crate) struct MonitorList {
 }
 
 /// Response value for [`crate::client::Ui::list_monitors`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Monitor {
     /// Name of this monitor.
     #[serde(rename = "monitorName")]
@@ -35,7 +35,7 @@ pub struct Monitor {
 }
 
 /// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct MonitorSize {
     /// Pixel width.
     #[serde(rename = "monitorWidth")]
@@ -46,7 +46,7 @@ pub struct MonitorSize {
 }
 
 /// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct MonitorPosition {
     /// Horizontal position on the screen.
     #[serde(rename = "monitorPositionX")]

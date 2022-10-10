@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     named different to be more concise.
   - Thank you to [@715209](https://github.com/715209) and [@Elinvynia](https://github.com/Elinvynia)
     for testing out these changes pre-release ❤️. Your ideas and bug reports helped a lot!
+- All response and event data structures now implement the recommended common traits, where
+  possible. In addition, `serde::Serialize` and `serde::Deserialize` is implemented for all of
+  them. That means, they can now be constructred easier, and used in more places, for example, as a
+  `HashMap` key.
 
 ## [0.9.1] - 2022-02-25
 

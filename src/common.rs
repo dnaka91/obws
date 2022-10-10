@@ -6,9 +6,12 @@ use serde::{Deserialize, Serialize};
 use crate::Error;
 
 /// Monitoring type for audio outputs.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
 pub enum MonitorType {
     /// No monitoring.
+    #[default]
     #[serde(rename = "OBS_MONITORING_TYPE_NONE")]
     None,
     /// Only monitor but don't output any sounds.
@@ -54,7 +57,7 @@ bitflags! {
     /// For example, only using `LEFT` would arrange the target to the left horizontally and
     /// centered vertically. To align to the top right, the alignments can be combined to
     /// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
-    #[derive(Serialize, Deserialize)]
+    #[derive(Default, Deserialize, Serialize)]
     #[serde(transparent)]
     pub struct Alignment: u8 {
         /// Align to the center.
@@ -85,9 +88,12 @@ impl From<Alignment> for u8 {
 }
 
 /// Different kinds of bounds that can be applied to different items on the scene.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
 pub enum BoundsType {
     /// No bounds.
+    #[default]
     #[serde(rename = "OBS_BOUNDS_NONE")]
     None,
     /// Stretch to bounds.
@@ -111,9 +117,12 @@ pub enum BoundsType {
 }
 
 /// Different kinds of media actions that can be performed (or happen in events).
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
 pub enum MediaAction {
     /// No media action.
+    #[default]
     #[serde(rename = "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_NONE")]
     None,
     /// Start media playback.
@@ -137,9 +146,12 @@ pub enum MediaAction {
 }
 
 /// Different kinds of scene item blend modes.
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
 pub enum BlendMode {
     /// No blending, overlaying without mixing colors, except for transparency.
+    #[default]
     #[serde(rename = "OBS_BLEND_NORMAL")]
     Normal,
     /// Add the pixel values to the ones beneath.

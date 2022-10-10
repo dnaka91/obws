@@ -1,10 +1,10 @@
 //! Responses related to recording.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 /// Response value for [`crate::client::Recording::status`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct RecordStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

@@ -1,9 +1,9 @@
 //! Responses related to sources.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::Sources::active`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SourceActive {
     /// Whether the source is showing in program.
     #[serde(rename = "videoActive")]

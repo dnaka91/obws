@@ -20,7 +20,7 @@ pub mod ui;
 pub(crate) mod virtual_cam;
 
 use serde::{de, Deserialize, Deserializer};
-use serde_repr::Deserialize_repr;
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
@@ -168,7 +168,9 @@ pub(crate) struct Status {
 
 /// The status code gives information about the result of a request. It gives further insight into
 /// what went wrong, if a request failed.
-#[derive(Debug, Deserialize_repr)]
+#[derive(
+    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
+)]
 #[repr(u16)]
 pub enum StatusCode {
     /// Unknown status, should never be used.
@@ -263,7 +265,9 @@ pub enum StatusCode {
 
 /// Additional close codes, defined by `obs-websocket`. These can be used to further pin down the
 /// details of why the web-socket connection was closed.
-#[derive(Debug)]
+#[derive(
+    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
+)]
 #[repr(u16)]
 pub enum WebSocketCloseCode {
     /// Unknown reason, should never be used.

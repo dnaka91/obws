@@ -1,9 +1,9 @@
 //! Responses related to the OBS configuration.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::Config::video_settings`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct VideoSettings {
     /// Numerator of the fractional FPS value.
     #[serde(rename = "fpsNumerator")]
@@ -26,7 +26,7 @@ pub struct VideoSettings {
 }
 
 /// Response value for [`crate::client::Config::stream_service_settings`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct StreamServiceSettings<T> {
     /// Stream service type, like `rtmp_custom` or `rtmp_common`.
     #[serde(rename = "streamServiceType")]

@@ -1,10 +1,10 @@
 //! Responses related to scenes.
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use time::Duration;
 
 /// Response value for [`crate::client::Scenes::list`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scenes {
     /// Current program scene.
     #[serde(rename = "currentProgramSceneName")]
@@ -18,7 +18,7 @@ pub struct Scenes {
 }
 
 /// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scene {
     /// Name of the scene.
     #[serde(rename = "sceneName")]
@@ -55,7 +55,7 @@ pub(crate) struct CurrentPreviewScene {
 }
 
 /// Response value for [`crate::client::Scenes::transition_override`].
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SceneTransitionOverride {
     /// Name of the overridden scene transition.
     #[serde(rename = "transitionName")]
