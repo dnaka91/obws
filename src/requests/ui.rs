@@ -87,6 +87,7 @@ pub(crate) struct OpenSourceProjectorInternal<'a> {
 /// Request information for [`crate::client::Ui::open_video_mix_projector`] as part of
 /// [`OpenVideoMixProjector`] and [`crate::client::Ui::open_source_projector`] as part of
 /// [`OpenSourceProjector`], describing the open location of the projector.
+#[non_exhaustive]
 pub enum Location {
     /// Monitor index, passing `-1` opens the projector in windowed mode.
     MonitorIndex(i32),
@@ -98,7 +99,7 @@ pub enum Location {
 /// [`OpenVideoMixProjector`] and [`crate::client::Ui::open_source_projector`] as part of
 /// [`OpenSourceProjector`], describing the open location of the projector.
 #[derive(Serialize)]
-pub enum LocationInternal {
+pub(crate) enum LocationInternal {
     /// Monitor index, passing `-1` opens the projector in windowed mode.
     #[serde(rename = "monitorIndex")]
     MonitorIndex(i32),
@@ -119,6 +120,7 @@ impl From<Location> for LocationInternal {
 /// Request information for [`crate::client::Ui::open_video_mix_projector`] as part of
 /// [`OpenVideoMixProjector`], defining the type of video mix to open.
 #[derive(Serialize)]
+#[non_exhaustive]
 pub enum VideoMixType {
     /// Show the preview scene.
     #[serde(rename = "OBS_WEBSOCKET_VIDEO_MIX_TYPE_PREVIEW")]

@@ -9,6 +9,7 @@ use crate::Error;
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[non_exhaustive]
 pub enum MonitorType {
     /// No monitoring.
     #[default]
@@ -91,6 +92,7 @@ impl From<Alignment> for u8 {
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[non_exhaustive]
 pub enum BoundsType {
     /// No bounds.
     #[default]
@@ -120,6 +122,7 @@ pub enum BoundsType {
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[non_exhaustive]
 pub enum MediaAction {
     /// No media action.
     #[default]
@@ -149,6 +152,7 @@ pub enum MediaAction {
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[non_exhaustive]
 pub enum BlendMode {
     /// No blending, overlaying without mixing colors, except for transparency.
     #[default]

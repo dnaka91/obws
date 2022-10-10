@@ -13,6 +13,7 @@ use crate::{
 /// All possible event types that can occur while the user interacts with OBS.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "eventType", content = "eventData")]
+#[non_exhaustive]
 pub enum Event {
     // --------------------------------
     // Config
@@ -557,6 +558,7 @@ pub struct InputVolumeMeter {
 
 /// The output state describes the current status of any output (like recording, virtual-cam, ...).
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub enum OutputState {
     /// A request to start the output has been issued.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STARTING")]

@@ -46,6 +46,7 @@ pub struct SceneItem {
 
 /// Kind of source that is represented by a [`SceneItem`].
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub enum SourceType {
     /// Input source from outside of OBS.
     #[serde(rename = "OBS_SOURCE_TYPE_INPUT")]

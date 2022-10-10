@@ -172,6 +172,7 @@ pub(crate) struct Status {
     Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
 )]
 #[repr(u16)]
+#[non_exhaustive]
 pub enum StatusCode {
     /// Unknown status, should never be used.
     Unknown = 0,
@@ -269,6 +270,7 @@ pub enum StatusCode {
     Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
 )]
 #[repr(u16)]
+#[non_exhaustive]
 pub enum WebSocketCloseCode {
     /// Unknown reason, should never be used.
     UnknownReason = 4000,

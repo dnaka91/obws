@@ -46,6 +46,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// [`crate::client::Config::set_persistent_data`] as part of
 /// [`SetPersistentData`].
 #[derive(Clone, Copy, Serialize)]
+#[non_exhaustive]
 pub enum Realm {
     /// Data located in the global settings.
     #[serde(rename = "OBS_WEBSOCKET_DATA_REALM_GLOBAL")]

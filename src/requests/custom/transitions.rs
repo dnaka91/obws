@@ -39,6 +39,7 @@ pub struct Slide {
 /// The direction for a [`Swipe`] or [`Slide].
 #[derive(Clone, Copy, Debug, Serialize)]
 #[serde(rename_all = "lowercase")]
+#[non_exhaustive]
 pub enum Direction {
     /// From/to the left.
     Left,
@@ -79,6 +80,7 @@ pub struct Stinger<'a> {
 /// transition.
 #[derive(Clone, Copy, Debug, Serialize_repr)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum TransitionPointType {
     /// Time in milliseconds.
     Time = 0,
@@ -96,6 +98,7 @@ impl Default for TransitionPointType {
 /// locally or both at the same time.
 #[derive(Clone, Copy, Debug, Serialize_repr)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum AudioMonitoring {
     /// No monitoring, means to insert the audio into the output stream but not playing it on the
     /// local machine.
@@ -117,6 +120,7 @@ impl Default for AudioMonitoring {
 /// Describes the way in which the audio is faded between two scenes with a [`Stinger`] transition.
 #[derive(Clone, Copy, Debug, Serialize_repr)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum AudioFadeStyle {
     /// Fade out to transition point then fade in.
     FadeOutFadeIn = 0,
@@ -157,6 +161,7 @@ pub struct Wipe {
 
 /// A luma image that defines the animation of a [`Wipe`].
 #[derive(Serialize)]
+#[non_exhaustive]
 pub enum LumaImage {
     /// Barn door animation diagonal from the bottom left.
     #[serde(rename = "barndoor-botleft.png")]

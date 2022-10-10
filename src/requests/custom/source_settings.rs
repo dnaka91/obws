@@ -131,6 +131,7 @@ pub struct DisplayCapture<'a> {
 }
 
 /// The capture cropping for a [`DisplayCapture`] source.
+#[non_exhaustive]
 pub enum CropMode<'a> {
     /// Disable any cropping.
     None,
@@ -330,6 +331,7 @@ impl<'a> Default for SlideshowFile<'a> {
 /// Playback behavior setting for use in [`Slideshow`].
 #[derive(Clone, Copy, Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum PlaybackBehavior {
     /// Always play even when not visible.
     AlwaysPlay,
@@ -342,6 +344,7 @@ pub enum PlaybackBehavior {
 /// Playback control mode for use in [`Slideshow`].
 #[derive(Clone, Copy, Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum SlideMode {
     /// Automatic.
     ModeAuto,
@@ -358,6 +361,7 @@ impl Default for SlideMode {
 /// Transition animation between images in a [`Slideshow`].
 #[derive(Serialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum Transition {
     /// Immediately replace without animation.
     Cut,
@@ -378,6 +382,7 @@ impl Default for Transition {
 /// Aspect ratios and bounding sizes for use in [`Slideshow`].
 #[derive(Clone, Copy, Serialize)]
 #[serde(into = "String")]
+#[non_exhaustive]
 pub enum CustomSize {
     /// Automatically detect a ratio based on the input.
     Automatic,
@@ -451,6 +456,7 @@ pub struct FfmpegSource<'a> {
 /// YUV color range of a [`FfmpegSource`].
 #[derive(Serialize_repr)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum ColorRange {
     /// Automatic detection.
     Auto = 0,
@@ -617,6 +623,7 @@ pub struct AvCaptureInputV2<'a> {
 /// Color space as part of an [`AvCaptureInputV2`].
 #[derive(Serialize_repr)]
 #[repr(i8)]
+#[non_exhaustive]
 pub enum ColorSpace {
     /// Automatic detection.
     Auto = -1,
@@ -635,6 +642,7 @@ impl Default for ColorSpace {
 /// Video color range as part of an [`AvCaptureInputV2`].
 #[derive(Serialize_repr)]
 #[repr(i8)]
+#[non_exhaustive]
 pub enum VideoRange {
     /// Automatic detection.
     Auto = -1,
@@ -652,6 +660,7 @@ impl Default for VideoRange {
 
 /// Different presets for the [`AvCaptureInputV2`].
 #[derive(Serialize)]
+#[non_exhaustive]
 pub enum AvPreset {
     /// Preset for resolution _3840x2160_ (may not be available).
     #[serde(rename = "AVCaptureSessionPreset3840x2160")]

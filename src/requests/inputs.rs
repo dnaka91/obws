@@ -211,6 +211,7 @@ pub(crate) struct SetSettingsInternal<'a> {
 
 /// Request information for [`crate::client::Inputs::set_volume`].
 #[derive(Serialize)]
+#[non_exhaustive]
 pub enum Volume {
     /// Volume setting in mul.
     #[serde(rename = "inputVolumeMul")]

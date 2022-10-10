@@ -24,6 +24,7 @@ pub struct MediaStatus {
 #[derive(
     Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
 )]
+#[non_exhaustive]
 pub enum MediaState {
     /// No state.
     #[default]

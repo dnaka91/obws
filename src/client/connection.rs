@@ -87,6 +87,7 @@ impl ReidentifyReceiverList {
 
 /// Errors that can occur while performing the initial handshake with obs-websocket.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum HandshakeError {
     /// The connection to obs-websocket was interrupted while trying to read a message.
     #[error("connection to obs-websocket was closed: {}", match .0 {
