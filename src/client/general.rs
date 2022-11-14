@@ -56,7 +56,7 @@ impl<'a> General<'a> {
             .send_message(Request::CallVendorRequest(CallVendorRequestInternal {
                 vendor_name: request.vendor_name,
                 request_type: request.request_type,
-                request_data: serde_json::to_value(&request.request_data)
+                request_data: serde_json::to_value(request.request_data)
                     .map_err(Error::SerializeCustomData)?,
             }))
             .await

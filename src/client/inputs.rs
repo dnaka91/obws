@@ -70,7 +70,7 @@ impl<'a> Inputs<'a> {
         self.client
             .send_message(Request::SetSettings(SetSettingsInternal {
                 input: settings.input,
-                settings: serde_json::to_value(&settings.settings)
+                settings: serde_json::to_value(settings.settings)
                     .map_err(Error::SerializeCustomData)?,
                 overlay: settings.overlay,
             }))

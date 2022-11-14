@@ -165,7 +165,7 @@ impl<'a> SceneItems<'a> {
             .send_message(Request::SetPrivateSettings(SetPrivateSettingsInternal {
                 scene: settings.scene,
                 item_id: settings.item_id,
-                settings: serde_json::to_value(&settings.settings)
+                settings: serde_json::to_value(settings.settings)
                     .map_err(Error::SerializeCustomData)?,
             }))
             .await

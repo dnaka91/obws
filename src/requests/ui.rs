@@ -190,24 +190,24 @@ impl QtGeometry {
         const DATA_LENGTH: usize = 66;
 
         fn serialize_rect(data: &mut Vec<u8>, rect: &QtRect) {
-            data.extend(&rect.left.to_be_bytes());
-            data.extend(&rect.top.to_be_bytes());
-            data.extend(&rect.right.to_be_bytes());
-            data.extend(&rect.bottom.to_be_bytes());
+            data.extend(rect.left.to_be_bytes());
+            data.extend(rect.top.to_be_bytes());
+            data.extend(rect.right.to_be_bytes());
+            data.extend(rect.bottom.to_be_bytes());
         }
 
         let mut data = Vec::<u8>::with_capacity(DATA_LENGTH);
 
-        data.extend(&MAGIC_NUMBER.to_be_bytes());
-        data.extend(&MAJOR_VERSION.to_be_bytes());
-        data.extend(&MINOR_VERSION.to_be_bytes());
+        data.extend(MAGIC_NUMBER.to_be_bytes());
+        data.extend(MAJOR_VERSION.to_be_bytes());
+        data.extend(MINOR_VERSION.to_be_bytes());
 
         serialize_rect(&mut data, &self.rect); // frame geometry
         serialize_rect(&mut data, &self.rect); // normal geometry
 
-        data.extend(&self.screen_number.to_be_bytes());
-        data.extend(&self.window_state.to_be_bytes());
-        data.extend(&self.screen_width.to_be_bytes());
+        data.extend(self.screen_number.to_be_bytes());
+        data.extend(self.window_state.to_be_bytes());
+        data.extend(self.screen_width.to_be_bytes());
 
         serialize_rect(&mut data, &self.rect);
 
@@ -243,12 +243,8 @@ impl QtWindowState {
     /// Convert the state into a byte array for usage in [`QtGeometry::serialize`] .
     fn to_be_bytes(self) -> [u8; 2] {
         [
-            if self.contains(Self::MAXIMIZED) { 1 } else { 0 },
-            if self.contains(Self::FULLSCREEN) {
-                1
-            } else {
-                0
-            },
+            u8::from(self.contains(Self::MAXIMIZED)),
+            u8::from(self.contains(Self::FULLSCREEN)),
         ]
     }
 }
