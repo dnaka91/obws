@@ -31,7 +31,7 @@ sha2 = "0.10.6"
 thiserror = "1.0.37"
 time = "0.3.15"
 tokio = { version = "1.21.2", features = ["net", "rt", "sync", "time"] }
-tokio-tungstenite = "0.17.2"
+tokio-tungstenite = "0.18.0"
 tracing = "0.1.37"
 
 [dev-dependencies]
