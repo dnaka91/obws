@@ -18,7 +18,7 @@ features = ["events", "tls"]
 
 [dependencies]
 async-stream = { version = "0.3.3", optional = true }
-base64 = "0.13.1"
+base64 = "0.20.0"
 bitflags = "1.3.2"
 futures-util = { version = "0.3.25", features = ["sink"] }
 rgb = { version = "0.8.34", default-features = false }
