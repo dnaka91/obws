@@ -17,3 +17,8 @@ license-files = [
 allow = ["Unicode-DFS-2016"]
 name = "unicode-ident"
 version = "*"
+
+[bans]
+skip = [
+    { name = "base64", version = "=0.13.1" },
+]
