@@ -24,9 +24,9 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
-    /// First message sent from the server immediately on client connection. Contains authentication
-    /// information if authentication is required. Also contains RPC version for version
-    /// negotiation.
+    /// First message sent from the server immediately on client connection. Contains
+    /// authentication information if authentication is required. Also contains RPC version for
+    /// version negotiation.
     Hello(Hello),
     /// The identify request was received and validated, and the connection is now ready for normal
     /// operation.
@@ -65,10 +65,11 @@ impl<'de> Deserialize<'de> for ServerMessage {
             Identified = 2,
             /// The message sent by obs-websocket containing an event payload.
             Event = 5,
-            /// The message sent by obs-websocket in response to a particular request from a client.
+            /// The message sent by obs-websocket in response to a particular request from a
+            /// client.
             RequestResponse = 7,
-            /// The message sent by obs-websocket in response to a particular batch of requests from
-            /// a client.
+            /// The message sent by obs-websocket in response to a particular batch of requests
+            /// from a client.
             RequestBatchResponse = 9,
         }
 
@@ -230,8 +231,8 @@ pub enum StatusCode {
 
     /// The resource was not found.
     ///
-    /// **Note:** Resources are any kind of object in obs-websocket, like inputs, profiles, outputs,
-    /// etc.
+    /// **Note:** Resources are any kind of object in obs-websocket, like inputs, profiles,
+    /// outputs, etc.
     ResourceNotFound = 600,
     /// The resource already exists.
     ResourceAlreadyExists = 601,

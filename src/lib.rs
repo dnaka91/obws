@@ -99,8 +99,8 @@ pub enum Error {
     /// event stream).
     #[error("currently not connected to obs-websocket")]
     Disconnected,
-    /// The OBS studio version of the connected instance doesn't match the required version for this
-    /// crate.
+    /// The OBS studio version of the connected instance doesn't match the required version for
+    /// this crate.
     #[error("obs studio version {0} doesn't match required {1}")]
     ObsStudioVersion(Version, Comparator),
     /// The obs-websocket plugin version doesn't match the required version for this crate.

@@ -20,8 +20,8 @@ pub struct Version {
     /// Image formats available in `GetSourceScreenshot` and `SaveSourceScreenshot` requests.
     #[serde(rename = "supportedImageFormats")]
     pub supported_image_formats: Vec<String>,
-    /// Name of the platform. Usually `windows`, `macos`, or `ubuntu` (Linux flavor). Not guaranteed
-    /// to be any of those.
+    /// Name of the platform. Usually `windows`, `macos`, or `ubuntu` (Linux flavor). Not
+    /// guaranteed to be any of those.
     #[serde(rename = "platform")]
     pub platform: String,
     /// Description of the platform, like `Windows 10 (10.0)`.

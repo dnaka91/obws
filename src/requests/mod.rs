@@ -90,9 +90,9 @@ pub(crate) struct Identify {
     pub rpc_version: u32,
     #[serde(rename = "authentication")]
     pub authentication: Option<String>,
-    /// Bit mask of event subscription items to subscribe to events and event categories at will. By
-    /// default, all event categories are subscribed, except for events marked as high volume. High
-    /// volume events must be explicitly subscribed to.
+    /// Bit mask of event subscription items to subscribe to events and event categories at will.
+    /// By default, all event categories are subscribed, except for events marked as high
+    /// volume. High volume events must be explicitly subscribed to.
     #[serde(rename = "eventSubscriptions")]
     pub event_subscriptions: Option<EventSubscription>,
 }

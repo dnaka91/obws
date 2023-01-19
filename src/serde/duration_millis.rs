@@ -221,8 +221,7 @@ mod tests {
                 Token::U64(u64::MAX),
                 Token::StructEnd,
             ],
-            "value is too large for an i64: \
-            out of range integral type conversion attempted",
+            "value is too large for an i64: out of range integral type conversion attempted",
         );
     }
 }

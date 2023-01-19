@@ -157,8 +157,8 @@ pub enum CropMode<'a> {
         /// List up windows with empty names in the UI drop-down selection.
         show_empty_names: bool,
     },
-    /// A combination of [`Self::ToWindow`] and [`Self::Manual`], cropping to the window first, then
-    /// applying manual cropping.
+    /// A combination of [`Self::ToWindow`] and [`Self::Manual`], cropping to the window first,
+    /// then applying manual cropping.
     ToWindowAndManual {
         /// Owner of the window. Usually the program name.
         owner_name: &'a str,
@@ -437,8 +437,8 @@ pub struct FfmpegSource<'a> {
     pub input_format: &'a str,
     /// Reconnect delay in seconds. Only used if [`Self::is_local_file`] is set to `false`.
     pub reconnect_delay_sec: u8,
-    /// Restart playback when source becomes active.  Only used if [`Self::is_local_file`] is set to
-    /// `true`.
+    /// Restart playback when source becomes active.  Only used if [`Self::is_local_file`] is set
+    /// to `true`.
     pub restart_on_activate: bool,
     /// Show nothing when playback ends.
     pub clear_on_media_end: bool,

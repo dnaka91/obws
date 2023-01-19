@@ -1,6 +1,7 @@
 use std::env;
 
 use anyhow::Result;
+use base64::engine::{general_purpose, Engine};
 use obws::{requests::sources::TakeScreenshot, Client};
 use tokio::fs;
 
@@ -25,7 +26,7 @@ async fn main() -> Result<()> {
         .await?;
 
     let pos = screenshot.find("base64,").unwrap();
-    let image = base64::decode(&screenshot[pos + 7..])?;
+    let image = general_purpose::STANDARD.decode(&screenshot[pos + 7..])?;
 
     fs::write("screenshot.png", &image).await?;
 

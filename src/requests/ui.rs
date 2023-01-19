@@ -179,6 +179,8 @@ impl QtGeometry {
     /// | 4      | Screen width                                             |
     /// | 16     | Main rectangle (left, top, right, bottom) 4 bytes each   |
     pub(crate) fn serialize(&self) -> String {
+        use base64::engine::{general_purpose, Engine};
+
         /// Indicator for serialized Qt geometry data.
         const MAGIC_NUMBER: u32 = 0x1D9D0CB;
         /// Major version of this format.
@@ -211,7 +213,7 @@ impl QtGeometry {
 
         serialize_rect(&mut data, &self.rect);
 
-        base64::encode(data)
+        general_purpose::STANDARD.encode(data)
     }
 }
 
@@ -265,7 +267,6 @@ impl QtWindowState {
 /// │         bottom
 /// │
 /// Y
-///
 #[derive(Clone, Copy, Debug, Default)]
 pub struct QtRect {
     /// Left or X/horizontal position of the rectangle.

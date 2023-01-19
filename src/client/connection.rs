@@ -202,6 +202,7 @@ pub(super) async fn handshake(
 }
 
 fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
+    use base64::engine::{general_purpose, Engine};
     use sha2::{Digest, Sha256};
 
     let mut hasher = Sha256::new();
@@ -210,13 +211,13 @@ fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
 
     let mut auth = String::with_capacity(Sha256::output_size() * 4 / 3 + 4);
 
-    base64::encode_config_buf(hasher.finalize_reset(), base64::STANDARD, &mut auth);
+    general_purpose::STANDARD.encode_string(hasher.finalize_reset(), &mut auth);
 
     hasher.update(auth.as_bytes());
     hasher.update(challenge.as_bytes());
     auth.clear();
 
-    base64::encode_config_buf(hasher.finalize(), base64::STANDARD, &mut auth);
+    general_purpose::STANDARD.encode_string(hasher.finalize(), &mut auth);
 
     auth
 }
