@@ -52,11 +52,11 @@ async fn main() -> Result<()> {
 
     // Get and print out version information of OBS and obs-websocket.
     let version = client.general().version().await?;
-    println!("{:#?}", version);
+    println!("{version:#?}");
 
     // Get a list of available scenes and print them out.
     let scene_list = client.scenes().list().await?;
-    println!("{:#?}", scene_list);
+    println!("{scene_list:#?}");
 
     Ok(())
 }

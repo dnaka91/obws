@@ -414,8 +414,8 @@ impl From<CustomSize> for String {
             CustomSize::SixteenToTen => "16:10".to_owned(),
             CustomSize::FourToThree => "4:3".to_owned(),
             CustomSize::OneToOne => "1:1".to_owned(),
-            CustomSize::CustomRatio(w, h) => format!("{}:{}", w, h),
-            CustomSize::CustomSize(w, h) => format!("{}x{}", w, h),
+            CustomSize::CustomRatio(w, h) => format!("{w}:{h}"),
+            CustomSize::CustomSize(w, h) => format!("{w}x{h}"),
         }
     }
 }

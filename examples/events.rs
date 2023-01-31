@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
     pin_mut!(events);
 
     while let Some(event) = events.next().await {
-        println!("{:#?}", event);
+        println!("{event:#?}");
     }
 
     Ok(())
