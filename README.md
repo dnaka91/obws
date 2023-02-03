@@ -5,7 +5,7 @@
 [![Documentation][doc-img]][doc-url]
 [![Code Coverage][cover-img]][cover-url]
 
-[build-img]: https://img.shields.io/github/workflow/status/dnaka91/obws/CI/main?style=for-the-badge
+[build-img]: https://img.shields.io/github/actions/workflow/status/dnaka91/obws/ci.yml?branch=main&style=for-the-badge
 [build-url]: https://github.com/dnaka91/obws/actions?query=workflow%3ACI
 [crates-img]: https://img.shields.io/crates/v/obws?style=for-the-badge
 [crates-url]: https://crates.io/crates/obws
