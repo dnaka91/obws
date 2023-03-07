@@ -226,7 +226,7 @@ pub enum Event {
         /// Name of the input.
         #[serde(rename = "inputName")]
         name: String,
-        /// New volume level in `multimap`.
+        /// New volume level multiplier.
         #[serde(rename = "inputVolumeMul")]
         mul: f64,
         /// New volume level in `dB`.
@@ -533,6 +533,15 @@ pub enum Event {
         #[serde(rename = "studioModeEnabled")]
         enabled: bool,
     },
+    /// A screenshot has been saved.
+    ///
+    /// **Note**: Triggered for the screenshot feature available in `Settings -> Hotkeys ->
+    /// Screenshot Output` ONLY.
+    ScreenshotSaved {
+        /// Path of the saved image file.
+        #[serde(rename = "savedScreenshotPath")]
+        path: String,
+    },
     // --------------------------------
     // Custom
     // --------------------------------
@@ -572,6 +581,12 @@ pub enum OutputState {
     /// Output stopped successfully.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_STOPPED")]
     Stopped,
+    /// Output disconnected and is reconnecting.
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_RECONNECTING")]
+    Reconnecting,
+    /// Output reconnected successfully.
+    #[serde(rename = "OBS_WEBSOCKET_OUTPUT_RECONNECTED")]
+    Reconnected,
     /// Current output paused.
     #[serde(rename = "OBS_WEBSOCKET_OUTPUT_PAUSED")]
     Paused,

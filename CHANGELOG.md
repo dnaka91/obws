@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## Added
+
+- New features from obs-websocket v5.1.0
+  - New `ScreenshotSaved` event, that is triggered by hotkeys in the OBS UI.
+  - New variants for the `OutputState` enum, that signal reconnecting and reconnected states.
+
+## Changed
+
+- Update all dependencies to their lates version, most notably `base64` and `tokio-tungstenite`.
+
 ## [0.10.0] - 2022-11-14
 
 ### Changed
