@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Changed
 
 - Update all dependencies to their lates version, most notably `base64` and `tokio-tungstenite`.
+- The MSRV is now **1.63**.
 
 ## [0.10.0] - 2022-11-14
 
