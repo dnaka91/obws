@@ -135,7 +135,7 @@ pub(crate) struct RequestBatch<'a> {
 bitflags! {
     /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
     /// instance.
-    #[derive(Serialize)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
     #[serde(transparent)]
     pub struct EventSubscription: u32 {
         /// Subscription value used to disable all events.
@@ -166,17 +166,17 @@ bitflags! {
         const UI = 1 << 10;
 
         /// Helper to receive all non-high-volume events.
-        const ALL = Self::GENERAL.bits
-            | Self::CONFIG.bits
-            | Self::SCENES.bits
-            | Self::INPUTS.bits
-            | Self::TRANSITIONS.bits
-            | Self::FILTERS.bits
-            | Self::OUTPUTS.bits
-            | Self::SCENE_ITEMS.bits
-            | Self::MEDIA_INPUTS.bits
-            | Self::VENDORS.bits
-            | Self::UI.bits;
+        const ALL = Self::GENERAL.bits()
+            | Self::CONFIG.bits()
+            | Self::SCENES.bits()
+            | Self::INPUTS.bits()
+            | Self::TRANSITIONS.bits()
+            | Self::FILTERS.bits()
+            | Self::OUTPUTS.bits()
+            | Self::SCENE_ITEMS.bits()
+            | Self::MEDIA_INPUTS.bits()
+            | Self::VENDORS.bits()
+            | Self::UI.bits();
 
         /// Subscription value to receive the [`InputVolumeMeters`] high-volume event.
         ///

@@ -231,7 +231,7 @@ impl Default for QtGeometry {
 bitflags! {
     /// Request information for [`open_projector`](crate::client::General::open_projector) as part of
     /// [`Projector`].
-    #[derive(Default)]
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct QtWindowState: u32 {
         /// Window with maximum size, taking up as much space as possible but still showing
         /// the window frame.

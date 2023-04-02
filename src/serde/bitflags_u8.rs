@@ -81,6 +81,7 @@ mod tests {
     use serde_test::{assert_tokens, Token};
 
     bitflags! {
+        #[derive(Clone, Copy, Debug, PartialEq)]
         struct Flags: u8 {
             const ONE = 1;
             const TWO = 2;
@@ -89,7 +90,7 @@ mod tests {
 
     impl From<Flags> for u8 {
         fn from(value: Flags) -> Self {
-            value.bits
+            value.bits()
         }
     }
 

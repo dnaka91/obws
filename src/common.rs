@@ -25,6 +25,7 @@ pub enum MonitorType {
 
 bitflags! {
     /// Different flags for font display that can be combined.
+    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
     pub struct FontFlags: u8 {
         /// Make the text appear thicker.
         const BOLD = 1;
@@ -47,7 +48,7 @@ impl TryFrom<u8> for FontFlags {
 
 impl From<FontFlags> for u8 {
     fn from(value: FontFlags) -> Self {
-        value.bits
+        value.bits()
     }
 }
 
@@ -58,7 +59,9 @@ bitflags! {
     /// For example, only using `LEFT` would arrange the target to the left horizontally and
     /// centered vertically. To align to the top right, the alignments can be combined to
     /// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
-    #[derive(Default, Deserialize, Serialize)]
+    #[derive(
+        Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    )]
     #[serde(transparent)]
     pub struct Alignment: u8 {
         /// Align to the center.
@@ -84,7 +87,7 @@ impl TryFrom<u8> for Alignment {
 
 impl From<Alignment> for u8 {
     fn from(value: Alignment) -> Self {
-        value.bits
+        value.bits()
     }
 }
 
