@@ -14,7 +14,7 @@ jobs:
       - name: Configure cache
         uses: Swatinem/rust-cache@v2
       - name: Install cargo-hack
-        run: cargo install cargo-hack
+        uses: taiki-e/install-action@cargo-hack
       - name: Check feature combinations
         run: cargo hack clippy --feature-powerset --no-dev-deps
   test:
