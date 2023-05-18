@@ -18,8 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Changed
 
-- Update all dependencies to their lates version, most notably `base64` and `tokio-tungstenite`.
-- The MSRV is now **1.63**.
+- **BREAKING CHANGE:** Due to the update of `bitflags` the list of derived traits changed.
+- Update all dependencies to their lates version, most notably `base64`, `bitflags` and
+  `tokio-tungstenite`.
+- The MSRV is now **1.68**.
 
 ## [0.10.0] - 2022-11-14
 

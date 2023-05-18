@@ -3,7 +3,7 @@ name = "obws"
 version = "0.10.0"
 authors = ["Dominik Nakamura <dnaka91@gmail.com>"]
 edition = "2021"
-rust-version = "1.63"
+rust-version = "1.68"
 license = "MIT"
 readme = "README.md"
 description = "The obws (obvious) remote control library for OBS."
@@ -17,29 +17,29 @@ include = ["examples/**/*", "tests/**/*", "src/**/*", "LICENSE", "README.md", "C
 features = ["events", "tls"]
 
 [dependencies]
-async-stream = { version = "0.3.4", optional = true }
+async-stream = { version = "0.3.5", optional = true }
 base64 = "0.21.0"
-bitflags = { version = "2.0.2", features = ["serde"] }
+bitflags = { version = "2.3.1", features = ["serde"] }
 futures-util = { version = "0.3.28", features = ["sink"] }
 rgb = { version = "0.8.36", default-features = false }
 semver = { version = "1.0.17", features = ["serde"] }
-serde = { version = "1.0.159", features = ["derive"] }
-serde_json = "1.0.95"
+serde = { version = "1.0.163", features = ["derive"] }
+serde_json = "1.0.96"
 serde_repr = "0.1.12"
-serde_with = "2.3.1"
+serde_with = "3.0.0"
 sha2 = "0.10.6"
 thiserror = "1.0.40"
-time = "0.3.20"
-tokio = { version = "1.27.0", features = ["net", "rt", "sync", "time"] }
-tokio-tungstenite = "0.18.0"
+time = "0.3.21"
+tokio = { version = "1.28.1", features = ["net", "rt", "sync", "time"] }
+tokio-tungstenite = "0.19.0"
 tracing = "0.1.37"
 
 [dev-dependencies]
-anyhow = "1.0.70"
+anyhow = "1.0.71"
 dotenvy = "0.15.7"
-serde_test = "1.0.159"
-tokio = { version = "1.27.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
-tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+serde_test = "1.0.163"
+tokio = { version = "1.28.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tracing-subscriber = { version = "0.3.17", features = ["env-filter"] }
 
 [features]
 default = []
