@@ -10,15 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Added
+
+- All client methods now have a doc alias with the original name from the [`obs-websocket` spec](https://github.com/obsproject/obs-websocket/blob/master/docs/generated/protocol.md).
+  - The search will point to the right function when putting the original name in the search bar on docs.rs (or in locally generated docs).
+  - [Latest `rust-analyzer`](https://rust-analyzer.github.io/thisweek/2023/05/22/changelog-182.html) can use this information in the method completion menu.
+
 ## [0.11.0] - 2023-05-18
 
-## Added
+### Added
 
 - New features from obs-websocket v5.1.0
   - New `ScreenshotSaved` event, that is triggered by hotkeys in the OBS UI.
   - New variants for the `OutputState` enum, that signal reconnecting and reconnected states.
 
-## Changed
+### Changed
 
 - **BREAKING CHANGE:** Due to the update of `bitflags` the list of derived traits changed.
 - Update all dependencies to their lates version, most notably `base64`, `bitflags` and

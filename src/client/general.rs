@@ -14,17 +14,20 @@ pub struct General<'a> {
 
 impl<'a> General<'a> {
     /// Gets data about the current plugin and RPC version.
+    #[doc(alias = "GetVersion")]
     pub async fn version(&self) -> Result<responses::Version> {
         self.client.send_message(Request::Version).await
     }
 
     /// Gets statistics about OBS, obs-websocket, and the current session.
+    #[doc(alias = "GetStats")]
     pub async fn stats(&self) -> Result<responses::Stats> {
         self.client.send_message(Request::Stats).await
     }
 
     /// Broadcasts a custom event to all web-socket clients. Receivers are clients which are
     /// identified and subscribed.
+    #[doc(alias = "BroadcastCustomEvent")]
     pub async fn broadcast_custom_event<T>(&self, event_data: &T) -> Result<()>
     where
         T: Serialize,
@@ -44,6 +47,7 @@ impl<'a> General<'a> {
     /// A vendor is a unique name registered by a third-party plugin or script, which allows for
     /// custom requests and events to be added to obs-websocket. If a plugin or script implements
     /// vendor requests or events, documentation is expected to be provided with them.
+    #[doc(alias = "CallVendorRequest")]
     pub async fn call_vendor_request<T, R>(
         &self,
         request: CallVendorRequest<'_, T>,

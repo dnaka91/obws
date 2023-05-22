@@ -14,6 +14,7 @@ pub struct Config<'a> {
 
 impl<'a> Config<'a> {
     /// Gets the value of a "slot" from the selected persistent data realm.
+    #[doc(alias = "GetPersistentData")]
     pub async fn get_persistent_data(
         &self,
         realm: Realm,
@@ -25,6 +26,7 @@ impl<'a> Config<'a> {
     }
 
     /// Sets the value of a "slot" from the selected persistent data realm.
+    #[doc(alias = "SetPersistentData")]
     pub async fn set_persistent_data(&self, data: SetPersistentData<'_>) -> Result<()> {
         self.client
             .send_message(Request::SetPersistentData(data))
@@ -35,6 +37,7 @@ impl<'a> Config<'a> {
     ///
     /// **Note:** To get the true FPS value, divide the FPS numerator by the FPS denominator.
     /// Example: `60000/1001`.
+    #[doc(alias = "GetVideoSettings")]
     pub async fn video_settings(&self) -> Result<responses::VideoSettings> {
         self.client.send_message(Request::VideoSettings).await
     }
@@ -44,6 +47,7 @@ impl<'a> Config<'a> {
     /// **Note:** Fields must be specified in pairs. For example, you cannot set only
     /// [`SetVideoSettings::base_width`] without needing to specify
     /// [`SetVideoSettings::base_height`].
+    #[doc(alias = "SetVideoSettings")]
     pub async fn set_video_settings(&self, settings: SetVideoSettings) -> Result<()> {
         self.client
             .send_message(Request::SetVideoSettings(settings))
@@ -51,6 +55,7 @@ impl<'a> Config<'a> {
     }
 
     /// Gets the current stream service settings (stream destination).
+    #[doc(alias = "GetStreamServiceSettings")]
     pub async fn stream_service_settings<T>(&self) -> Result<responses::StreamServiceSettings<T>>
     where
         T: DeserializeOwned,
@@ -64,6 +69,7 @@ impl<'a> Config<'a> {
     ///
     /// **Note:** Simple RTMP settings can be set with type `rtmp_custom` and the settings fields
     /// `server` and `key`.
+    #[doc(alias = "SetStreamServiceSettings")]
     pub async fn set_stream_service_settings<T>(&self, r#type: &'a str, settings: &T) -> Result<()>
     where
         T: Serialize,
@@ -77,6 +83,7 @@ impl<'a> Config<'a> {
     }
 
     /// Gets the current directory that the record output is set to.
+    #[doc(alias = "GetRecordDirectory")]
     pub async fn record_directory(&self) -> Result<String> {
         self.client
             .send_message::<_, responses::RecordDirectory>(Request::RecordDirectory)

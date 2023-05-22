@@ -15,6 +15,7 @@ pub struct Ui<'a> {
 
 impl<'a> Ui<'a> {
     /// Gets whether studio is enabled.
+    #[doc(alias = "GetStudioModeEnabled")]
     pub async fn studio_mode_enabled(&self) -> Result<bool> {
         self.client
             .send_message::<_, responses::StudioModeEnabled>(Request::GetStudioModeEnabled)
@@ -25,6 +26,7 @@ impl<'a> Ui<'a> {
     /// Enables or disables studio mode.
     ///
     /// - `enabled`: Enable or disable the studio mode.
+    #[doc(alias = "SetStudioModeEnabled")]
     pub async fn set_studio_mode_enabled(&self, enabled: bool) -> Result<()> {
         self.client
             .send_message(Request::SetStudioModeEnabled { enabled })
@@ -32,6 +34,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Opens the properties dialog of an input.
+    #[doc(alias = "OpenInputPropertiesDialog")]
     pub async fn open_properties_dialog(&self, input: &str) -> Result<()> {
         self.client
             .send_message(Request::OpenInputPropertiesDialog { input })
@@ -39,6 +42,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Opens the filters dialog of an input.
+    #[doc(alias = "OpenInputFiltersDialog")]
     pub async fn open_filters_dialog(&self, input: &str) -> Result<()> {
         self.client
             .send_message(Request::OpenInputFiltersDialog { input })
@@ -46,6 +50,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Opens the interact dialog of an input.
+    #[doc(alias = "OpenInputInteractDialog")]
     pub async fn open_interact_dialog(&self, input: &str) -> Result<()> {
         self.client
             .send_message(Request::OpenInputInteractDialog { input })
@@ -53,6 +58,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Gets a list of connected monitors and information about them.
+    #[doc(alias = "GetMonitorList")]
     pub async fn list_monitors(&self) -> Result<Vec<responses::Monitor>> {
         self.client
             .send_message::<_, responses::MonitorList>(Request::GetMonitorList)
@@ -61,6 +67,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Open a projector for a specific output video mix.
+    #[doc(alias = "OpenVideoMixProjector")]
     pub async fn open_video_mix_projector(&self, open: OpenVideoMixProjector) -> Result<()> {
         self.client
             .send_message(Request::OpenVideoMixProjector(
@@ -73,6 +80,7 @@ impl<'a> Ui<'a> {
     }
 
     /// Opens a projector for a source.
+    #[doc(alias = "OpenSourceProjector")]
     pub async fn open_source_projector(&self, open: OpenSourceProjector<'a>) -> Result<()> {
         self.client
             .send_message(Request::OpenSourceProjector(OpenSourceProjectorInternal {

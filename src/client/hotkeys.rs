@@ -12,6 +12,7 @@ pub struct Hotkeys<'a> {
 
 impl<'a> Hotkeys<'a> {
     /// Gets an array of all hotkey names in OBS.
+    #[doc(alias = "GetHotkeyList")]
     pub async fn list(&self) -> Result<Vec<String>> {
         self.client
             .send_message::<_, responses::Hotkeys>(Request::List)
@@ -20,6 +21,7 @@ impl<'a> Hotkeys<'a> {
     }
 
     /// Triggers a hotkey using its name. See [`Self::list`].
+    #[doc(alias = "TriggerHotkeyByName")]
     pub async fn trigger_by_name(&self, name: &str) -> Result<()> {
         self.client
             .send_message(Request::TriggerByName { name })
@@ -27,6 +29,7 @@ impl<'a> Hotkeys<'a> {
     }
 
     /// Triggers a hotkey using a sequence of keys.
+    #[doc(alias = "TriggerHotkeyByKeySequence")]
     pub async fn trigger_by_sequence(&self, id: &str, modifiers: KeyModifiers) -> Result<()> {
         self.client
             .send_message(Request::TriggerBySequence { id, modifiers })

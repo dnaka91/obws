@@ -18,6 +18,7 @@ pub struct Inputs<'a> {
 
 impl<'a> Inputs<'a> {
     /// Gets an array of all inputs in OBS.
+    #[doc(alias = "GetInputList")]
     pub async fn list(&self, kind: Option<&str>) -> Result<Vec<responses::Input>> {
         self.client
             .send_message::<_, responses::Inputs>(Request::List { kind })
@@ -26,6 +27,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets an array of all available input kinds in OBS.
+    #[doc(alias = "GetInputKindList")]
     pub async fn list_kinds(&self, unversioned: bool) -> Result<Vec<String>> {
         self.client
             .send_message::<_, responses::InputKinds>(Request::ListKinds { unversioned })
@@ -34,11 +36,13 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets the names of all special inputs.
+    #[doc(alias = "GetSpecialInputs")]
     pub async fn specials(&self) -> Result<responses::SpecialInputs> {
         self.client.send_message(Request::Specials).await
     }
 
     /// Gets the default settings for an input kind.
+    #[doc(alias = "GetInputDefaultSettings")]
     pub async fn default_settings<T>(&self, kind: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -55,6 +59,7 @@ impl<'a> Inputs<'a> {
     ///
     /// **Note:** Does not include defaults. To create the entire settings object, overlay input
     /// settings over the default input settings provided by [`Inputs::default_settings`].
+    #[doc(alias = "GetInputSettings")]
     pub async fn settings<T>(&self, name: &str) -> Result<responses::InputSettings<T>>
     where
         T: DeserializeOwned,
@@ -63,6 +68,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the settings of an input.
+    #[doc(alias = "SetInputSettings")]
     pub async fn set_settings<T>(&self, settings: SetSettings<'_, T>) -> Result<()>
     where
         T: Serialize,
@@ -78,6 +84,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets the audio mute state of an input.
+    #[doc(alias = "GetInputMute")]
     pub async fn muted(&self, name: &str) -> Result<bool> {
         self.client
             .send_message::<_, responses::InputMuted>(Request::Muted { name })
@@ -86,6 +93,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the audio mute state of an input.
+    #[doc(alias = "SetInputMute")]
     pub async fn set_muted(&self, name: &str, muted: bool) -> Result<()> {
         self.client
             .send_message(Request::SetMuted { name, muted })
@@ -93,6 +101,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Toggles the audio mute state of an input.
+    #[doc(alias = "ToggleInputMute")]
     pub async fn toggle_mute(&self, name: &str) -> Result<bool> {
         self.client
             .send_message::<_, responses::InputMuted>(Request::ToggleMute { name })
@@ -101,11 +110,13 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets the current volume setting of an input.
+    #[doc(alias = "GetInputVolume")]
     pub async fn volume(&self, name: &str) -> Result<responses::InputVolume> {
         self.client.send_message(Request::Volume { name }).await
     }
 
     /// Sets the volume setting of an input.
+    #[doc(alias = "SetInputVolume")]
     pub async fn set_volume(&self, name: &str, volume: Volume) -> Result<()> {
         self.client
             .send_message(Request::SetVolume { name, volume })
@@ -113,6 +124,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the name of an input (rename).
+    #[doc(alias = "SetInputName")]
     pub async fn set_name(&self, name: &str, new: &str) -> Result<()> {
         self.client
             .send_message(Request::SetName { name, new })
@@ -120,6 +132,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Creates a new input, adding it as a scene item to the specified scene.
+    #[doc(alias = "CreateInput")]
     pub async fn create<T>(&self, input: Create<'_, T>) -> Result<i64>
     where
         T: Serialize,
@@ -144,11 +157,13 @@ impl<'a> Inputs<'a> {
     /// Removes an existing input.
     ///
     /// **Note:** Will immediately remove all associated scene items.
+    #[doc(alias = "RemoveInput")]
     pub async fn remove(&self, name: &str) -> Result<()> {
         self.client.send_message(Request::Remove { name }).await
     }
 
     /// Gets the audio balance of an input.
+    #[doc(alias = "GetInputAudioBalance")]
     pub async fn audio_balance(&self, name: &str) -> Result<f32> {
         self.client
             .send_message::<_, responses::AudioBalance>(Request::AudioBalance { name })
@@ -157,6 +172,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the audio balance of an input.
+    #[doc(alias = "SetInputAudioBalance")]
     pub async fn set_audio_balance(&self, name: &str, balance: f32) -> Result<()> {
         self.client
             .send_message(Request::SetAudioBalance { name, balance })
@@ -166,6 +182,7 @@ impl<'a> Inputs<'a> {
     /// Gets the audio sync offset of an input.
     ///
     /// **Note:** The audio sync offset can be negative too!
+    #[doc(alias = "GetInputAudioSyncOffset")]
     pub async fn audio_sync_offset(&self, name: &str) -> Result<Duration> {
         self.client
             .send_message::<_, responses::AudioSyncOffset>(Request::AudioSyncOffset { name })
@@ -174,6 +191,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the audio sync offset of an input.
+    #[doc(alias = "SetInputAudioSyncOffset")]
     pub async fn set_audio_sync_offset(&self, name: &str, offset: Duration) -> Result<()> {
         self.client
             .send_message(Request::SetAudioSyncOffset { name, offset })
@@ -181,6 +199,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets the audio monitor type of input.
+    #[doc(alias = "GetInputAudioMonitorType")]
     pub async fn audio_monitor_type(&self, name: &str) -> Result<MonitorType> {
         self.client
             .send_message::<_, responses::AudioMonitorType>(Request::AudioMonitorType { name })
@@ -189,6 +208,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the audio monitor type of input.
+    #[doc(alias = "SetInputAudioMonitorType")]
     pub async fn set_audio_monitor_type(
         &self,
         name: &str,
@@ -200,6 +220,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Gets the enable state of all audio tracks of an input.
+    #[doc(alias = "GetInputAudioTracks")]
     pub async fn audio_tracks(&self, name: &str) -> Result<[bool; 6]> {
         self.client
             .send_message::<_, responses::AudioTracks>(Request::AudioTracks { name })
@@ -208,6 +229,7 @@ impl<'a> Inputs<'a> {
     }
 
     /// Sets the enable state of audio tracks of an input.
+    #[doc(alias = "SetInputAudioTracks")]
     pub async fn set_audio_tracks(&self, name: &str, tracks: [Option<bool>; 6]) -> Result<()> {
         self.client
             .send_message(Request::SetAudioTracks { name, tracks })
@@ -218,6 +240,7 @@ impl<'a> Inputs<'a> {
     ///
     /// **Note:** Use this in cases where an input provides a dynamic, selectable list of items. For
     /// example, display capture, where it provides a list of available displays.
+    #[doc(alias = "GetInputPropertiesListPropertyItems")]
     pub async fn properties_list_property_items(
         &self,
         input: &str,
@@ -237,6 +260,7 @@ impl<'a> Inputs<'a> {
     /// **Note:** Use this in cases where there is a button in the properties of an input that
     /// cannot be accessed in any other way. For example, browser sources, where there is a refresh
     /// button.
+    #[doc(alias = "PressInputPropertiesButton")]
     pub async fn press_properties_button(&self, input: &str, property: &str) -> Result<()> {
         self.client
             .send_message(Request::PressPropertiesButton { input, property })

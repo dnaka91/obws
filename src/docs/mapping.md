@@ -217,6 +217,5 @@ the equivalent function calls.
 | OpenInputFiltersDialog    | [`Ui::open_filters_dialog`](crate::client::Ui::open_filters_dialog)           |
 | OpenInputInteractDialog   | [`Ui::open_interact_dialog`](crate::client::Ui::open_interact_dialog)         |
 | GetMonitorList            | [`Ui::list_monitors`](crate::client::Ui::list_monitors)                       |
-| GetMonitorList            | [`Ui::list_monitors`](crate::client::Ui::list_monitors)                       |
 | OpenVideoMixProjector     | [`Ui::open_video_mix_projector`](crate::client::Ui::open_video_mix_projector) |
 | OpenSourceProjector       | [`Ui::open_source_projector`](crate::client::Ui::open_source_projector)       |

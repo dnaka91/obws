@@ -10,6 +10,7 @@ pub struct Outputs<'a> {
 
 impl<'a> Outputs<'a> {
     /// Gets the list of available outputs.
+    #[doc(alias = "GetOutputList")]
     pub async fn list(&self) -> Result<Vec<responses::Output>> {
         self.client
             .send_message::<_, responses::OutputList>(Request::List)
@@ -18,11 +19,13 @@ impl<'a> Outputs<'a> {
     }
 
     /// Gets the status of an output.
+    #[doc(alias = "GetOutputStatus")]
     pub async fn status(&self, name: &str) -> Result<responses::OutputStatus> {
         self.client.send_message(Request::Status { name }).await
     }
 
     /// Toggles the status of an output.
+    #[doc(alias = "ToggleOutput")]
     pub async fn toggle(&self, name: &str) -> Result<bool> {
         self.client
             .send_message::<_, responses::OutputActive>(Request::Toggle { name })
@@ -31,16 +34,19 @@ impl<'a> Outputs<'a> {
     }
 
     /// Starts an output.
+    #[doc(alias = "StartOutput")]
     pub async fn start(&self, name: &str) -> Result<()> {
         self.client.send_message(Request::Start { name }).await
     }
 
     /// Stops an output.
+    #[doc(alias = "StopOutput")]
     pub async fn stop(&self, name: &str) -> Result<()> {
         self.client.send_message(Request::Stop { name }).await
     }
 
     /// Gets the settings of an output.
+    #[doc(alias = "GetOutputSettings")]
     pub async fn settings<T>(&self, name: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -52,6 +58,7 @@ impl<'a> Outputs<'a> {
     }
 
     /// Sets the settings of an output.
+    #[doc(alias = "SetOutputSettings")]
     pub async fn set_settings<T>(&self, name: &str, settings: T) -> Result<()>
     where
         T: Serialize,

@@ -13,6 +13,7 @@ pub struct MediaInputs<'a> {
 
 impl<'a> MediaInputs<'a> {
     /// Gets the status of a media input.
+    #[doc(alias = "GetMediaInputStatus")]
     pub async fn status(&self, input: &str) -> Result<responses::MediaStatus> {
         self.client.send_message(Request::Status { input }).await
     }
@@ -20,6 +21,7 @@ impl<'a> MediaInputs<'a> {
     /// Sets the cursor position of a media input.
     ///
     /// This request does not perform bounds checking of the cursor position.
+    #[doc(alias = "SetMediaInputCursor")]
     pub async fn set_cursor(&self, input: &str, cursor: Duration) -> Result<()> {
         self.client
             .send_message(Request::SetCursor { input, cursor })
@@ -29,6 +31,7 @@ impl<'a> MediaInputs<'a> {
     /// Offsets the current cursor position of a media input by the specified value.
     ///
     /// This request does not perform bounds checking of the cursor position.
+    #[doc(alias = "OffsetMediaInputCursor")]
     pub async fn offset_cursor(&self, input: &str, offset: Duration) -> Result<()> {
         self.client
             .send_message(Request::OffsetCursor { input, offset })
@@ -36,6 +39,7 @@ impl<'a> MediaInputs<'a> {
     }
 
     /// Triggers an action on a media input.
+    #[doc(alias = "TriggerMediaInputAction")]
     pub async fn trigger_action(&self, input: &str, action: MediaAction) -> Result<()> {
         self.client
             .send_message(Request::TriggerAction { input, action })

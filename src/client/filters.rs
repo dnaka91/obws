@@ -17,6 +17,7 @@ pub struct Filters<'a> {
 
 impl<'a> Filters<'a> {
     /// Gets an array of all of a source's filters.
+    #[doc(alias = "GetSourceFilterList")]
     pub async fn list(&self, source: &str) -> Result<Vec<responses::SourceFilter>> {
         self.client
             .send_message::<_, responses::Filters>(Request::List { source })
@@ -25,6 +26,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Gets the default settings for a filter kind.
+    #[doc(alias = "GetSourceFilterDefaultSettings")]
     pub async fn default_settings<T>(&self, kind: &str) -> Result<T>
     where
         T: DeserializeOwned,
@@ -38,6 +40,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Creates a new filter, adding it to the specified source.
+    #[doc(alias = "CreateSourceFilter")]
     pub async fn create<T>(&self, filter: Create<'_, T>) -> Result<()>
     where
         T: Serialize,
@@ -57,6 +60,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Removes a filter from a source.
+    #[doc(alias = "RemoveSourceFilter")]
     pub async fn remove(&self, source: &str, filter: &str) -> Result<()> {
         self.client
             .send_message(Request::Remove { source, filter })
@@ -64,11 +68,13 @@ impl<'a> Filters<'a> {
     }
 
     /// Sets the name of a source filter (rename).
+    #[doc(alias = "SetSourceFilterName")]
     pub async fn set_name(&self, name: SetName<'_>) -> Result<()> {
         self.client.send_message(Request::SetName(name)).await
     }
 
     /// Gets the info for a specific source filter.
+    #[doc(alias = "GetSourceFilter")]
     pub async fn get(&self, source: &str, filter: &str) -> Result<responses::SourceFilter> {
         self.client
             .send_message(Request::Get { source, filter })
@@ -76,11 +82,13 @@ impl<'a> Filters<'a> {
     }
 
     /// Sets the index position of a filter on a source.
+    #[doc(alias = "SetSourceFilterIndex")]
     pub async fn set_index(&self, index: SetIndex<'_>) -> Result<()> {
         self.client.send_message(Request::SetIndex(index)).await
     }
 
     /// Sets the settings of a source filter.
+    #[doc(alias = "SetSourceFilterSettings")]
     pub async fn set_settings<T>(&self, settings: SetSettings<'_, T>) -> Result<()>
     where
         T: Serialize,
@@ -97,6 +105,7 @@ impl<'a> Filters<'a> {
     }
 
     /// Sets the enable state of a source filter.
+    #[doc(alias = "SetSourceFilterEnabled")]
     pub async fn set_enabled(&self, enabled: SetEnabled<'_>) -> Result<()> {
         self.client.send_message(Request::SetEnabled(enabled)).await
     }
