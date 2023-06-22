@@ -1,6 +1,6 @@
 [package]
 name = "obws"
-version = "0.11.1"
+version = "0.11.2"
 authors = ["Dominik Nakamura <dnaka91@gmail.com>"]
 edition = "2021"
 rust-version = "1.68"
