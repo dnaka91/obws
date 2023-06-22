@@ -532,7 +532,6 @@ pub struct Font<'a> {
     /// Font face.
     pub face: &'a str,
     /// Flags for different display styles.
-    #[serde(with = "crate::serde::bitflags_u8")]
     pub flags: FontFlags,
     /// Display size.
     pub size: u32,

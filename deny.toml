@@ -22,6 +22,3 @@ version = "*"
 skip = [
     { name = "regex-syntax", version = "=0.6.29" },
 ]
-skip-tree = [
-	{ name = "windows-sys", version = "=0.45.0", depth = 3 },
-]

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Fixed
+
+- Some of the bitflag values like `FontFlags`, `Alignment` and `EventSubscription` were not always serialized as numbers but their string form, causing errors in the respective request or response.
+
 ## [0.11.1] - 2023-05-22
 
 ### Added

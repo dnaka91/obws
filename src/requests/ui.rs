@@ -267,6 +267,7 @@ impl QtWindowState {
 /// │         bottom
 /// │
 /// Y
+/// ```
 #[derive(Clone, Copy, Debug, Default)]
 pub struct QtRect {
     /// Left or X/horizontal position of the rectangle.

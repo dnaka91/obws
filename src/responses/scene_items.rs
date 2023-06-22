@@ -101,13 +101,13 @@ pub struct SceneItemTransform {
     #[serde(rename = "height")]
     pub height: f32,
     /// The point on the source that the item is manipulated from.
-    #[serde(rename = "alignment", with = "crate::serde::bitflags_u8")]
+    #[serde(rename = "alignment")]
     pub alignment: Alignment,
     /// Type of bounding box.
     #[serde(rename = "boundsType")]
     pub bounds_type: BoundsType,
     /// Alignment of the bounding box.
-    #[serde(rename = "boundsAlignment", with = "crate::serde::bitflags_u8")]
+    #[serde(rename = "boundsAlignment")]
     pub bounds_alignment: Alignment,
     /// Width of the bounding box.
     #[serde(rename = "boundsWidth")]

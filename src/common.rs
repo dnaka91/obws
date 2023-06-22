@@ -7,7 +7,7 @@ use crate::Error;
 
 /// Monitoring type for audio outputs.
 #[derive(
-    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 )]
 #[non_exhaustive]
 pub enum MonitorType {
@@ -25,7 +25,10 @@ pub enum MonitorType {
 
 bitflags! {
     /// Different flags for font display that can be combined.
-    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    #[derive(
+        Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    )]
+    #[serde(try_from = "u8", into = "u8")]
     pub struct FontFlags: u8 {
         /// Make the text appear thicker.
         const BOLD = 1;
@@ -62,7 +65,7 @@ bitflags! {
     #[derive(
         Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
     )]
-    #[serde(transparent)]
+    #[serde(try_from = "u8", into = "u8")]
     pub struct Alignment: u8 {
         /// Align to the center.
         const CENTER = 0;

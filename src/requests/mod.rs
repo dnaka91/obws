@@ -136,7 +136,7 @@ bitflags! {
     /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
     /// instance.
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
-    #[serde(transparent)]
+    #[serde(into = "u32")]
     pub struct EventSubscription: u32 {
         /// Subscription value used to disable all events.
         const NONE = 0;
@@ -195,6 +195,12 @@ bitflags! {
         /// [`SceneItemTransformChanged`]: crate::events::Event::SceneItemTransformChanged
         const SCENE_ITEM_TRANSFORM_CHANGED = 1 << 19;
 
+    }
+}
+
+impl From<EventSubscription> for u32 {
+    fn from(value: EventSubscription) -> Self {
+        value.bits()
     }
 }
 
