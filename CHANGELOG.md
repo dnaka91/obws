@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Updated several dependencies, most notably `tokio-tungstenite` to `0.20`.
+- Pin `serde` to `1.0.171`, as newer versions use a pre-compiled binary for the derive macros.
+
 ## [0.11.2] - 2023-06-22
 
 ### Fixed
