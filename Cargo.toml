@@ -23,13 +23,13 @@ bitflags = { version = "2.4.0", features = ["serde"] }
 futures-util = { version = "0.3.28", features = ["sink"] }
 rgb = { version = "0.8.36", default-features = false }
 semver = { version = "1.0.18", features = ["serde"] }
-serde = { version = "=1.0.171", features = ["derive"] }
+serde = { version = "1.0.185", features = ["derive"] }
 serde_json = "1.0.105"
 serde_repr = "0.1.16"
 serde_with = "3.2.0"
 sha2 = "0.10.7"
 thiserror = "1.0.47"
-time = "0.3.26"
+time = "0.3.27"
 tokio = { version = "1.32.0", features = ["net", "rt", "sync", "time"] }
 tokio-tungstenite = "0.20.0"
 tracing = "0.1.37"
