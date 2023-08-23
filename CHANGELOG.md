@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Unpin `serde` and update to `1.0.185`, which resolved the issue in `serde_derive` <https://github.com/serde-rs/serde/issues/2538>. Also, raised the version of `time` as it pinned the serde version as well.
+
 ## [0.11.3] - 2023-08-19
 
 ### Changed
