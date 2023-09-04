@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.11.5] - 2023-09-04
+
 ### Changed
 
 - Explicitly unsubscribe from all events when the `events` feature isn't enabled. By default, `obs-websocket` sends all possible events, but those are not needed without the events feature flag in obws.
@@ -252,7 +254,8 @@ is currently in progress on the `v5-api` branch and the release is expected to b
 - Initial release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/dnaka91/obws/compare/v0.11.4...HEAD
+[Unreleased]: https://github.com/dnaka91/obws/compare/v0.11.5...HEAD
+[0.11.5]: https://github.com/dnaka91/obws/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/dnaka91/obws/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/dnaka91/obws/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/dnaka91/obws/compare/v0.11.1...v0.11.2
