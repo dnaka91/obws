@@ -258,11 +258,18 @@ impl Client {
                             trace!(?event, "got OBS event");
                             events_tx.send(event).ok();
                         }
+                        #[cfg(not(feature = "events"))]
+                        ServerMessage::Event => {
+                            trace!("got OBS event");
+                        }
                         ServerMessage::Identified(identified) => {
                             trace!(?identified, "got identified message");
                             reidentify_receivers2.notify(identified).await;
                         }
-                        _ => return Err(InnerError::UnexpectedMessage(message)),
+                        _ => {
+                            trace!(?message, "got unexpected message");
+                            return Err(InnerError::UnexpectedMessage(message));
+                        }
                     }
 
                     Ok(())
