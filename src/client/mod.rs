@@ -178,7 +178,11 @@ impl Client {
             host,
             port,
             password,
-            event_subscriptions: None,
+            event_subscriptions: if cfg!(feature = "events") {
+                None
+            } else {
+                Some(EventSubscription::NONE)
+            },
             #[cfg(feature = "tls")]
             tls: false,
             broadcast_capacity: None,
