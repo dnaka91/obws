@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Explicitly unsubscribe from all events when the `events` feature isn't enabled. By default, `obs-websocket` sends all possible events, but those are not needed without the events feature flag in obws.
+
+### Fixed
+
+- Any received event from `obs-websocket` was wrongly reported as error level log while the `events` feature flag wasn't enabled in `obws`. These are now handled properly and logged as trace level log.
+
 ## [0.11.4] - 2023-08-23
 
 ### Changed
