@@ -194,6 +194,11 @@ pub enum StatusCode {
     GenericError = 205,
     /// The request batch execution type is not supported.
     UnsupportedRequestBatchExecutionType = 206,
+    /// The server is not ready to handle the request.
+    ///
+    /// **Note:** This usually occurs during OBS scene collection change or exit. Requests may be
+    /// tried again after a delay if this code is given.
+    NotReady = 207,
 
     /// A required request field is missing.
     MissingRequestField = 300,

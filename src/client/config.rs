@@ -90,4 +90,12 @@ impl<'a> Config<'a> {
             .await
             .map(|rd| rd.record_directory)
     }
+
+    /// Sets the current directory that the record output writes files to.
+    #[doc(alias = "SetRecordDirectory")]
+    pub async fn set_record_directory(&self, directory: &'a str) -> Result<()> {
+        self.client
+            .send_message(Request::SetRecordDirectory { directory })
+            .await
+    }
 }

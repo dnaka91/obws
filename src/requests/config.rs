@@ -34,6 +34,12 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "GetRecordDirectory")]
     RecordDirectory,
+    #[serde(rename = "SetRecordDirectory")]
+    SetRecordDirectory {
+        /// Output directory.
+        #[serde(rename = "recordDirectory")]
+        directory: &'a str,
+    },
 }
 
 impl<'a> From<Request<'a>> for super::RequestType<'a> {

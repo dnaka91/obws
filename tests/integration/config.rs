@@ -29,7 +29,8 @@ async fn config() -> Result<()> {
         .set_stream_service_settings(&settings.r#type, &settings.settings)
         .await?;
 
-    client.record_directory().await?;
+    let directory = client.record_directory().await?;
+    client.set_record_directory(&directory).await?;
 
     Ok(())
 }
