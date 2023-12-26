@@ -67,9 +67,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
       - name: Check ${{ matrix.checks }}
-        uses: dnaka91/actions/deny-check@main
+        uses: EmbarkStudios/cargo-deny-action@v1
         with:
-          checks: ${{ matrix.checks }}
+          command: check ${{ matrix.checks }}
