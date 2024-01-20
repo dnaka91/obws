@@ -2,6 +2,7 @@
 
 use serde::Serialize;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
