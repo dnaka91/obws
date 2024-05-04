@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New `list_kinds` command for filters.
   - New `source` command for scene items.
   - New `InputSettingsChanged` and `SourceFilterSettingsChanged` event.
+- **BREAKING CHANGE:** Extend the connection config with a `connection_timeout` setting that allows to cancel the connection attempt after a set duration. The `Client::connect` method now defaults to a _30 second_ timeout.
 
 ### Removed
 

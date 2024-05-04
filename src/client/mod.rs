@@ -8,6 +8,7 @@ use std::{
         atomic::{AtomicU64, Ordering},
         Arc,
     },
+    time::Duration,
 };
 
 #[cfg(feature = "events")]
@@ -133,6 +134,10 @@ where
     /// not be send to listeners anymore.
     #[cfg_attr(not(feature = "events"), allow(dead_code))]
     pub broadcast_capacity: Option<usize>,
+    /// Maximum wait time to establish a connection with the OBS instance. If this limit is
+    /// exceeded, the connection ([`Client::connect_with_config`]) call will cancel the attempt and
+    /// return an [`Error::Timeout`].
+    pub connect_timeout: Duration,
 }
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
@@ -169,6 +174,11 @@ where
 
 impl Client {
     /// Connect to a obs-websocket instance on the given host and port.
+    ///
+    /// # Errors
+    ///
+    /// Will return an [`Error::Timeout`] if the connection couldn't be established within **30
+    /// seconds**.
     pub async fn connect(
         host: impl AsRef<str>,
         port: u16,
@@ -186,6 +196,7 @@ impl Client {
             #[cfg(feature = "tls")]
             tls: false,
             broadcast_capacity: None,
+            connect_timeout: Duration::from_secs(30),
         })
         .await
     }
@@ -196,13 +207,17 @@ impl Client {
         H: AsRef<str>,
         P: AsRef<str>,
     {
-        let (socket, _) = tokio_tungstenite::connect_async(format!(
-            "{}://{}:{}",
-            if config.tls() { "wss" } else { "ws" },
-            config.host.as_ref(),
-            config.port
-        ))
+        let (socket, _) = tokio::time::timeout(
+            config.connect_timeout,
+            tokio_tungstenite::connect_async(format!(
+                "{}://{}:{}",
+                if config.tls() { "wss" } else { "ws" },
+                config.host.as_ref(),
+                config.port
+            )),
+        )
         .await
+        .map_err(|_| Error::Timeout)?
         .map_err(Error::Connect)?;
 
         let (mut write, mut read) = socket.split();

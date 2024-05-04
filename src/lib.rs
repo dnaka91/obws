@@ -60,6 +60,9 @@ pub enum Error {
     /// An error occurred while trying to connect to the web-socket.
     #[error("failed to connect to the obs-websocket plugin")]
     Connect(#[source] tokio_tungstenite::tungstenite::Error),
+    /// The set connection timeout was reached before the connection could be created.
+    #[error("timeout happened before the connection could be established")]
+    Timeout,
     /// The initial handshake with `obs-websocket` didn't succeed.
     #[error("failed to execute the handshake with obs-websocket")]
     Handshake(#[from] crate::client::HandshakeError),
