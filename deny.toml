@@ -1,9 +1,19 @@
+[advisories]
+version = 2
+
 [licenses]
+version = 2
 allow = [
+    "Apache-2.0",
+    "BSD-3-Clause",
+    "ISC",
+    "MIT",
     "MPL-2.0",
     "OpenSSL",
 ]
-allow-osi-fsf-free = "both"
+exceptions = [
+    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
+]
 
 [[licenses.clarify]]
 name = "ring"
@@ -13,7 +23,7 @@ license-files = [
     { path = "LICENSE", hash = 0xbd0eed23 },
 ]
 
-[[licenses.exceptions]]
-allow = ["Unicode-DFS-2016"]
-name = "unicode-ident"
-version = "*"
+[bans]
+skip-tree = [
+    { name = "windows-sys", version = "0.48", depth = 3 },
+]
