@@ -89,9 +89,6 @@ pub enum Error {
         /// Optional message to provide additional details about the error.
         message: Option<String>,
     },
-    /// The obs-websocket API requires authentication but no password was given.
-    #[error("authentication required but no password provided")]
-    NoPassword,
     /// Unknown flags were found while trying to parse bitflags.
     #[error("value {0} contains unknown flags")]
     UnknownFlags(u8),

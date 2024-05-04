@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New `source` command for scene items.
   - New `InputSettingsChanged` and `SourceFilterSettingsChanged` event.
 
+### Removed
+
+- **BREAKING CHANGE:** Removed the `Error::NoPassword` variant, which was a relic from the previous v4.x API of obs-websocket. The new API doesn't provide any way to tell whether the password is the cause of an authentication error. However, the `WebSocketCloseCode::AuthenticationFailed` is the closest to identifying this error.
+
 ## [0.11.5] - 2023-09-04
 
 ### Changed
