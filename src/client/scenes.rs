@@ -1,6 +1,8 @@
+use uuid::Uuid;
+
 use super::Client;
 use crate::{
-    requests::scenes::{Request, SetTransitionOverride},
+    requests::scenes::{Request, SceneId, SetTransitionOverride},
     responses::scenes as responses,
     Result,
 };
@@ -31,18 +33,17 @@ impl<'a> Scenes<'a> {
 
     /// Gets the current program scene.
     #[doc(alias = "GetCurrentProgramScene")]
-    pub async fn current_program_scene(&self) -> Result<String> {
-        self.client
-            .send_message::<_, responses::CurrentProgramScene>(Request::CurrentProgramScene)
-            .await
-            .map(|cps| cps.current_program_scene_name)
+    pub async fn current_program_scene(&self) -> Result<responses::CurrentProgramScene> {
+        self.client.send_message(Request::CurrentProgramScene).await
     }
 
     /// Sets the current program scene.
     #[doc(alias = "SetCurrentProgramScene")]
-    pub async fn set_current_program_scene(&self, scene: &str) -> Result<()> {
+    pub async fn set_current_program_scene(&self, scene: impl Into<SceneId<'_>>) -> Result<()> {
         self.client
-            .send_message(Request::SetCurrentProgramScene { scene })
+            .send_message(Request::SetCurrentProgramScene {
+                scene: scene.into(),
+            })
             .await
     }
 
@@ -50,26 +51,25 @@ impl<'a> Scenes<'a> {
     ///
     /// Only available when studio mode is enabled.
     #[doc(alias = "GetCurrentPreviewScene")]
-    pub async fn current_preview_scene(&self) -> Result<String> {
-        self.client
-            .send_message::<_, responses::CurrentPreviewScene>(Request::CurrentPreviewScene)
-            .await
-            .map(|cps| cps.current_preview_scene_name)
+    pub async fn current_preview_scene(&self) -> Result<responses::CurrentPreviewScene> {
+        self.client.send_message(Request::CurrentPreviewScene).await
     }
 
     /// Sets the current preview scene.
     ///
     /// Only available when studio mode is enabled.
     #[doc(alias = "SetCurrentPreviewScene")]
-    pub async fn set_current_preview_scene(&self, scene: &str) -> Result<()> {
+    pub async fn set_current_preview_scene(&self, scene: impl Into<SceneId<'_>>) -> Result<()> {
         self.client
-            .send_message(Request::SetCurrentPreviewScene { scene })
+            .send_message(Request::SetCurrentPreviewScene {
+                scene: scene.into(),
+            })
             .await
     }
 
     /// Sets the name of a scene (rename).
     #[doc(alias = "SetSceneName")]
-    pub async fn set_name(&self, scene: &str, new_name: &str) -> Result<()> {
+    pub async fn set_name(&self, scene: SceneId<'_>, new_name: &str) -> Result<()> {
         self.client
             .send_message(Request::SetName { scene, new_name })
             .await
@@ -77,13 +77,16 @@ impl<'a> Scenes<'a> {
 
     /// Creates a new scene in OBS.
     #[doc(alias = "CreateScene")]
-    pub async fn create(&self, name: &str) -> Result<()> {
-        self.client.send_message(Request::Create { name }).await
+    pub async fn create(&self, name: &str) -> Result<Uuid> {
+        self.client
+            .send_message::<_, responses::CreateScene>(Request::Create { name })
+            .await
+            .map(|cs| cs.uuid)
     }
 
     /// Removes a scene from OBS.
     #[doc(alias = "RemoveScene")]
-    pub async fn remove(&self, scene: &str) -> Result<()> {
+    pub async fn remove(&self, scene: SceneId<'_>) -> Result<()> {
         self.client.send_message(Request::Remove { scene }).await
     }
 
@@ -91,7 +94,7 @@ impl<'a> Scenes<'a> {
     #[doc(alias = "GetSceneSceneTransitionOverride")]
     pub async fn transition_override(
         &self,
-        scene: &str,
+        scene: SceneId<'_>,
     ) -> Result<responses::SceneTransitionOverride> {
         self.client
             .send_message(Request::TransitionOverride { scene })

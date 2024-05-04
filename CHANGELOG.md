@@ -12,9 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New features from obs-websocket v5.3.0
+- New features from obs-websocket [v5.3.0](https://github.com/obsproject/obs-websocket/releases/tag/5.3.0)
   - New `set_record_directory` command, that allows to modify the output directory for recordings.
   - New `NotReady` status code, that signals the obs-websocket server is not ready yet to accept any commands.
+- New features from obs-websocket [v5.4.0](https://github.com/obsproject/obs-websocket/releases/tag/5.4.0)
+  - **BREAKING CHANGE:** Support for UUIDs to identify sources, inputs, scenes and transitions. This includes various breaking changes around those fields to make it impossible to misuse them in requests (basically using an enum to only use the name _or_ UUID in a request but not both).
+  - New `list_kinds` command for filters.
+  - New `source` command for scene items.
+  - New `InputSettingsChanged` and `SourceFilterSettingsChanged` event.
 
 ## [0.11.5] - 2023-09-04
 

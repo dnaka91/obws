@@ -16,19 +16,27 @@ async fn scenes() -> Result<()> {
     client.list_groups().await?;
 
     let current = client.current_program_scene().await?;
-    let other = &scenes.iter().find(|s| s.name != current).unwrap().name;
-    client.set_current_program_scene(other).await?;
-    client.set_current_program_scene(&current).await?;
+    let other = &scenes.iter().find(|s| s.name != current.id).unwrap().name;
+    client.set_current_program_scene(other.as_str()).await?;
+    client
+        .set_current_program_scene(current.id.name.as_str())
+        .await?;
 
     let current = client.current_preview_scene().await?;
-    let other = &scenes.iter().find(|s| s.name != current).unwrap().name;
-    client.set_current_preview_scene(other).await?;
-    client.set_current_preview_scene(&current).await?;
+    let other = &scenes.iter().find(|s| s.name != current.id).unwrap().name;
+    client.set_current_preview_scene(other.as_str()).await?;
+    client
+        .set_current_preview_scene(current.id.name.as_str())
+        .await?;
 
-    client.set_name(TEST_SCENE, TEST_SCENE_RENAME).await?;
-    client.set_name(TEST_SCENE_RENAME, TEST_SCENE).await?;
+    client
+        .set_name(TEST_SCENE, TEST_SCENE_RENAME.as_name().unwrap())
+        .await?;
+    client
+        .set_name(TEST_SCENE_RENAME, TEST_SCENE.as_name().unwrap())
+        .await?;
 
-    client.create(TEST_SCENE_CREATE).await?;
+    client.create(TEST_SCENE_CREATE.as_name().unwrap()).await?;
     client.remove(TEST_SCENE_CREATE).await?;
 
     let to = client.transition_override(TEST_SCENE).await?;

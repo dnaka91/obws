@@ -10,6 +10,7 @@ pub mod custom;
 pub mod filters;
 pub mod general;
 pub mod hotkeys;
+pub(crate) mod ids;
 pub mod inputs;
 pub(crate) mod media_inputs;
 pub(crate) mod outputs;

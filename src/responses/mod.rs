@@ -4,6 +4,7 @@ pub mod config;
 pub mod filters;
 pub mod general;
 pub(crate) mod hotkeys;
+pub(crate) mod ids;
 pub mod inputs;
 pub mod media_inputs;
 pub mod outputs;
@@ -39,6 +40,7 @@ pub(crate) enum ServerMessage {
     /// `obs-websocket` is responding to a request coming from a client.
     RequestResponse(RequestResponse),
     /// `obs-websocket` is responding to a request batch coming from the client.
+    #[allow(dead_code)]
     RequestBatchResponse(RequestBatchResponse),
 }
 

@@ -12,6 +12,9 @@ pub(crate) enum Request<'a> {
         /// Name of the hotkey to trigger.
         #[serde(rename = "hotkeyName")]
         name: &'a str,
+        /// Name of context of the hotkey to trigger.
+        #[serde(rename = "contextName")]
+        context: Option<&'a str>,
     },
     #[serde(rename = "TriggerHotkeyByKeySequence")]
     TriggerBySequence {

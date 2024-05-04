@@ -2,6 +2,14 @@
 
 use serde::{Deserialize, Serialize};
 
+/// Response value for [`crate::client::Filters::get_source_filter_kind_list`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct FilterKinds {
+    /// Array of source filter kinds.
+    #[serde(rename = "sourceFilterKinds")]
+    pub kinds: Vec<String>,
+}
+
 /// Response value for [`crate::client::Filters::get_source_filter_list`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct Filters {

@@ -3,6 +3,8 @@
 use bitflags::bitflags;
 use serde::Serialize;
 
+use super::{inputs::InputId, sources::SourceId};
+
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
@@ -16,21 +18,21 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "OpenInputPropertiesDialog")]
     OpenInputPropertiesDialog {
-        /// Name of the input to open the dialog of.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the input to open the dialog of.
+        #[serde(flatten)]
+        input: InputId<'a>,
     },
     #[serde(rename = "OpenInputFiltersDialog")]
     OpenInputFiltersDialog {
-        /// Name of the input to open the dialog of.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the input to open the dialog of.
+        #[serde(flatten)]
+        input: InputId<'a>,
     },
     #[serde(rename = "OpenInputInteractDialog")]
     OpenInputInteractDialog {
-        /// Name of the input to open the dialog of.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the input to open the dialog of.
+        #[serde(flatten)]
+        input: InputId<'a>,
     },
     #[serde(rename = "GetMonitorList")]
     GetMonitorList,
@@ -67,8 +69,8 @@ pub(crate) struct OpenVideoMixProjectorInternal {
 
 /// Request information for [`crate::client::Ui::open_source_projector`].
 pub struct OpenSourceProjector<'a> {
-    /// Name of the source to open a projector for.
-    pub source: &'a str,
+    /// Identifier of the source to open a projector for.
+    pub source: SourceId<'a>,
     /// Optional location for the new projector window.
     pub location: Option<Location>,
 }
@@ -76,9 +78,9 @@ pub struct OpenSourceProjector<'a> {
 /// Request information for [`crate::client::Ui::open_source_projector`].
 #[derive(Serialize)]
 pub(crate) struct OpenSourceProjectorInternal<'a> {
-    /// Name of the source to open a projector for.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source to open a projector for.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Optional location for the new projector window.
     #[serde(flatten)]
     pub location: Option<LocationInternal>,

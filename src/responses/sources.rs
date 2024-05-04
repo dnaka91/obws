@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+pub use super::ids::SourceId;
+
 /// Response value for [`crate::client::Sources::active`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SourceActive {

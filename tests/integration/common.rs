@@ -2,21 +2,22 @@ use std::{env, sync::Once};
 
 use anyhow::{ensure, Result};
 use obws::{
+    requests::{inputs::InputId, scenes::SceneId},
     responses::{filters::SourceFilter, inputs::Input, scenes::Scene},
     Client,
 };
 
 pub const TEST_PROFILE: &str = "OBWS-TEST";
-pub const TEST_SCENE: &str = "OBWS-TEST-Scene";
-pub const TEST_SCENE_2: &str = "OBWS-TEST-Scene2";
-pub const TEST_SCENE_RENAME: &str = "OBWS-TEST-Scene-Renamed";
-pub const TEST_SCENE_CREATE: &str = "OBWS-TEST-Scene-Created";
-pub const TEST_TEXT: &str = "OBWS-TEST-Text";
-pub const TEST_TEXT_2: &str = "OBWS-TEST-Text2";
-pub const TEST_BROWSER: &str = "OBWS-TEST-Browser";
-pub const TEST_BROWSER_RENAME: &str = "OBWS-TEST-Browser-Renamed";
-pub const TEST_MEDIA: &str = "OBWS-TEST-Media";
-pub const TEST_GROUP: &str = "OBWS-TEST-Group";
+pub const TEST_SCENE: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene");
+pub const TEST_SCENE_2: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene2");
+pub const TEST_SCENE_RENAME: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene-Renamed");
+pub const TEST_SCENE_CREATE: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene-Created");
+pub const TEST_TEXT: InputId<'_> = InputId::Name("OBWS-TEST-Text");
+pub const TEST_TEXT_2: InputId<'_> = InputId::Name("OBWS-TEST-Text2");
+pub const TEST_BROWSER: InputId<'_> = InputId::Name("OBWS-TEST-Browser");
+pub const TEST_BROWSER_RENAME: InputId<'_> = InputId::Name("OBWS-TEST-Browser-Renamed");
+pub const TEST_MEDIA: InputId<'_> = InputId::Name("OBWS-TEST-Media");
+pub const TEST_GROUP: SceneId<'_> = SceneId::Name("OBWS-TEST-Group");
 pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
 pub const TEST_FILTER: &str = "OBWS-TEST-Filter";
 pub const TEST_FILTER_2: &str = "OBWS-TEST-Filter2";
@@ -84,7 +85,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
     ensure!(
         inputs.iter().any(is_required_text_2_input),
         "text input `{}` not found, required for inputs tests",
-        TEST_TEXT
+        TEST_TEXT_2
     );
     ensure!(
         inputs.iter().any(is_required_browser_input),
@@ -102,7 +103,7 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
         TEST_BROWSER_RENAME
     );
 
-    let filters = client.filters().list(TEST_TEXT).await?;
+    let filters = client.filters().list(TEST_TEXT.as_source()).await?;
     ensure!(
         filters.iter().any(is_required_filter),
         "filter `{}` not found, required for filters tests",
@@ -179,23 +180,23 @@ fn is_required_group(group: &str) -> bool {
 }
 
 fn is_required_text_input(input: &Input) -> bool {
-    input.name == TEST_TEXT && is_text_input(input)
+    input.id == TEST_TEXT && is_text_input(input)
 }
 
 fn is_required_text_2_input(input: &Input) -> bool {
-    input.name == TEST_TEXT_2 && is_text_input(input)
+    input.id == TEST_TEXT_2 && is_text_input(input)
 }
 
 fn is_required_browser_input(input: &Input) -> bool {
-    input.name == TEST_BROWSER && is_browser_input(input)
+    input.id == TEST_BROWSER && is_browser_input(input)
 }
 
 fn is_required_media_input(input: &Input) -> bool {
-    input.name == TEST_MEDIA && is_media_input(input)
+    input.id == TEST_MEDIA && is_media_input(input)
 }
 
 fn is_renamed_input(input: &Input) -> bool {
-    input.name == TEST_BROWSER_RENAME
+    input.id == TEST_BROWSER_RENAME
 }
 
 fn is_text_input(input: &Input) -> bool {

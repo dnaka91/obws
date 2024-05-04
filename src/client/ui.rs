@@ -1,8 +1,11 @@
 use super::Client;
 use crate::{
-    requests::ui::{
-        OpenSourceProjector, OpenSourceProjectorInternal, OpenVideoMixProjector,
-        OpenVideoMixProjectorInternal, Request,
+    requests::{
+        inputs::InputId,
+        ui::{
+            OpenSourceProjector, OpenSourceProjectorInternal, OpenVideoMixProjector,
+            OpenVideoMixProjectorInternal, Request,
+        },
     },
     responses::ui as responses,
     Result,
@@ -35,7 +38,7 @@ impl<'a> Ui<'a> {
 
     /// Opens the properties dialog of an input.
     #[doc(alias = "OpenInputPropertiesDialog")]
-    pub async fn open_properties_dialog(&self, input: &str) -> Result<()> {
+    pub async fn open_properties_dialog(&self, input: InputId<'_>) -> Result<()> {
         self.client
             .send_message(Request::OpenInputPropertiesDialog { input })
             .await
@@ -43,7 +46,7 @@ impl<'a> Ui<'a> {
 
     /// Opens the filters dialog of an input.
     #[doc(alias = "OpenInputFiltersDialog")]
-    pub async fn open_filters_dialog(&self, input: &str) -> Result<()> {
+    pub async fn open_filters_dialog(&self, input: InputId<'_>) -> Result<()> {
         self.client
             .send_message(Request::OpenInputFiltersDialog { input })
             .await
@@ -51,7 +54,7 @@ impl<'a> Ui<'a> {
 
     /// Opens the interact dialog of an input.
     #[doc(alias = "OpenInputInteractDialog")]
-    pub async fn open_interact_dialog(&self, input: &str) -> Result<()> {
+    pub async fn open_interact_dialog(&self, input: InputId<'_>) -> Result<()> {
         self.client
             .send_message(Request::OpenInputInteractDialog { input })
             .await

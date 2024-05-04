@@ -4,10 +4,17 @@ use std::{collections::BTreeMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 use time::Duration;
+use uuid::Uuid;
 
 use crate::{
     common::{MediaAction, MonitorType},
-    responses::{filters::SourceFilter, scene_items::SceneItemTransform},
+    responses::{
+        filters::SourceFilter,
+        ids::{SceneId, TransitionId},
+        inputs::InputId,
+        scene_items::SceneItemTransform,
+        sources::SourceId,
+    },
 };
 
 /// All possible event types that can occur while the user interacts with OBS.
@@ -128,6 +135,18 @@ pub enum Event {
         #[serde(rename = "filterName")]
         new_name: String,
     },
+    /// A source filter's settings have changed (been updated).
+    SourceFilterSettingsChanged {
+        /// Name of the source the filter is on.
+        #[serde(rename = "sourceName")]
+        source: String,
+        /// Name of the filter.
+        #[serde(rename = "filterName")]
+        filter: String,
+        /// New settings object of the filter.
+        #[serde(rename = "filterSettings")]
+        settings: serde_json::Value,
+    },
     // --------------------------------
     // General
     // --------------------------------
@@ -159,9 +178,9 @@ pub enum Event {
     // --------------------------------
     /// An input has been created.
     InputCreated {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// The kind of the input.
         #[serde(rename = "inputKind")]
         kind: String,
@@ -177,12 +196,15 @@ pub enum Event {
     },
     /// An input has been removed.
     InputRemoved {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
     },
     /// The name of an input has changed.
     InputNameChanged {
+        /// UUID of the input.
+        #[serde(rename = "inputUuid")]
+        uuid: Uuid,
         /// Old name of the input.
         #[serde(rename = "oldInputName")]
         old_name: String,
@@ -190,13 +212,26 @@ pub enum Event {
         #[serde(rename = "inputName")]
         new_name: String,
     },
+    /// An input's settings have changed (been updated).
+    ///
+    /// Note: On some inputs, changing values in the properties dialog will cause an immediate
+    /// update. Pressing the _Cancel_ button will revert the settings, resulting in another event
+    /// being fired.
+    InputSettingsChanged {
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
+        /// New settings object of the input.
+        #[serde(rename = "inputSettings")]
+        settings: serde_json::Value,
+    },
     /// An input's active state has changed.
     ///
     /// When an input is active, it means it's being shown by the program feed.
     InputActiveStateChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// Whether the input is active.
         #[serde(rename = "videoActive")]
         active: bool,
@@ -205,27 +240,27 @@ pub enum Event {
     ///
     /// When an input is showing, it means it's being shown by the preview or a dialog.
     InputShowStateChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// Whether the input is showing.
         #[serde(rename = "videoShowing")]
         showing: bool,
     },
     /// An input's mute state has changed.
     InputMuteStateChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// Whether the input is muted.
         #[serde(rename = "inputMuted")]
         muted: bool,
     },
     /// An input's volume level has changed.
     InputVolumeChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// New volume level multiplier.
         #[serde(rename = "inputVolumeMul")]
         mul: f64,
@@ -235,18 +270,18 @@ pub enum Event {
     },
     /// The audio balance value of an input has changed.
     InputAudioBalanceChanged {
-        /// Name of the affected input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// New audio balance value of the input.
         #[serde(rename = "inputAudioBalance")]
         audio_balance: f64,
     },
     /// The sync offset of an input has changed.
     InputAudioSyncOffsetChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// New sync offset in milliseconds.
         #[serde(
             rename = "inputAudioSyncOffset",
@@ -256,18 +291,18 @@ pub enum Event {
     },
     /// The audio tracks of an input have changed.
     InputAudioTracksChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// Object of audio tracks along with their associated enable states.
         #[serde(rename = "inputAudioTracks")]
         tracks: BTreeMap<String, bool>,
     },
     /// The monitor type of an input has changed.
     InputAudioMonitorTypeChanged {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// New monitor type of the input.
         #[serde(rename = "monitorType")]
         monitor_type: MonitorType,
@@ -283,21 +318,21 @@ pub enum Event {
     // --------------------------------
     /// A media input has started playing.
     MediaInputPlaybackStarted {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
     },
     /// A media input has finished playing.
     MediaInputPlaybackEnded {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
     },
     /// An action has been performed on an input.
     MediaInputActionTriggered {
-        /// Name of the input.
-        #[serde(rename = "inputName")]
-        name: String,
+        /// Identifier of the input.
+        #[serde(flatten)]
+        id: InputId,
         /// Action performed on the input.
         #[serde(rename = "mediaAction")]
         media_action: MediaAction,
@@ -355,12 +390,12 @@ pub enum Event {
     // --------------------------------
     /// A scene item has been created.
     SceneItemCreated {
-        /// Name of the scene the item was added to.
-        #[serde(rename = "sceneName")]
-        scene: String,
-        /// Name of the underlying source (input/scene).
-        #[serde(rename = "sourceName")]
-        source: String,
+        /// Identifier of the scene the item was added to.
+        #[serde(flatten)]
+        scene: SceneId,
+        /// Identifier of the underlying source (input/scene).
+        #[serde(flatten)]
+        source: SourceId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
@@ -372,30 +407,30 @@ pub enum Event {
     ///
     /// This event is not emitted when the scene the item is in is removed.
     SceneItemRemoved {
-        /// Name of the scene the item was removed from.
-        #[serde(rename = "sceneName")]
-        scene: String,
-        /// Name of the underlying source (input/scene).
-        #[serde(rename = "sourceName")]
-        source: String,
+        /// Identifier of the scene the item was removed from.
+        #[serde(flatten)]
+        scene: SceneId,
+        /// Identifier of the underlying source (input/scene).
+        #[serde(flatten)]
+        source: SourceId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
     },
     /// A scene's item list has been re-indexed.
     SceneItemListReindexed {
-        /// Name of the scene.
-        #[serde(rename = "sceneName")]
-        scene: String,
+        /// Identifier of the scene.
+        #[serde(flatten)]
+        scene: SceneId,
         /// Array of scene item objects.
         #[serde(rename = "sceneItems")]
         items: Vec<BasicSceneItem>,
     },
     /// A scene item's enable state has changed.
     SceneItemEnableStateChanged {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: String,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
@@ -405,9 +440,9 @@ pub enum Event {
     },
     /// A scene item's lock state has changed.
     SceneItemLockStateChanged {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: String,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
@@ -417,18 +452,18 @@ pub enum Event {
     },
     /// A scene item has been selected in the UI.
     SceneItemSelected {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: String,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
     },
     /// The transform/crop of a scene item has changed.
     SceneItemTransformChanged {
-        /// The name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: String,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: u64,
@@ -441,24 +476,27 @@ pub enum Event {
     // --------------------------------
     /// A new scene has been created.
     SceneCreated {
-        /// Name of the new scene.
-        #[serde(rename = "sceneName")]
-        name: String,
+        /// Identifier of the new scene.
+        #[serde(flatten)]
+        id: SceneId,
         /// Whether the new scene is a group.
         #[serde(rename = "isGroup")]
         is_group: bool,
     },
     /// A scene has been removed.
     SceneRemoved {
-        /// Name of the removed scene.
-        #[serde(rename = "sceneName")]
-        name: String,
+        /// Identifier of the removed scene.
+        #[serde(flatten)]
+        id: SceneId,
         /// Whether the scene was a group.
         #[serde(rename = "isGroup")]
         is_group: bool,
     },
     /// The name of a scene has changed.
     SceneNameChanged {
+        /// UUID of the scene.
+        #[serde(rename = "sceneUuid")]
+        uuid: Uuid,
         /// Old name of the scene.
         #[serde(rename = "oldSceneName")]
         old_name: String,
@@ -468,15 +506,15 @@ pub enum Event {
     },
     /// The current program scene has changed.
     CurrentProgramSceneChanged {
-        /// Name of the scene that was switched to.
-        #[serde(rename = "sceneName")]
-        name: String,
+        /// Identifier of the scene that was switched to.
+        #[serde(flatten)]
+        id: SceneId,
     },
     /// The current preview scene has changed.
     CurrentPreviewSceneChanged {
-        /// Name of the scene that was switched to.
-        #[serde(rename = "sceneName")]
-        name: String,
+        /// Identifier of the scene that was switched to.
+        #[serde(flatten)]
+        id: SceneId,
     },
     /// The list of scenes has changed.
     SceneListChanged {
@@ -488,9 +526,9 @@ pub enum Event {
     // --------------------------------
     /// The current scene transition has changed.
     CurrentSceneTransitionChanged {
-        /// Name of the new transition.
-        #[serde(rename = "transitionName")]
-        name: String,
+        /// Identifier of the new transition.
+        #[serde(flatten)]
+        id: TransitionId,
     },
     /// The current scene transition duration has changed.
     CurrentSceneTransitionDurationChanged {
@@ -500,17 +538,17 @@ pub enum Event {
     },
     /// A scene transition has started.
     SceneTransitionStarted {
-        /// Scene transition name.
-        #[serde(rename = "transitionName")]
-        name: String,
+        /// Scene transition identifier.
+        #[serde(flatten)]
+        id: TransitionId,
     },
     /// A scene transition has completed fully.
     ///
     /// **Note:** Does not appear to trigger when the transition is interrupted by the user.
     SceneTransitionEnded {
-        /// Scene transition name.
-        #[serde(rename = "transitionName")]
-        name: String,
+        /// Scene transition identifier.
+        #[serde(flatten)]
+        id: TransitionId,
     },
     /// A scene transition's video has completed fully.
     ///
@@ -520,9 +558,9 @@ pub enum Event {
     ///
     /// **Note:** Appears to be called by every transition, regardless of relevance.
     SceneTransitionVideoEnded {
-        /// Scene transition name.
-        #[serde(rename = "transitionName")]
-        name: String,
+        /// Scene transition identifier.
+        #[serde(flatten)]
+        id: TransitionId,
     },
     // --------------------------------
     // UI

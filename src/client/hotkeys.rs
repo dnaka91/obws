@@ -22,9 +22,9 @@ impl<'a> Hotkeys<'a> {
 
     /// Triggers a hotkey using its name. See [`Self::list`].
     #[doc(alias = "TriggerHotkeyByName")]
-    pub async fn trigger_by_name(&self, name: &str) -> Result<()> {
+    pub async fn trigger_by_name(&self, name: &str, context: Option<&str>) -> Result<()> {
         self.client
-            .send_message(Request::TriggerByName { name })
+            .send_message(Request::TriggerByName { name, context })
             .await
     }
 

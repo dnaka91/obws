@@ -3,14 +3,18 @@
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 
+use super::sources::SourceId;
+
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
+    #[serde(rename = "GetSourceFilterKindList")]
+    KindList,
     #[serde(rename = "GetSourceFilterList")]
     List {
-        /// Name of the source.
-        #[serde(rename = "sourceName")]
-        source: &'a str,
+        /// Identifier of the source.
+        #[serde(flatten)]
+        source: SourceId<'a>,
     },
     #[serde(rename = "GetSourceFilterDefaultSettings")]
     DefaultSettings {
@@ -22,9 +26,9 @@ pub(crate) enum Request<'a> {
     Create(CreateInternal<'a>),
     #[serde(rename = "RemoveSourceFilter")]
     Remove {
-        /// Name of the source the filter is on.
-        #[serde(rename = "sourceName")]
-        source: &'a str,
+        /// Identifier of the source the filter is on.
+        #[serde(flatten)]
+        source: SourceId<'a>,
         /// Name of the filter to remove.
         #[serde(rename = "filterName")]
         filter: &'a str,
@@ -33,9 +37,9 @@ pub(crate) enum Request<'a> {
     SetName(SetName<'a>),
     #[serde(rename = "GetSourceFilter")]
     Get {
-        /// Name of the source.
-        #[serde(rename = "sourceName")]
-        source: &'a str,
+        /// Identifier of the source.
+        #[serde(flatten)]
+        source: SourceId<'a>,
         /// Name of the filter.
         #[serde(rename = "filterName")]
         filter: &'a str,
@@ -56,8 +60,8 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 
 /// Request information for [`crate::client::Filters::create`].
 pub struct Create<'a, T> {
-    /// Name of the source to add the filter to.
-    pub source: &'a str,
+    /// Identifier of the source to add the filter to.
+    pub source: SourceId<'a>,
     /// Name of the new filter to be created.
     pub filter: &'a str,
     /// The kind of filter to be created.
@@ -70,9 +74,9 @@ pub struct Create<'a, T> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct CreateInternal<'a> {
-    /// Name of the source to add the filter to.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source to add the filter to.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Name of the new filter to be created.
     #[serde(rename = "filterName")]
     pub filter: &'a str,
@@ -87,9 +91,9 @@ pub(crate) struct CreateInternal<'a> {
 /// Request information for [`crate::client::Filters::set_name`].
 #[derive(Default, Serialize)]
 pub struct SetName<'a> {
-    /// Name of the source the filter is on.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source the filter is on.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Current name of the filter.
     #[serde(rename = "filterName")]
     pub filter: &'a str,
@@ -101,9 +105,9 @@ pub struct SetName<'a> {
 /// Request information for [`crate::client::Filters::set_index`].
 #[derive(Default, Serialize)]
 pub struct SetIndex<'a> {
-    /// Name of the source the filter is on.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source the filter is on.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Name of the filter.
     #[serde(rename = "filterName")]
     pub filter: &'a str,
@@ -114,8 +118,8 @@ pub struct SetIndex<'a> {
 
 /// Request information for [`crate::client::Filters::set_settings`].
 pub struct SetSettings<'a, T> {
-    /// Name of the source the filter is on.
-    pub source: &'a str,
+    /// Identifier of the source the filter is on.
+    pub source: SourceId<'a>,
     /// Name of the filter to set the settings of.
     pub filter: &'a str,
     /// Object of settings to apply.
@@ -127,9 +131,9 @@ pub struct SetSettings<'a, T> {
 /// Request information for [`crate::client::Filters::set_settings`].
 #[derive(Default, Serialize)]
 pub(crate) struct SetSettingsInternal<'a> {
-    /// Name of the source the filter is on.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source the filter is on.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Name of the filter to set the settings of.
     #[serde(rename = "filterName")]
     pub filter: &'a str,
@@ -144,9 +148,9 @@ pub(crate) struct SetSettingsInternal<'a> {
 /// Request information for [`crate::client::Filters::set_enabled`].
 #[derive(Default, Serialize)]
 pub struct SetEnabled<'a> {
-    /// Name of the source the filter is on.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source the filter is on.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Name of the filter.
     #[serde(rename = "filterName")]
     pub filter: &'a str,

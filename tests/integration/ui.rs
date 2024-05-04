@@ -31,7 +31,7 @@ async fn ui() -> Result<()> {
         .await?;
     client
         .open_source_projector(OpenSourceProjector {
-            source: TEST_TEXT,
+            source: TEST_TEXT.as_source(),
             location: Some(Location::MonitorIndex(-1)),
         })
         .await?;

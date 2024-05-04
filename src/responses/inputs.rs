@@ -2,7 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 use time::Duration;
+use uuid::Uuid;
 
+pub use super::ids::InputId;
 use crate::common::MonitorType;
 
 /// Response value for [`crate::client::Inputs::get_input_list`].
@@ -16,9 +18,9 @@ pub(crate) struct Inputs {
 /// Response value for [`crate::client::Inputs::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Input {
-    /// Name of the input source.
-    #[serde(rename = "inputName")]
-    pub name: String,
+    /// Identifier of the input source.
+    #[serde(flatten)]
+    pub id: InputId,
     /// Version input kind.
     #[serde(rename = "inputKind")]
     pub kind: String,
@@ -154,8 +156,12 @@ pub struct ListPropertyItem {
     pub value: serde_json::Value,
 }
 
-#[derive(Debug, Deserialize)]
-pub(crate) struct SceneItemId {
+/// Response value for [`crate::client::Inputs::create`].
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub struct SceneItemId {
+    ///  UUID of the newly created input.
+    #[serde(rename = "inputUuid")]
+    pub input_uuid: Uuid,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub scene_item_id: i64,

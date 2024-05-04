@@ -2,9 +2,12 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
-    requests::filters::{
-        Create, CreateInternal, Request, SetEnabled, SetIndex, SetName, SetSettings,
-        SetSettingsInternal,
+    requests::{
+        filters::{
+            Create, CreateInternal, Request, SetEnabled, SetIndex, SetName, SetSettings,
+            SetSettingsInternal,
+        },
+        sources::SourceId,
     },
     responses::filters as responses,
     Error, Result,
@@ -16,9 +19,18 @@ pub struct Filters<'a> {
 }
 
 impl<'a> Filters<'a> {
+    /// Gets an array of all available source filter kinds.
+    #[doc(alias = "GetSourceFilterKindList")]
+    pub async fn list_kinds(&self) -> Result<Vec<String>> {
+        self.client
+            .send_message::<_, responses::FilterKinds>(Request::KindList)
+            .await
+            .map(|fk| fk.kinds)
+    }
+
     /// Gets an array of all of a source's filters.
     #[doc(alias = "GetSourceFilterList")]
-    pub async fn list(&self, source: &str) -> Result<Vec<responses::SourceFilter>> {
+    pub async fn list(&self, source: SourceId<'_>) -> Result<Vec<responses::SourceFilter>> {
         self.client
             .send_message::<_, responses::Filters>(Request::List { source })
             .await
@@ -61,7 +73,7 @@ impl<'a> Filters<'a> {
 
     /// Removes a filter from a source.
     #[doc(alias = "RemoveSourceFilter")]
-    pub async fn remove(&self, source: &str, filter: &str) -> Result<()> {
+    pub async fn remove(&self, source: SourceId<'_>, filter: &str) -> Result<()> {
         self.client
             .send_message(Request::Remove { source, filter })
             .await
@@ -75,7 +87,7 @@ impl<'a> Filters<'a> {
 
     /// Gets the info for a specific source filter.
     #[doc(alias = "GetSourceFilter")]
-    pub async fn get(&self, source: &str, filter: &str) -> Result<responses::SourceFilter> {
+    pub async fn get(&self, source: SourceId<'_>, filter: &str) -> Result<responses::SourceFilter> {
         self.client
             .send_message(Request::Get { source, filter })
             .await

@@ -3,6 +3,7 @@
 use serde::Serialize;
 use time::Duration;
 
+use super::inputs::InputId;
 use crate::common::MediaAction;
 
 #[derive(Serialize)]
@@ -10,33 +11,33 @@ use crate::common::MediaAction;
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetMediaInputStatus")]
     Status {
-        /// Name of the media input.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the media input.
+        #[serde(flatten)]
+        input: InputId<'a>,
     },
     #[serde(rename = "SetMediaInputCursor")]
     SetCursor {
-        /// Name of the media input.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the media input.
+        #[serde(flatten)]
+        input: InputId<'a>,
         /// New cursor position to set.
         #[serde(rename = "mediaCursor", with = "crate::serde::duration_millis")]
         cursor: Duration,
     },
     #[serde(rename = "OffsetMediaInputCursor")]
     OffsetCursor {
-        /// Name of the media input.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the media input.
+        #[serde(flatten)]
+        input: InputId<'a>,
         /// Value to offset the current cursor position by.
         #[serde(rename = "mediaCursorOffset", with = "crate::serde::duration_millis")]
         offset: Duration,
     },
     #[serde(rename = "TriggerMediaInputAction")]
     TriggerAction {
-        /// Name of the media input.
-        #[serde(rename = "inputName")]
-        input: &'a str,
+        /// Identifier of the media input.
+        #[serde(flatten)]
+        input: InputId<'a>,
         /// Identifier of the media action.
         #[serde(rename = "mediaAction")]
         action: MediaAction,

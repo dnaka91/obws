@@ -3,6 +3,7 @@
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 
+use super::{ids::DestinationSceneId, scenes::SceneId, sources::SourceId};
 use crate::common::{Alignment, BlendMode, BoundsType};
 
 #[derive(Serialize)]
@@ -10,25 +11,27 @@ use crate::common::{Alignment, BlendMode, BoundsType};
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetSceneItemList")]
     List {
-        /// Name of the scene to get the items of.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene to get the items of.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "GetGroupSceneItemList")]
     ListGroup {
-        /// Name of the group to get the items of.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the group to get the items of.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "GetSceneItemId")]
     Id(Id<'a>),
+    #[serde(rename = "GetSceneItemSource")]
+    Source(Source<'a>),
     #[serde(rename = "CreateSceneItem")]
     Create(CreateSceneItem<'a>),
     #[serde(rename = "RemoveSceneItem")]
     Remove {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -37,9 +40,9 @@ pub(crate) enum Request<'a> {
     Duplicate(Duplicate<'a>),
     #[serde(rename = "GetSceneItemTransform")]
     Transform {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -48,9 +51,9 @@ pub(crate) enum Request<'a> {
     SetTransform(SetTransform<'a>),
     #[serde(rename = "GetSceneItemEnabled")]
     Enabled {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -59,9 +62,9 @@ pub(crate) enum Request<'a> {
     SetEnabled(SetEnabled<'a>),
     #[serde(rename = "GetSceneItemLocked")]
     Locked {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -70,9 +73,9 @@ pub(crate) enum Request<'a> {
     SetLocked(SetLocked<'a>),
     #[serde(rename = "GetSceneItemIndex")]
     Index {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -81,9 +84,9 @@ pub(crate) enum Request<'a> {
     SetIndex(SetIndex<'a>),
     #[serde(rename = "GetSceneItemBlendMode")]
     BlendMode {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         ///  Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -92,9 +95,9 @@ pub(crate) enum Request<'a> {
     SetBlendMode(SetBlendMode<'a>),
     #[serde(rename = "GetSceneItemPrivateSettings")]
     PrivateSettings {
-        /// Name of the scene the item is in.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene the item is in.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// Numeric ID of the scene item.
         #[serde(rename = "sceneItemId")]
         item_id: i64,
@@ -113,9 +116,9 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct Id<'a> {
-    /// Name of the scene or group to search in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene or group to search in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Name of the source to find.
     #[serde(rename = "sourceName")]
     pub source: &'a str,
@@ -126,16 +129,28 @@ pub struct Id<'a> {
     pub search_offset: Option<i32>,
 }
 
+/// Request information for [`crate::client::SceneItems::source`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+pub struct Source<'a> {
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::create`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct CreateSceneItem<'a> {
-    /// Name of the scene to create the new item in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
-    /// Name of the source to add to the scene.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the scene to create the new item in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Identifier of the source to add to the scene.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Enable state to apply to the scene item on creation.
     #[serde(rename = "sceneItemEnabled")]
     pub enabled: Option<bool>,
@@ -145,23 +160,23 @@ pub struct CreateSceneItem<'a> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct Duplicate<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
-    /// Name of the scene to create the duplicated item in.
-    #[serde(rename = "destinationSceneName")]
-    pub destination: Option<&'a str>,
+    /// Identifier of the scene to create the duplicated item in.
+    #[serde(flatten)]
+    pub destination: Option<DestinationSceneId<'a>>,
 }
 
 /// Request information for [`crate::client::SceneItems::set_transform`].
 #[derive(Default, Serialize)]
 pub struct SetTransform<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
@@ -291,9 +306,9 @@ pub struct Crop {
 /// Request information for [`crate::client::SceneItems::set_enabled`].
 #[derive(Default, Serialize)]
 pub struct SetEnabled<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
@@ -305,9 +320,9 @@ pub struct SetEnabled<'a> {
 /// Request information for [`crate::client::SceneItems::set_locked`].
 #[derive(Default, Serialize)]
 pub struct SetLocked<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
@@ -319,9 +334,9 @@ pub struct SetLocked<'a> {
 /// Request information for [`crate::client::SceneItems::set_index`].
 #[derive(Default, Serialize)]
 pub struct SetIndex<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
@@ -333,9 +348,9 @@ pub struct SetIndex<'a> {
 /// Request information for [`crate::client::SceneItems::set_blend_mode`].
 #[derive(Serialize)]
 pub struct SetBlendMode<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,
@@ -346,8 +361,8 @@ pub struct SetBlendMode<'a> {
 
 /// Request information for [`crate::client::SceneItems::set_private_settings`].
 pub struct SetPrivateSettings<'a, T> {
-    /// Name of the scene the item is in.
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     pub item_id: i64,
     /// Object of settings to apply.
@@ -359,9 +374,9 @@ pub struct SetPrivateSettings<'a, T> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct SetPrivateSettingsInternal<'a> {
-    /// Name of the scene the item is in.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
     #[serde(rename = "sceneItemId")]
     pub item_id: i64,

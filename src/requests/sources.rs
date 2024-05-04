@@ -5,14 +5,16 @@ use std::path::Path;
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 
+pub use super::ids::SourceId;
+
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetSourceActive")]
     Active {
-        /// Name of the source to get the active state of.
-        #[serde(rename = "sourceName")]
-        name: &'a str,
+        /// Identifier of the source to get the active state of.
+        #[serde(flatten)]
+        source: SourceId<'a>,
     },
     #[serde(rename = "GetSourceScreenshot")]
     TakeScreenshot(TakeScreenshot<'a>),
@@ -28,11 +30,11 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 
 /// Request information for [`crate::client::Sources::take_screenshot`].
 #[skip_serializing_none]
-#[derive(Default, Serialize)]
+#[derive(Serialize)]
 pub struct TakeScreenshot<'a> {
-    /// Name of the source to take a screenshot of.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source to take a screenshot of.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Image compression format to use. Use [`crate::client::General::version`] to get compatible
     /// image formats.
     #[serde(rename = "imageFormat")]
@@ -53,9 +55,9 @@ pub struct TakeScreenshot<'a> {
 #[skip_serializing_none]
 #[derive(Serialize)]
 pub struct SaveScreenshot<'a> {
-    /// Name of the source to take a screenshot of.
-    #[serde(rename = "sourceName")]
-    pub source: &'a str,
+    /// Identifier of the source to take a screenshot of.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
     /// Image compression format to use. Use [`crate::client::General::version`] to get compatible
     /// image formats.
     #[serde(rename = "imageFormat")]

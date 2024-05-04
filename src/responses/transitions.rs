@@ -3,6 +3,8 @@
 use serde::{Deserialize, Serialize};
 use time::Duration;
 
+pub use super::ids::{CurrentSceneTransitionId, TransitionId};
+
 /// Response value for
 /// [`crate::client::Transitions::get_transition_kind_list`].
 #[derive(Debug, Deserialize)]
@@ -15,9 +17,9 @@ pub(crate) struct TransitionKinds {
 /// Response value for [`crate::client::Transitions::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct SceneTransitionList {
-    /// Name of the current scene transition.
-    #[serde(rename = "currentSceneTransitionName")]
-    pub current_scene_transition_name: Option<String>,
+    /// Identifier of the current scene transition.
+    #[serde(flatten)]
+    pub current_scene_transition: Option<CurrentSceneTransitionId>,
     /// Kind of the current scene transition.
     #[serde(rename = "currentSceneTransitionKind")]
     pub current_scene_transition_kind: Option<String>,
@@ -29,9 +31,9 @@ pub struct SceneTransitionList {
 /// Response value for [`crate::client::Transitions::list`] as part of [`SceneTransitionList`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Transition {
-    /// Name of the transition.
-    #[serde(rename = "transitionName")]
-    pub name: String,
+    /// Identifier of the transition.
+    #[serde(flatten)]
+    pub id: TransitionId,
     /// Kind of the transition.
     #[serde(rename = "transitionKind")]
     pub kind: String,
@@ -46,9 +48,9 @@ pub struct Transition {
 /// Response value for [`crate::client::Transitions::current`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct CurrentSceneTransition {
-    /// Name of the transition.
-    #[serde(rename = "transitionName")]
-    pub name: String,
+    /// Identifier of the transition.
+    #[serde(flatten)]
+    pub id: TransitionId,
     /// Kind of the transition.
     #[serde(rename = "transitionKind")]
     pub kind: String,

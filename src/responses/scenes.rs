@@ -2,16 +2,19 @@
 
 use serde::{Deserialize, Serialize};
 use time::Duration;
+use uuid::Uuid;
+
+pub use super::ids::{CurrentPreviewSceneId, CurrentProgramSceneId, SceneId};
 
 /// Response value for [`crate::client::Scenes::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scenes {
-    /// Current program scene.
-    #[serde(rename = "currentProgramSceneName")]
-    pub current_program_scene_name: Option<String>,
-    /// Current preview scene. [`None`] if not in studio mode.
-    #[serde(rename = "currentPreviewSceneName")]
-    pub current_preview_scene_name: Option<String>,
+    /// Current program scene identifier. Can be [`None`] if internal state desync.
+    #[serde(flatten)]
+    pub current_program_scene: Option<CurrentProgramSceneId>,
+    /// Current preview scene identifier. [`None`] if not in studio mode.
+    #[serde(flatten)]
+    pub current_preview_scene: Option<CurrentPreviewSceneId>,
     /// Array of scenes in OBS.
     #[serde(rename = "scenes")]
     pub scenes: Vec<Scene>,
@@ -38,20 +41,27 @@ pub(crate) struct Groups {
 
 /// Response value for
 /// [`crate::client::Scenes::get_current_program_scene`].
-#[derive(Debug, Deserialize)]
-pub(crate) struct CurrentProgramScene {
-    /// Current program scene.
-    #[serde(rename = "currentProgramSceneName")]
-    pub current_program_scene_name: String,
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub struct CurrentProgramScene {
+    /// Current program scene identifier.
+    #[serde(flatten)]
+    pub id: SceneId,
 }
 
 /// Response value for
 /// [`crate::client::Scenes::get_current_preview_scene`].
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+pub struct CurrentPreviewScene {
+    /// Current preview scene identifier.
+    #[serde(flatten)]
+    pub id: SceneId,
+}
+
 #[derive(Debug, Deserialize)]
-pub(crate) struct CurrentPreviewScene {
-    /// Current preview scene.
-    #[serde(rename = "currentPreviewSceneName")]
-    pub current_preview_scene_name: String,
+pub(crate) struct CreateScene {
+    /// UUID of the created scene.
+    #[serde(rename = "sceneUuid")]
+    pub uuid: Uuid,
 }
 
 /// Response value for [`crate::client::Scenes::transition_override`].

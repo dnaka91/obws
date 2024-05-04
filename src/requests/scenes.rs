@@ -4,6 +4,9 @@ use serde::Serialize;
 use serde_with::skip_serializing_none;
 use time::Duration;
 
+pub use super::ids::SceneId;
+
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
@@ -16,22 +19,22 @@ pub(crate) enum Request<'a> {
     #[serde(rename = "SetCurrentProgramScene")]
     SetCurrentProgramScene {
         /// Scene to set as the current program scene.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "GetCurrentPreviewScene")]
     CurrentPreviewScene,
     #[serde(rename = "SetCurrentPreviewScene")]
     SetCurrentPreviewScene {
         /// Scene to set as the current preview scene.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "SetSceneName")]
     SetName {
-        /// Name of the scene to be renamed.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// The scene to be renamed.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
         /// New name for the scene.
         #[serde(rename = "newSceneName")]
         new_name: &'a str,
@@ -44,15 +47,15 @@ pub(crate) enum Request<'a> {
     },
     #[serde(rename = "RemoveScene")]
     Remove {
-        /// Name of the scene to remove.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// The scene to remove.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "GetSceneSceneTransitionOverride")]
     TransitionOverride {
-        /// Name of the scene.
-        #[serde(rename = "sceneName")]
-        scene: &'a str,
+        /// Identifier of the scene.
+        #[serde(flatten)]
+        scene: SceneId<'a>,
     },
     #[serde(rename = "SetSceneSceneTransitionOverride")]
     SetTransitionOverride(SetTransitionOverride<'a>),
@@ -68,9 +71,9 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub struct SetTransitionOverride<'a> {
-    /// Name of the scene.
-    #[serde(rename = "sceneName")]
-    pub scene: &'a str,
+    /// The target scene.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
     /// Name of the scene transition to use as override.
     #[serde(rename = "transitionName")]
     pub transition: Option<&'a str>,

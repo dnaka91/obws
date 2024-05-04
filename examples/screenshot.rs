@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
     let screenshot = client
         .sources()
         .take_screenshot(TakeScreenshot {
-            source: "OBWS-TEST-Scene",
+            source: "OBWS-TEST-Scene".into(),
             width: None,
             height: None,
             compression_quality: None,

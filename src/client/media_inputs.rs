@@ -2,7 +2,9 @@ use time::Duration;
 
 use super::Client;
 use crate::{
-    common::MediaAction, requests::media_inputs::Request, responses::media_inputs as responses,
+    common::MediaAction,
+    requests::{inputs::InputId, media_inputs::Request},
+    responses::media_inputs as responses,
     Result,
 };
 
@@ -14,7 +16,7 @@ pub struct MediaInputs<'a> {
 impl<'a> MediaInputs<'a> {
     /// Gets the status of a media input.
     #[doc(alias = "GetMediaInputStatus")]
-    pub async fn status(&self, input: &str) -> Result<responses::MediaStatus> {
+    pub async fn status(&self, input: InputId<'_>) -> Result<responses::MediaStatus> {
         self.client.send_message(Request::Status { input }).await
     }
 
@@ -22,7 +24,7 @@ impl<'a> MediaInputs<'a> {
     ///
     /// This request does not perform bounds checking of the cursor position.
     #[doc(alias = "SetMediaInputCursor")]
-    pub async fn set_cursor(&self, input: &str, cursor: Duration) -> Result<()> {
+    pub async fn set_cursor(&self, input: InputId<'_>, cursor: Duration) -> Result<()> {
         self.client
             .send_message(Request::SetCursor { input, cursor })
             .await
@@ -32,7 +34,7 @@ impl<'a> MediaInputs<'a> {
     ///
     /// This request does not perform bounds checking of the cursor position.
     #[doc(alias = "OffsetMediaInputCursor")]
-    pub async fn offset_cursor(&self, input: &str, offset: Duration) -> Result<()> {
+    pub async fn offset_cursor(&self, input: InputId<'_>, offset: Duration) -> Result<()> {
         self.client
             .send_message(Request::OffsetCursor { input, offset })
             .await
@@ -40,7 +42,7 @@ impl<'a> MediaInputs<'a> {
 
     /// Triggers an action on a media input.
     #[doc(alias = "TriggerMediaInputAction")]
-    pub async fn trigger_action(&self, input: &str, action: MediaAction) -> Result<()> {
+    pub async fn trigger_action(&self, input: InputId<'_>, action: MediaAction) -> Result<()> {
         self.client
             .send_message(Request::TriggerAction { input, action })
             .await

@@ -1,6 +1,6 @@
 use super::Client;
 use crate::{
-    requests::sources::{Request, SaveScreenshot, TakeScreenshot},
+    requests::sources::{Request, SaveScreenshot, SourceId, TakeScreenshot},
     responses::sources as responses,
     Result,
 };
@@ -13,8 +13,8 @@ pub struct Sources<'a> {
 impl<'a> Sources<'a> {
     /// Gets the active and show state of a source.
     #[doc(alias = "GetSourceActive")]
-    pub async fn active(&self, name: &str) -> Result<responses::SourceActive> {
-        self.client.send_message(Request::Active { name }).await
+    pub async fn active(&self, source: SourceId<'_>) -> Result<responses::SourceActive> {
+        self.client.send_message(Request::Active { source }).await
     }
 
     /// Gets a Base64-encoded screenshot of a source.

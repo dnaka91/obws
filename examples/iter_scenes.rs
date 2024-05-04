@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
     for scene in scene_list.scenes.iter().cycle() {
         client
             .scenes()
-            .set_current_program_scene(&scene.name)
+            .set_current_program_scene(&*scene.name)
             .await?;
         tokio::time::sleep(Duration::from_secs(1)).await;
     }

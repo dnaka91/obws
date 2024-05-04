@@ -20,7 +20,7 @@ async fn scene_items() -> Result<()> {
     let test_text_id = client
         .id(Id {
             scene: TEST_SCENE,
-            source: TEST_TEXT,
+            source: TEST_TEXT.as_name().unwrap(),
             search_offset: None,
         })
         .await?;
@@ -29,7 +29,7 @@ async fn scene_items() -> Result<()> {
         .duplicate(Duplicate {
             scene: TEST_SCENE,
             item_id: test_text_id,
-            destination: Some(TEST_SCENE_2),
+            destination: Some(TEST_SCENE_2.into()),
         })
         .await?;
     client.remove(TEST_SCENE_2, id).await?;
@@ -37,7 +37,7 @@ async fn scene_items() -> Result<()> {
     let id = client
         .create(CreateSceneItem {
             scene: TEST_SCENE_2,
-            source: TEST_TEXT,
+            source: TEST_TEXT.as_source(),
             enabled: Some(true),
         })
         .await?;

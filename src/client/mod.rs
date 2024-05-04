@@ -137,7 +137,7 @@ where
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
     op: Op::GreaterEq,
-    major: 28,
+    major: 30,
     minor: None,
     patch: None,
     pre: Prerelease::EMPTY,

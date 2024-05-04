@@ -42,8 +42,12 @@ async fn inputs() -> Result<()> {
         .set_volume(TEST_MEDIA, Volume::Mul(volume.mul))
         .await?;
 
-    client.set_name(TEST_BROWSER, TEST_BROWSER_RENAME).await?;
-    client.set_name(TEST_BROWSER_RENAME, TEST_BROWSER).await?;
+    client
+        .set_name(TEST_BROWSER, TEST_BROWSER_RENAME.as_name().unwrap())
+        .await?;
+    client
+        .set_name(TEST_BROWSER_RENAME, TEST_BROWSER.as_name().unwrap())
+        .await?;
 
     let balance = client.audio_balance(TEST_MEDIA).await?;
     client.set_audio_balance(TEST_MEDIA, balance / 2.0).await?;
