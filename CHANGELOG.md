@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+## [0.12.0] - 2024-05-04
+
 ### Added
 
 - New features from obs-websocket [v5.3.0](https://github.com/obsproject/obs-websocket/releases/tag/5.3.0)
@@ -270,7 +272,8 @@ is currently in progress on the `v5-api` branch and the release is expected to b
 - Initial release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/dnaka91/obws/compare/v0.11.5...HEAD
+[Unreleased]: https://github.com/dnaka91/obws/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/dnaka91/obws/compare/v0.11.5...v0.12.0
 [0.11.5]: https://github.com/dnaka91/obws/compare/v0.11.4...v0.11.5
 [0.11.4]: https://github.com/dnaka91/obws/compare/v0.11.3...v0.11.4
 [0.11.3]: https://github.com/dnaka91/obws/compare/v0.11.2...v0.11.3
