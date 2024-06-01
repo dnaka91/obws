@@ -23,12 +23,24 @@ pub struct Scenes {
 /// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scene {
+    /// UUID of the scene.
+    #[serde(rename = "sceneUuid")]
+    pub uuid: Uuid,
     /// Name of the scene.
     #[serde(rename = "sceneName")]
     pub name: String,
     /// Positional index in the list of scenes.
     #[serde(rename = "sceneIndex")]
     pub index: usize,
+}
+
+impl From<Scene> for SceneId {
+    fn from(scene: Scene) -> Self {
+        Self {
+            name: scene.name,
+            uuid: scene.uuid
+        }
+    }
 }
 
 /// Response value for [`crate::client::Scenes::get_group_list`].
