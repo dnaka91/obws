@@ -31,7 +31,7 @@ sha2 = "0.10.8"
 thiserror = "1.0.59"
 time = "0.3.36"
 tokio = { version = "1.37.0", features = ["net", "rt", "sync", "time"] }
-tokio-tungstenite = "0.22.0"
+tokio-tungstenite = "0.23.0"
 tracing = "0.1.40"
 uuid = { version = "1.8.0", features = ["serde"] }
 
