@@ -16,18 +16,14 @@ async fn scenes() -> Result<()> {
     client.list_groups().await?;
 
     let current = client.current_program_scene().await?;
-    let other = &scenes.iter().find(|s| s.name != current.id).unwrap().name;
-    client.set_current_program_scene(other.as_str()).await?;
-    client
-        .set_current_program_scene(current.id.name.as_str())
-        .await?;
+    let other = &scenes.iter().find(|s| s.id != current.id).unwrap().id;
+    client.set_current_program_scene(other).await?;
+    client.set_current_program_scene(current.id).await?;
 
     let current = client.current_preview_scene().await?;
-    let other = &scenes.iter().find(|s| s.name != current.id).unwrap().name;
-    client.set_current_preview_scene(other.as_str()).await?;
-    client
-        .set_current_preview_scene(current.id.name.as_str())
-        .await?;
+    let other = &scenes.iter().find(|s| s.id != current.id).unwrap().id;
+    client.set_current_preview_scene(other).await?;
+    client.set_current_preview_scene(current.id).await?;
 
     client
         .set_name(TEST_SCENE, TEST_SCENE_RENAME.as_name().unwrap())

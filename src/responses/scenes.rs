@@ -23,9 +23,9 @@ pub struct Scenes {
 /// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Scene {
-    /// Name of the scene.
-    #[serde(rename = "sceneName")]
-    pub name: String,
+    /// Identifier of the scene.
+    #[serde(flatten)]
+    pub id: SceneId,
     /// Positional index in the list of scenes.
     #[serde(rename = "sceneIndex")]
     pub index: usize,

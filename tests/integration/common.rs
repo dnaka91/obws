@@ -160,19 +160,19 @@ async fn ensure_obs_setup(client: &Client) -> Result<()> {
 }
 
 fn is_required_scene(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE
+    scene.id == TEST_SCENE
 }
 
 fn is_required_scene_2(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE_2
+    scene.id == TEST_SCENE_2
 }
 
 fn is_renamed_scene(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE_RENAME
+    scene.id == TEST_SCENE_RENAME
 }
 
 fn is_created_scene(scene: &Scene) -> bool {
-    scene.name == TEST_SCENE_CREATE
+    scene.id == TEST_SCENE_CREATE
 }
 
 fn is_required_group(group: &str) -> bool {
