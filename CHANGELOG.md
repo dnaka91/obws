@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Updated tokio-tungstenite to the latest `v0.24`.
+
+### Fixed
+
+- **BREAKING CHANGE:** Deserialize the UUIDs of scene list responses, effectively exchanging the `name` field for an `id`. This was an oversight when introducing the UUIDs.
+
 ## [0.12.0] - 2024-05-04
 
 ### Added
