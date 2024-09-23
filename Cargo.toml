@@ -19,27 +19,27 @@ features = ["events", "tls"]
 [dependencies]
 async-stream = { version = "0.3.5", optional = true }
 base64 = "0.22.1"
-bitflags = { version = "2.5.0", features = ["serde"] }
+bitflags = { version = "2.6.0", features = ["serde"] }
 futures-util = { version = "0.3.30", features = ["sink"] }
-rgb = { version = "0.8.37", default-features = false }
-semver = { version = "1.0.22", features = ["serde"] }
-serde = { version = "1.0.200", features = ["derive"] }
-serde_json = "1.0.116"
+rgb = { version = "0.8.50", default-features = false }
+semver = { version = "1.0.23", features = ["serde"] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
 serde_repr = "0.1.19"
-serde_with = "3.8.1"
+serde_with = "3.9.0"
 sha2 = "0.10.8"
-thiserror = "1.0.59"
+thiserror = "1.0.64"
 time = "0.3.36"
-tokio = { version = "1.37.0", features = ["net", "rt", "sync", "time"] }
-tokio-tungstenite = "0.23.0"
+tokio = { version = "1.38.1", features = ["net", "rt", "sync", "time"] }
+tokio-tungstenite = "0.24.0"
 tracing = "0.1.40"
-uuid = { version = "1.8.0", features = ["serde"] }
+uuid = { version = "1.10.0", features = ["serde"] }
 
 [dev-dependencies]
-anyhow = "1.0.82"
+anyhow = "1.0.89"
 dotenvy = "0.15.7"
-serde_test = "1.0.176"
-tokio = { version = "1.37.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+serde_test = "1.0.177"
+tokio = { version = "1.38.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 
 [features]
