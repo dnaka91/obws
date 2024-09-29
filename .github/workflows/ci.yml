@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        toolchain: [stable, "1.68"]
+        toolchain: [stable, "1.70"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
