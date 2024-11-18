@@ -379,7 +379,7 @@ impl Client {
             let write_result = write
                 .lock()
                 .await
-                .send(Message::Text(json))
+                .send(Message::text(json))
                 .await
                 .map_err(Error::Send);
 
@@ -437,7 +437,7 @@ impl Client {
         self.write
             .lock()
             .await
-            .send(Message::Text(json))
+            .send(Message::text(json))
             .await
             .map_err(Error::Send)?;
 

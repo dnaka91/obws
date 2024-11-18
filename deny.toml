@@ -1,8 +1,7 @@
-[advisories]
-version = 2
+[graph]
+all-features = true
 
 [licenses]
-version = 2
 allow = [
     "Apache-2.0",
     "BSD-3-Clause",
@@ -11,7 +10,7 @@ allow = [
     "MPL-2.0",
 ]
 exceptions = [
-    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
+    { name = "unicode-ident", allow = ["Unicode-3.0"] },
 ]
 
 [[licenses.clarify]]

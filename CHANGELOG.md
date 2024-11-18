@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Updated tokio-tungstenite to the latest `v0.26.1`.
+- Updated all dependencies to their latest version.
+
 ## [0.13.0] - 2024-09-23
 
 ### Changed

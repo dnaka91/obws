@@ -150,7 +150,7 @@ pub(super) async fn handshake(
             return Err(HandshakeError::ConnectionClosed(info.take().map(|i| {
                 CloseDetails {
                     code: i.code,
-                    reason: i.reason.into_owned(),
+                    reason: i.reason.as_str().to_owned(),
                 }
             })));
         }
@@ -182,7 +182,7 @@ pub(super) async fn handshake(
             .map_err(HandshakeError::SerializeMessage)?;
 
             write
-                .send(Message::Text(req))
+                .send(Message::text(req))
                 .await
                 .map_err(HandshakeError::Send)?;
         }
