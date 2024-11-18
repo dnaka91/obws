@@ -37,6 +37,7 @@ pub const SOURCE_WINDOW_CAPTURE: &str = "window_capture";
 
 /// Settings specific to a **CoreAudio** input capture source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CoreaudioInputCapture<'a> {
     /// Input device identifier.
     pub device_id: &'a str,
@@ -44,6 +45,7 @@ pub struct CoreaudioInputCapture<'a> {
 
 /// Settings specific to a **CoreAudio** output capture source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CoreaudioOutputCapture<'a> {
     /// Output device identifier.
     pub device_id: &'a str,
@@ -51,6 +53,7 @@ pub struct CoreaudioOutputCapture<'a> {
 
 /// Settings specific to a browser source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct BrowserSource<'a> {
     /// Whether to use a local file instead of a remote location.
     ///
@@ -98,6 +101,7 @@ impl Default for BrowserSource<'_> {
 
 /// Settings specific to a color source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct ColorSourceV3 {
     /// Color to display.
     #[serde(with = "crate::serde::rgba8_inverse")]
@@ -120,6 +124,7 @@ impl Default for ColorSourceV3 {
 
 /// Settings specific to a display capture source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct DisplayCapture<'a> {
     /// Index of the display to capture. Usually `0` for the main display.
     pub display: u8,
@@ -246,6 +251,7 @@ impl Serialize for CropMode<'_> {
 
 /// Settings specific to an image source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct ImageSource<'a> {
     /// Location of the file to display.
     pub file: &'a Path,
@@ -264,6 +270,7 @@ impl Default for ImageSource<'_> {
 
 /// Settings specific to an image slide-show source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Slideshow<'a> {
     /// Behavior of playback in relation to visibility.
     pub playback_behavior: PlaybackBehavior,
@@ -309,6 +316,7 @@ impl Default for Slideshow<'_> {
 
 /// Single file as part of a [`Slideshow`].
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SlideshowFile<'a> {
     /// Location of the file to display.
     pub value: &'a Path,
@@ -407,6 +415,7 @@ impl From<CustomSize> for String {
 
 /// Settings specific to a **FFmpeg** video source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct FfmpegSource<'a> {
     /// Whether the source is a local file or remote.
     pub is_local_file: bool,
@@ -454,6 +463,7 @@ pub enum ColorRange {
 
 /// Settings specific to a **FreeType2** text source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct TextFt2SourceV2<'a> {
     /// Draw the text with smoothed corners.
     pub antialiasing: bool,
@@ -508,6 +518,7 @@ impl Default for TextFt2SourceV2<'_> {
 
 /// Font settings for a [`TextFt2SourceV2`].
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Font<'a> {
     /// Font face.
     pub face: &'a str,
@@ -536,6 +547,7 @@ impl Default for Font<'_> {
 
 /// Settings specific to a **VLC** video source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct VlcSource<'a> {
     /// Loop play-list.
     #[serde(rename = "bool")]
@@ -574,6 +586,7 @@ impl Default for VlcSource<'_> {
 
 /// Settings specific to an audio/video input capture source.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct AvCaptureInputV2<'a> {
     /// Whether to use buffering.
     pub buffering: bool,
@@ -668,6 +681,7 @@ pub enum AvPreset {
 /// The value is split into numerator and denominator as integer values instead of a floating point
 /// value. To calculate the frame rate as FPS divide the `numerator` by the `denominator`.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct FrameRate {
     /// The numerator to form the frame rate.
     pub numerator: u64,
@@ -677,6 +691,7 @@ pub struct FrameRate {
 
 /// Video resolution for an [`AvCaptureInputV2`].
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Resolution {
     /// Video width.
     pub width: u32,
@@ -686,6 +701,7 @@ pub struct Resolution {
 
 /// Settings specific to a window capture source.
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct WindowCapture<'a> {
     /// Name of the owning process.
     pub owner_name: &'a str,

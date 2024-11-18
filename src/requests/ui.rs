@@ -49,6 +49,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 }
 
 /// Request information for [`crate::client::Ui::open_video_mix_projector`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct OpenVideoMixProjector {
     /// Type of mix to open.
     pub r#type: VideoMixType,
@@ -68,6 +69,7 @@ pub(crate) struct OpenVideoMixProjectorInternal {
 }
 
 /// Request information for [`crate::client::Ui::open_source_projector`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct OpenSourceProjector<'a> {
     /// Identifier of the source to open a projector for.
     pub source: SourceId<'a>,
@@ -138,6 +140,7 @@ pub enum VideoMixType {
 /// Request information for [`crate::client::Ui::open_video_mix_projector`] and
 /// [`crate::client::Ui::open_source_projector`] as part of [`Location`].
 #[derive(Debug)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct QtGeometry {
     /// The screen number to display a widget or [`Self::DEFAULT_SCREEN`] to let OBS pick the
     /// default.
@@ -271,6 +274,7 @@ impl QtWindowState {
 /// Y
 /// ```
 #[derive(Clone, Copy, Debug, Default)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct QtRect {
     /// Left or X/horizontal position of the rectangle.
     pub left: i32,

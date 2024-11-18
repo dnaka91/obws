@@ -185,6 +185,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 }
 
 /// Request information for [`crate::client::Inputs::set_settings`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetSettings<'a, T> {
     /// The input to set the settings of.
     pub input: InputId<'a>,
@@ -224,6 +225,7 @@ pub enum Volume {
 }
 
 /// Request information for [`crate::client::Inputs::create`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Create<'a, T> {
     /// Name of the scene to add the input to as a scene item.
     pub scene: SceneId<'a>,

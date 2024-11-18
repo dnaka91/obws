@@ -28,6 +28,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 }
 
 /// Request information for [`crate::client::General::call_vendor_request`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CallVendorRequest<'a, T> {
     /// Name of the vendor to use.
     pub vendor_name: &'a str,

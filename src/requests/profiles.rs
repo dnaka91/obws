@@ -48,6 +48,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// Request information for [`crate::client::Profiles::set_parameter`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetParameter<'a> {
     /// Category of the parameter to set.
     #[serde(rename = "parameterCategory")]

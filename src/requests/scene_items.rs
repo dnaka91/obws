@@ -115,6 +115,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// Request information for [`crate::client::SceneItems::id`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Id<'a> {
     /// Identifier of the scene or group to search in.
     #[serde(flatten)]
@@ -132,6 +133,7 @@ pub struct Id<'a> {
 /// Request information for [`crate::client::SceneItems::source`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Source<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -144,6 +146,7 @@ pub struct Source<'a> {
 /// Request information for [`crate::client::SceneItems::create`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CreateSceneItem<'a> {
     /// Identifier of the scene to create the new item in.
     #[serde(flatten)]
@@ -159,6 +162,7 @@ pub struct CreateSceneItem<'a> {
 /// Request information for [`crate::client::SceneItems::duplicate`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Duplicate<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -173,6 +177,7 @@ pub struct Duplicate<'a> {
 
 /// Request information for [`crate::client::SceneItems::set_transform`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetTransform<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -189,6 +194,7 @@ pub struct SetTransform<'a> {
 /// [`SetTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SceneItemTransform {
     /// Position (or offset) on the screen.
     #[serde(rename = "position", flatten)]
@@ -243,6 +249,7 @@ impl From<crate::responses::scene_items::SceneItemTransform> for SceneItemTransf
 /// [`SceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Position {
     /// The x position of the source from the left.
     #[serde(rename = "positionX")]
@@ -256,6 +263,7 @@ pub struct Position {
 /// [`SceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Scale {
     /// The x-scale factor of the source.
     #[serde(rename = "scaleX")]
@@ -269,6 +277,7 @@ pub struct Scale {
 /// [`SceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Bounds {
     /// Type of bounding box.
     #[serde(rename = "boundsType")]
@@ -288,6 +297,7 @@ pub struct Bounds {
 /// [`SceneItemTransform`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Crop {
     /// The number of pixels cropped off the left of the source before scaling.
     #[serde(rename = "cropLeft")]
@@ -305,6 +315,7 @@ pub struct Crop {
 
 /// Request information for [`crate::client::SceneItems::set_enabled`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetEnabled<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -319,6 +330,7 @@ pub struct SetEnabled<'a> {
 
 /// Request information for [`crate::client::SceneItems::set_locked`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetLocked<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -333,6 +345,7 @@ pub struct SetLocked<'a> {
 
 /// Request information for [`crate::client::SceneItems::set_index`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetIndex<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -347,6 +360,7 @@ pub struct SetIndex<'a> {
 
 /// Request information for [`crate::client::SceneItems::set_blend_mode`].
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetBlendMode<'a> {
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
@@ -360,6 +374,7 @@ pub struct SetBlendMode<'a> {
 }
 
 /// Request information for [`crate::client::SceneItems::set_private_settings`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetPrivateSettings<'a, T> {
     /// Identifier of the scene the item is in.
     pub scene: SceneId<'a>,

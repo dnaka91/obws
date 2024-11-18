@@ -20,6 +20,7 @@ pub const TYPE_WIPE: &str = "wipe_transition";
 /// Options for a swipe transition. A swipe describes one scene hovering over another and making
 /// the other scene visible by moving in/out of the scene.
 #[derive(Debug, Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Swipe {
     /// Direction of the swipe.
     pub direction: Direction,
@@ -31,6 +32,7 @@ pub struct Swipe {
 /// Options for a slide transition. A slide describes two scene directly next to each other making
 /// one visible by "pushing" the other one away.
 #[derive(Debug, Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Slide {
     /// Direction of the slide.
     pub direction: Direction,
@@ -56,6 +58,7 @@ pub enum Direction {
 /// completely, then switch the scene while only the video is visible. Afterwards the video moves
 /// out of the view again to make the new scene visible.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Stinger<'a> {
     /// Location of the video file.
     pub path: &'a Path,
@@ -119,6 +122,7 @@ pub enum AudioFadeStyle {
 /// a given color until only the color is visible and then blend from the color to the new scene
 /// until the color is fully gone.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct FadeToColor {
     /// Color to blend in/out.
     #[serde(with = "crate::serde::rgba8_inverse")]
@@ -130,6 +134,7 @@ pub struct FadeToColor {
 /// Options for a luma wipe transition. A luma wipe describes one scene being gradually displayed
 /// over the other, where the luma image defines a certain animation to do so.
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Wipe {
     /// The image to use. This describes the animation that is used.
     pub luma_image: LumaImage,

@@ -64,6 +64,7 @@ pub enum Realm {
 
 /// Request information for [`crate::client::Config::set_persistent_data`].
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetPersistentData<'a> {
     /// The data realm to select.
     #[serde(rename = "realm")]
@@ -79,6 +80,7 @@ pub struct SetPersistentData<'a> {
 /// Request information for [`crate::client::Config::set_video_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetVideoSettings {
     /// Numerator of the fractional FPS value.
     #[serde(rename = "fpsNumerator")]

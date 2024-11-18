@@ -31,6 +31,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// Request information for [`crate::client::Sources::take_screenshot`].
 #[skip_serializing_none]
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct TakeScreenshot<'a> {
     /// Identifier of the source to take a screenshot of.
     #[serde(flatten)]
@@ -54,6 +55,7 @@ pub struct TakeScreenshot<'a> {
 /// Request information for [`crate::client::Sources::save_screenshot`].
 #[skip_serializing_none]
 #[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SaveScreenshot<'a> {
     /// Identifier of the source to take a screenshot of.
     #[serde(flatten)]

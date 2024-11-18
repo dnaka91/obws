@@ -59,6 +59,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 }
 
 /// Request information for [`crate::client::Filters::create`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Create<'a, T> {
     /// Identifier of the source to add the filter to.
     pub source: SourceId<'a>,
@@ -90,6 +91,7 @@ pub(crate) struct CreateInternal<'a> {
 
 /// Request information for [`crate::client::Filters::set_name`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetName<'a> {
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
@@ -104,6 +106,7 @@ pub struct SetName<'a> {
 
 /// Request information for [`crate::client::Filters::set_index`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetIndex<'a> {
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
@@ -117,6 +120,7 @@ pub struct SetIndex<'a> {
 }
 
 /// Request information for [`crate::client::Filters::set_settings`].
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetSettings<'a, T> {
     /// Identifier of the source the filter is on.
     pub source: SourceId<'a>,
@@ -147,6 +151,7 @@ pub(crate) struct SetSettingsInternal<'a> {
 
 /// Request information for [`crate::client::Filters::set_enabled`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetEnabled<'a> {
     /// Identifier of the source the filter is on.
     #[serde(flatten)]

@@ -37,6 +37,7 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// Request information for
 /// [`crate::client::Hotkeys::trigger_by_sequence`].
 #[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct KeyModifiers {
     /// Press Shift.
     #[serde(rename = "shift")]

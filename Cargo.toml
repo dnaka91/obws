@@ -14,12 +14,13 @@ keywords = ["async", "obs", "obs-websocket", "remote-control", "tokio"]
 include = ["examples/**/*", "tests/**/*", "src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
 
 [package.metadata.docs.rs]
-features = ["events", "tls"]
+features = ["builder", "events", "tls"]
 
 [dependencies]
 async-stream = { version = "0.3.6", optional = true }
 base64 = "0.22.1"
 bitflags = { version = "2.6.0", features = ["serde"] }
+bon = { version = "3.3.2", optional = true }
 futures-util = { version = "0.3.31", features = ["sink"] }
 rgb = { version = "0.8.50", default-features = false }
 semver = { version = "1.0.24", features = ["serde"] }
@@ -45,6 +46,7 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 [features]
 default = []
 test-integration = []
+builder = ["dep:bon"]
 events = ["dep:async-stream"]
 tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
 
