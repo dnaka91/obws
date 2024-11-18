@@ -4,7 +4,6 @@ use std::path::Path;
 
 use rgb::RGBA8;
 use serde::Serialize;
-use serde_repr::Serialize_repr;
 
 /// Identifier for swipe transitions.
 pub const TYPE_SWIPE: &str = "swipe_transition";
@@ -76,7 +75,8 @@ pub struct Stinger<'a> {
 
 /// Different units that are used together with a value to define scene switching point of a video
 /// transition.
-#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+#[serde(into = "u8")]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum TransitionPointType {
@@ -87,9 +87,16 @@ pub enum TransitionPointType {
     Frame = 1,
 }
 
+impl From<TransitionPointType> for u8 {
+    fn from(value: TransitionPointType) -> Self {
+        value as Self
+    }
+}
+
 /// Setting for the audio monitoring which defines whether audio is send to the stream, played
 /// locally or both at the same time.
-#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+#[serde(into = "u8")]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum AudioMonitoring {
@@ -105,8 +112,15 @@ pub enum AudioMonitoring {
     MonitorAndOutput = 2,
 }
 
+impl From<AudioMonitoring> for u8 {
+    fn from(value: AudioMonitoring) -> Self {
+        value as Self
+    }
+}
+
 /// Describes the way in which the audio is faded between two scenes with a [`Stinger`] transition.
-#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+#[serde(into = "u8")]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum AudioFadeStyle {
@@ -116,6 +130,12 @@ pub enum AudioFadeStyle {
     /// Fade out the audio from the old scene and fade in the new scene's audio at the same time,
     /// creating a slight overlap.
     Crossfade = 1,
+}
+
+impl From<AudioFadeStyle> for u8 {
+    fn from(value: AudioFadeStyle) -> Self {
+        value as Self
+    }
 }
 
 /// Options for a fade to color transition. A color fading describes one scene being blended with

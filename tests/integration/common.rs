@@ -2,6 +2,7 @@ use std::net::Ipv4Addr;
 
 use anyhow::{Context, Result, bail, ensure};
 use base64::{Engine, engine::general_purpose};
+use derive_more::TryFrom;
 use futures_util::{SinkExt, StreamExt};
 use obws::{
     Client,
@@ -11,7 +12,6 @@ use obws::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use serde_json::json;
-use serde_repr::{Deserialize_repr, Serialize_repr};
 use sha2::{Digest, Sha256};
 use tokio::{
     net::{TcpListener, TcpStream},
@@ -323,13 +323,20 @@ impl Serialize for ServerMessage {
             d: T,
         }
 
-        #[derive(Serialize_repr)]
+        #[derive(Clone, Copy, Serialize)]
+        #[serde(into = "u8")]
         #[repr(u8)]
         enum OpCode {
             Hello = 0,
             Identified = 2,
             Event = 5,
             RequestResponse = 7,
+        }
+
+        impl From<OpCode> for u8 {
+            fn from(value: OpCode) -> Self {
+                value as Self
+            }
         }
 
         match self {
@@ -423,7 +430,9 @@ impl<'de> Deserialize<'de> for ClientMessage {
             d: serde_json::Value,
         }
 
-        #[derive(Deserialize_repr)]
+        #[derive(Deserialize, TryFrom)]
+        #[try_from(repr)]
+        #[serde(try_from = "u8")]
         #[repr(u8)]
         enum OpCode {
             Identify = 1,

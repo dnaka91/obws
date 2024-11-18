@@ -20,8 +20,8 @@ pub mod transitions;
 pub mod ui;
 pub(crate) mod virtual_cam;
 
-use serde::{Deserialize, Deserializer, de};
-use serde_repr::{Deserialize_repr, Serialize_repr};
+use derive_more::derive::TryFrom;
+use serde::{Deserialize, Deserializer, Serialize, de};
 
 #[derive(Debug)]
 pub(crate) enum ServerMessage {
@@ -57,7 +57,9 @@ impl<'de> Deserialize<'de> for ServerMessage {
             data: serde_json::Value,
         }
 
-        #[derive(Deserialize_repr)]
+        #[derive(Deserialize, TryFrom)]
+        #[serde(try_from = "u8")]
+        #[try_from(repr)]
         #[repr(u8)]
         enum OpCode {
             /// The initial message sent by obs-websocket to newly connected clients.
@@ -172,8 +174,10 @@ pub(crate) struct Status {
 /// The status code gives information about the result of a request. It gives further insight into
 /// what went wrong, if a request failed.
 #[derive(
-    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
+    Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize, TryFrom,
 )]
+#[serde(into = "u16", try_from = "u16")]
+#[try_from(repr)]
 #[repr(u16)]
 #[non_exhaustive]
 pub enum StatusCode {
@@ -272,11 +276,19 @@ pub enum StatusCode {
     CannotAct = 703,
 }
 
+impl From<StatusCode> for u16 {
+    fn from(value: StatusCode) -> Self {
+        value as Self
+    }
+}
+
 /// Additional close codes, defined by `obs-websocket`. These can be used to further pin down the
 /// details of why the web-socket connection was closed.
 #[derive(
-    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize_repr,
+    Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize, TryFrom,
 )]
+#[serde(into = "u16", try_from = "u16")]
+#[try_from(repr)]
 #[repr(u16)]
 #[non_exhaustive]
 pub enum WebSocketCloseCode {
@@ -310,4 +322,10 @@ pub enum WebSocketCloseCode {
     SessionInvalidated = 4011,
     /// A requested feature is not supported due to hardware/software limitations.
     UnsupportedFeature = 4012,
+}
+
+impl From<WebSocketCloseCode> for u16 {
+    fn from(value: WebSocketCloseCode) -> Self {
+        value as Self
+    }
 }

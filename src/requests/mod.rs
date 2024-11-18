@@ -4,7 +4,6 @@
 
 use bitflags::bitflags;
 use serde::{Serialize, ser::SerializeStruct};
-use serde_repr::Serialize_repr;
 use serde_with::skip_serializing_none;
 
 pub mod config;
@@ -48,7 +47,8 @@ impl Serialize for ClientRequest<'_> {
     where
         S: serde::Serializer,
     {
-        #[derive(Clone, Copy, Serialize_repr)]
+        #[derive(Clone, Copy, Serialize)]
+        #[serde(into = "u8")]
         #[repr(u8)]
         enum OpCode {
             /// The message sent by a newly connected client to obs-websocket in response to a
@@ -61,6 +61,12 @@ impl Serialize for ClientRequest<'_> {
             Request = 6,
             /// The message sent by a client to obs-websocket to perform a batch of requests.
             RequestBatch = 8,
+        }
+
+        impl From<OpCode> for u8 {
+            fn from(value: OpCode) -> Self {
+                value as Self
+            }
         }
 
         fn write_state<S>(serializer: S, op: OpCode, d: &impl Serialize) -> Result<S::Ok, S::Error>
@@ -224,7 +230,8 @@ impl From<u32> for EventSubscription {
 }
 
 #[allow(dead_code)]
-#[derive(Serialize_repr)]
+#[derive(Clone, Copy, Serialize)]
+#[serde(into = "i8")]
 #[repr(i8)]
 pub(crate) enum ExecutionType {
     /// Not a request batch.
@@ -237,6 +244,12 @@ pub(crate) enum ExecutionType {
     /// A request batch type which processes all requests using all available threads in the thread
     /// pool.
     Parallel = 2,
+}
+
+impl From<ExecutionType> for i8 {
+    fn from(value: ExecutionType) -> Self {
+        value as Self
+    }
 }
 
 pub(crate) enum RequestType<'a> {

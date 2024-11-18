@@ -5,7 +5,6 @@ use std::path::Path;
 
 use rgb::RGBA8;
 use serde::{Serialize, Serializer, ser::SerializeStruct};
-use serde_repr::Serialize_repr;
 use time::Duration;
 
 use crate::common::FontFlags;
@@ -448,7 +447,8 @@ pub struct FfmpegSource<'a> {
 }
 
 /// YUV color range of a [`FfmpegSource`].
-#[derive(Default, Serialize_repr)]
+#[derive(Clone, Copy, Default, Serialize)]
+#[serde(into = "u8")]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum ColorRange {
@@ -459,6 +459,12 @@ pub enum ColorRange {
     Partial = 1,
     /// Full color range.
     Full = 2,
+}
+
+impl From<ColorRange> for u8 {
+    fn from(value: ColorRange) -> Self {
+        value as Self
+    }
 }
 
 /// Settings specific to a **`FreeType2`** text source.
@@ -613,7 +619,8 @@ pub struct AvCaptureInputV2<'a> {
 }
 
 /// Color space as part of an [`AvCaptureInputV2`].
-#[derive(Default, Serialize_repr)]
+#[derive(Clone, Copy, Default, Serialize)]
+#[serde(into = "i8")]
 #[repr(i8)]
 #[non_exhaustive]
 pub enum ColorSpace {
@@ -626,8 +633,15 @@ pub enum ColorSpace {
     Rec709 = 2,
 }
 
+impl From<ColorSpace> for i8 {
+    fn from(value: ColorSpace) -> Self {
+        value as Self
+    }
+}
+
 /// Video color range as part of an [`AvCaptureInputV2`].
-#[derive(Default, Serialize_repr)]
+#[derive(Clone, Copy, Default, Serialize)]
+#[serde(into = "i8")]
 #[repr(i8)]
 #[non_exhaustive]
 pub enum VideoRange {
@@ -638,6 +652,12 @@ pub enum VideoRange {
     Partial = 1,
     /// Full color range.
     Full = 2,
+}
+
+impl From<VideoRange> for i8 {
+    fn from(value: VideoRange) -> Self {
+        value as Self
+    }
 }
 
 /// Different presets for the [`AvCaptureInputV2`].
