@@ -342,30 +342,26 @@ pub enum PlaybackBehavior {
 }
 
 /// Playback control mode for use in [`Slideshow`].
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Default, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum SlideMode {
     /// Automatic.
+    #[default]
     ModeAuto,
     /// Manual (Use hotkeys to control slide-show).
     ModeManual,
 }
 
-impl Default for SlideMode {
-    fn default() -> Self {
-        Self::ModeAuto
-    }
-}
-
 /// Transition animation between images in a [`Slideshow`].
-#[derive(Serialize)]
+#[derive(Default, Serialize)]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum Transition {
     /// Immediately replace without animation.
     Cut,
     /// Gradually fade between the two images until the new one is fully visible.
+    #[default]
     Fade,
     /// Swipe the new image over the old one.
     Swipe,
@@ -373,18 +369,13 @@ pub enum Transition {
     Slide,
 }
 
-impl Default for Transition {
-    fn default() -> Self {
-        Self::Fade
-    }
-}
-
 /// Aspect ratios and bounding sizes for use in [`Slideshow`].
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Default, Serialize)]
 #[serde(into = "String")]
 #[non_exhaustive]
 pub enum CustomSize {
     /// Automatically detect a ratio based on the input.
+    #[default]
     Automatic,
     /// 16:9 aspect ratio.
     SixteenToNine,
@@ -398,12 +389,6 @@ pub enum CustomSize {
     CustomRatio(u32, u32),
     /// Custom width x height size.
     CustomSize(u32, u32),
-}
-
-impl Default for CustomSize {
-    fn default() -> Self {
-        Self::Automatic
-    }
 }
 
 impl From<CustomSize> for String {
@@ -454,22 +439,17 @@ pub struct FfmpegSource<'a> {
 }
 
 /// YUV color range of a [`FfmpegSource`].
-#[derive(Serialize_repr)]
+#[derive(Default, Serialize_repr)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum ColorRange {
     /// Automatic detection.
+    #[default]
     Auto = 0,
     /// Partial color range.
     Partial = 1,
     /// Full color range.
     Full = 2,
-}
-
-impl Default for ColorRange {
-    fn default() -> Self {
-        Self::Auto
-    }
 }
 
 /// Settings specific to a **FreeType2** text source.
@@ -620,11 +600,12 @@ pub struct AvCaptureInputV2<'a> {
 }
 
 /// Color space as part of an [`AvCaptureInputV2`].
-#[derive(Serialize_repr)]
+#[derive(Default, Serialize_repr)]
 #[repr(i8)]
 #[non_exhaustive]
 pub enum ColorSpace {
     /// Automatic detection.
+    #[default]
     Auto = -1,
     /// Rec. 601 color space.
     Rec601 = 1,
@@ -632,29 +613,18 @@ pub enum ColorSpace {
     Rec709 = 2,
 }
 
-impl Default for ColorSpace {
-    fn default() -> Self {
-        Self::Auto
-    }
-}
-
 /// Video color range as part of an [`AvCaptureInputV2`].
-#[derive(Serialize_repr)]
+#[derive(Default, Serialize_repr)]
 #[repr(i8)]
 #[non_exhaustive]
 pub enum VideoRange {
     /// Automatic detection.
+    #[default]
     Auto = -1,
     /// Partial color range.
     Partial = 1,
     /// Full color range.
     Full = 2,
-}
-
-impl Default for VideoRange {
-    fn default() -> Self {
-        Self::Auto
-    }
 }
 
 /// Different presets for the [`AvCaptureInputV2`].

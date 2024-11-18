@@ -37,11 +37,12 @@ pub struct Slide {
 }
 
 /// The direction for a [`Swipe`] or [`Slide].
-#[derive(Clone, Copy, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Serialize)]
 #[serde(rename_all = "lowercase")]
 #[non_exhaustive]
 pub enum Direction {
     /// From/to the left.
+    #[default]
     Left,
     /// From/to the right.
     Right,
@@ -49,12 +50,6 @@ pub enum Direction {
     Up,
     /// From/to the bottom.
     Down,
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Self::Left
-    }
 }
 
 /// Options for a stinger transition. A stinger describes a video being used to hide the old scene
@@ -78,30 +73,26 @@ pub struct Stinger<'a> {
 
 /// Different units that are used together with a value to define scene switching point of a video
 /// transition.
-#[derive(Clone, Copy, Debug, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum TransitionPointType {
     /// Time in milliseconds.
+    #[default]
     Time = 0,
     /// Frames (single images) of the video.
     Frame = 1,
 }
 
-impl Default for TransitionPointType {
-    fn default() -> Self {
-        Self::Time
-    }
-}
-
 /// Setting for the audio monitoring which defines whether audio is send to the stream, played
 /// locally or both at the same time.
-#[derive(Clone, Copy, Debug, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum AudioMonitoring {
     /// No monitoring, means to insert the audio into the output stream but not playing it on the
     /// local machine.
+    #[default]
     MonitorOff = 0,
     /// The opposite of [`Self::MonitorOff`], playing the audio locally but not sending it to
     /// the stream.
@@ -111,28 +102,17 @@ pub enum AudioMonitoring {
     MonitorAndOutput = 2,
 }
 
-impl Default for AudioMonitoring {
-    fn default() -> Self {
-        Self::MonitorOff
-    }
-}
-
 /// Describes the way in which the audio is faded between two scenes with a [`Stinger`] transition.
-#[derive(Clone, Copy, Debug, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Serialize_repr)]
 #[repr(u8)]
 #[non_exhaustive]
 pub enum AudioFadeStyle {
     /// Fade out to transition point then fade in.
+    #[default]
     FadeOutFadeIn = 0,
     /// Fade out the audio from the old scene and fade in the new scene's audio at the same time,
     /// creating a slight overlap.
     Crossfade = 1,
-}
-
-impl Default for AudioFadeStyle {
-    fn default() -> Self {
-        Self::FadeOutFadeIn
-    }
 }
 
 /// Options for a fade to color transition. A color fading describes one scene being blended with
@@ -160,7 +140,7 @@ pub struct Wipe {
 }
 
 /// A luma image that defines the animation of a [`Wipe`].
-#[derive(Serialize)]
+#[derive(Default, Serialize)]
 #[non_exhaustive]
 pub enum LumaImage {
     /// Barn door animation diagonal from the bottom left.
@@ -218,6 +198,7 @@ pub enum LumaImage {
     #[serde(rename = "iris.png")]
     Iris,
     /// Horizontal linear animation.
+    #[default]
     #[serde(rename = "linear-h.png")]
     LinearHorizontal,
     /// Linear animation from the top left.
@@ -265,10 +246,4 @@ pub enum LumaImage {
     /// Vertical zig-zag animation.
     #[serde(rename = "zigzag-v.png")]
     ZigzagVertical,
-}
-
-impl Default for LumaImage {
-    fn default() -> Self {
-        Self::LinearHorizontal
-    }
 }
