@@ -361,6 +361,13 @@ pub enum Event {
         #[serde(rename = "outputPath")]
         path: Option<String>,
     },
+    /// The record output has started writing to a new file. For example, when a file split
+    /// happens.
+    RecordFileChanged {
+        /// File name that the output has begun writing to.
+        #[serde(rename = "newOutputPath")]
+        path: String,
+    },
     /// The state of the replay buffer output has changed.
     ReplayBufferStateChanged {
         /// Whether the output is active.

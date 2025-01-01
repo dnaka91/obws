@@ -202,7 +202,7 @@ pub struct DangerousConnectConfig {
 const OBS_STUDIO_VERSION: Comparator = Comparator {
     op: Op::GreaterEq,
     major: 30,
-    minor: None,
+    minor: Some(2),
     patch: None,
     pre: Prerelease::EMPTY,
 };
@@ -210,7 +210,7 @@ const OBS_STUDIO_VERSION: Comparator = Comparator {
 const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
     op: Op::Caret,
     major: 5,
-    minor: None,
+    minor: Some(5),
     patch: None,
     pre: Prerelease::EMPTY,
 };

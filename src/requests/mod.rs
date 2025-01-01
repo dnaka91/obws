@@ -234,7 +234,7 @@ pub(crate) enum RequestType<'a> {
     MediaInputs(self::media_inputs::Request<'a>),
     Outputs(self::outputs::Request<'a>),
     Profiles(self::profiles::Request<'a>),
-    Recording(self::recording::Request),
+    Recording(self::recording::Request<'a>),
     ReplayBuffer(self::replay_buffer::Request),
     SceneCollections(self::scene_collections::Request<'a>),
     SceneItems(self::scene_items::Request<'a>),

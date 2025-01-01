@@ -57,4 +57,20 @@ impl<'a> Recording<'a> {
     pub async fn resume(&self) -> Result<()> {
         self.client.send_message(Request::Resume).await
     }
+
+    /// Splits the current file being recorded into a new file.
+    #[doc(alias = "SplitRecordFile")]
+    pub async fn split_file(&self) -> Result<()> {
+        self.client.send_message(Request::SplitFile).await
+    }
+
+    /// Adds a new chapter marker to the file currently being recorded.
+    ///
+    /// **Note:** As of OBS 30.2.0, the only file format supporting this feature is Hybrid MP4.
+    #[doc(alias = "CreateRecordChapter")]
+    pub async fn create_chapter(&self, name: Option<&str>) -> Result<()> {
+        self.client
+            .send_message(Request::CreateChapter { name })
+            .await
+    }
 }

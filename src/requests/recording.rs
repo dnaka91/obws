@@ -4,7 +4,7 @@ use serde::Serialize;
 
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
-pub(crate) enum Request {
+pub(crate) enum Request<'a> {
     #[serde(rename = "GetRecordStatus")]
     Status,
     #[serde(rename = "ToggleRecord")]
@@ -19,10 +19,18 @@ pub(crate) enum Request {
     Pause,
     #[serde(rename = "ResumeRecord")]
     Resume,
+    #[serde(rename = "SplitRecordFile")]
+    SplitFile,
+    #[serde(rename = "CreateRecordChapter")]
+    CreateChapter {
+        /// Name of the new chapter.
+        #[serde(rename = "chapterName")]
+        name: Option<&'a str>,
+    },
 }
 
-impl From<Request> for super::RequestType<'_> {
-    fn from(value: Request) -> Self {
+impl<'a> From<Request<'a>> for super::RequestType<'a> {
+    fn from(value: Request<'a>) -> Self {
         super::RequestType::Recording(value)
     }
 }

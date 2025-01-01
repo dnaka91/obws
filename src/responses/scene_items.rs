@@ -126,6 +126,9 @@ pub struct SceneItemTransform {
     /// The number of pixels cropped off the bottom of the source before scaling.
     #[serde(rename = "cropBottom")]
     pub crop_bottom: u32,
+    /// Whether to limit cropping to the bounding box.
+    #[serde(rename = "cropToBounds", default)]
+    pub crop_to_bounds: bool,
 }
 
 /// Response value for [`crate::client::SceneItems::enabled`].

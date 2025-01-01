@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New features from obs-websocket [v5.5.0](https://github.com/obsproject/obs-websocket/releases/tag/5.5.0)
+  - New `RecordFileChanged` event.
+  - New `split_file` and `create_chapter` command for recordings.
 - Added builders for all request structures, available behind the new `builder` feature.
 - Allow disabling of the OBS Studio and OBS WebSocket version checks.
 

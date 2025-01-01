@@ -78,7 +78,7 @@ the equivalent function calls.
 | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
 | GetInputList                        | [`Inputs::list`](crate::client::Inputs::list)                                                     |
 | GetInputKindList                    | [`Inputs::list_kinds`](crate::client::Inputs::list_kinds)                                         |
-| GetSpecialInputs                    | [`Inputs::specials`](crate::client::Inputs::specials)                                             |  |
+| GetSpecialInputs                    | [`Inputs::specials`](crate::client::Inputs::specials)                                             |
 | CreateInput                         | [`Inputs::create`](crate::client::Inputs::create)                                                 |
 | RemoveInput                         | [`Inputs::remove`](crate::client::Inputs::remove)                                                 |
 | SetInputName                        | [`Inputs::set_name`](crate::client::Inputs::set_name)                                             |
@@ -188,15 +188,17 @@ the equivalent function calls.
 
 ## Record Requests
 
-| obs-websocket     | obws                                                                |
-| ----------------- | ------------------------------------------------------------------- |
-| GetRecordStatus   | [`Recording::status`](crate::client::Recording::status)             |
-| ToggleRecord      | [`Recording::toggle`](crate::client::Recording::toggle)             |
-| StartRecord       | [`Recording::start`](crate::client::Recording::start)               |
-| StopRecord        | [`Recording::stop`](crate::client::Recording::stop)                 |
-| ToggleRecordPause | [`Recording::toggle_pause`](crate::client::Recording::toggle_pause) |
-| PauseRecord       | [`Recording::pause`](crate::client::Recording::pause)               |
-| ResumeRecord      | [`Recording::resume`](crate::client::Recording::resume)             |
+| obs-websocket       | obws                                                                    |
+| ------------------- | ----------------------------------------------------------------------- |
+| GetRecordStatus     | [`Recording::status`](crate::client::Recording::status)                 |
+| ToggleRecord        | [`Recording::toggle`](crate::client::Recording::toggle)                 |
+| StartRecord         | [`Recording::start`](crate::client::Recording::start)                   |
+| StopRecord          | [`Recording::stop`](crate::client::Recording::stop)                     |
+| ToggleRecordPause   | [`Recording::toggle_pause`](crate::client::Recording::toggle_pause)     |
+| PauseRecord         | [`Recording::pause`](crate::client::Recording::pause)                   |
+| ResumeRecord        | [`Recording::resume`](crate::client::Recording::resume)                 |
+| SplitRecordFile     | [`Recording::split_file`](crate::client::Recording::split_file)         |
+| CreateRecordChapter | [`Recording::create_chapter`](crate::client::Recording::create_chapter) |
 
 ## Media Inputs Requests
 
