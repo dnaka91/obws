@@ -26,7 +26,7 @@ use tokio_tungstenite::{
     tungstenite::{protocol::CloseFrame, Message},
     MaybeTlsStream, WebSocketStream,
 };
-use tracing::{debug, error, info, trace};
+use tracing::{debug, error, info, trace, warn};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
@@ -101,6 +101,7 @@ pub struct Client {
     /// receivers and event listeners. It allows to shut down all the machinery once the client is
     /// no longer needed.
     handle: Option<JoinHandle<()>>,
+    dangerous: DangerousConnectConfig,
 }
 
 /// Shorthand for the writer side of a web-socket stream that has been split into reader and writer.
@@ -124,6 +125,10 @@ where
     /// Port to connect to.
     #[cfg_attr(feature = "builder", builder(start_fn))]
     pub port: u16,
+    /// Dangerous configuration options that are not given any support for.
+    #[cfg_attr(feature = "builder", builder(field))]
+    pub dangerous: Option<DangerousConnectConfig>,
+    /// The host name, usually `localhost` unless the OBS instance is on a remote machine.
     /// Optional password to authenticate against `obs-websocket`.
     pub password: Option<P>,
     /// Optional list of event subscriptions, controlling what events to receive. By default all
@@ -149,6 +154,35 @@ where
     /// cancel the attempt and return an [`Error::Timeout`].
     #[cfg_attr(feature = "builder", builder(default = DEFAULT_CONNECT_TIMEOUT))]
     pub connect_timeout: Duration,
+}
+
+#[cfg(feature = "builder")]
+impl<H, P, S> ConnectConfigBuilder<H, P, S>
+where
+    H: AsRef<str>,
+    P: AsRef<str>,
+    S: connect_config_builder::State,
+{
+    /// Enter into dangerous configuration.
+    pub fn dangerous<S2: dangerous_connect_config_builder::State>(
+        mut self,
+        f: impl FnOnce(DangerousConnectConfigBuilder) -> DangerousConnectConfigBuilder<S2>,
+    ) -> Self {
+        self.dangerous = Some(f(DangerousConnectConfig::builder()).build());
+        self
+    }
+}
+
+/// Dangerous configuration options that are not given any support for.
+#[derive(Default)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct DangerousConnectConfig {
+    /// Skip validation of the minimum OBS Studio version.
+    #[cfg_attr(feature = "builder", builder(default))]
+    pub skip_studio_version_check: bool,
+    /// Skip validation of the minimum OBS WebSocket version.
+    #[cfg_attr(feature = "builder", builder(default))]
+    pub skip_websocket_version_check: bool,
 }
 
 const OBS_STUDIO_VERSION: Comparator = Comparator {
@@ -210,6 +244,7 @@ impl Client {
             tls: false,
             broadcast_capacity: DEFAULT_BROADCAST_CAPACITY,
             connect_timeout: DEFAULT_CONNECT_TIMEOUT,
+            dangerous: None,
         })
         .await
     }
@@ -220,6 +255,13 @@ impl Client {
         H: AsRef<str>,
         P: AsRef<str>,
     {
+        if config.dangerous.is_some() {
+            warn!(
+                "dangerous configuration is being used. Please not that no support is given for \
+                 any issues encountered while using these options"
+            );
+        }
+
         let (socket, _) = tokio::time::timeout(
             config.connect_timeout,
             tokio_tungstenite::connect_async(format!(
@@ -332,6 +374,7 @@ impl Client {
             #[cfg(feature = "events")]
             event_sender: Arc::downgrade(&event_sender),
             handle: Some(handle),
+            dangerous: config.dangerous.unwrap_or_default(),
         };
 
         client.verify_versions().await?;
@@ -342,14 +385,18 @@ impl Client {
     async fn verify_versions(&self) -> Result<()> {
         let version = self.general().version().await?;
 
-        if !OBS_STUDIO_VERSION.matches(&version.obs_version) {
+        if !self.dangerous.skip_studio_version_check
+            && !OBS_STUDIO_VERSION.matches(&version.obs_version)
+        {
             return Err(Error::ObsStudioVersion(
                 version.obs_version,
                 OBS_STUDIO_VERSION,
             ));
         }
 
-        if !OBS_WEBSOCKET_VERSION.matches(&version.obs_web_socket_version) {
+        if !self.dangerous.skip_websocket_version_check
+            && !OBS_WEBSOCKET_VERSION.matches(&version.obs_web_socket_version)
+        {
             return Err(Error::ObsWebsocketVersion(
                 version.obs_web_socket_version,
                 OBS_WEBSOCKET_VERSION,

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added builders for all request structures, available behind the new `builder` feature.
+- Allow disabling of the OBS Studio and OBS WebSocket version checks.
 
 ### Changed
 
