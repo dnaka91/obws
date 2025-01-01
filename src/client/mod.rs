@@ -107,18 +107,22 @@ pub struct Client {
 type MessageWriter = SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>;
 
 /// Default broadcast capacity used when not overwritten by the user.
-#[cfg(feature = "events")]
-const DEFAULT_CAPACITY: usize = 100;
+pub const DEFAULT_BROADCAST_CAPACITY: usize = 100;
+/// Default connect timeout duration used when not overwritten by the user.
+pub const DEFAULT_CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Configuration for connecting to a obs-websocket instance.
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct ConnectConfig<H, P>
 where
     H: AsRef<str>,
     P: AsRef<str>,
 {
+    #[cfg_attr(feature = "builder", builder(start_fn))]
     /// The host name, usually `localhost` unless the OBS instance is on a remote machine.
     pub host: H,
     /// Port to connect to.
+    #[cfg_attr(feature = "builder", builder(start_fn))]
     pub port: u16,
     /// Optional password to authenticate against `obs-websocket`.
     pub password: Option<P>,
@@ -127,16 +131,23 @@ where
     pub event_subscriptions: Option<EventSubscription>,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
     #[cfg(feature = "tls")]
+    #[cfg_attr(feature = "builder", builder(default))]
     pub tls: bool,
-    /// Capacity of the broadcast channel for events. The default is `100` which should suffice.
+    /// Capacity of the broadcast channel for events. The default is [`DEFAULT_BROADCAST_CAPACITY`]
+    /// which should suffice.
+    ///
     /// If the consumption of events takes a long time and the broadcast channel fills up faster
     /// than events are consumed, it will start dropping old messages from the queue and these will
     /// not be send to listeners anymore.
     #[cfg_attr(not(feature = "events"), allow(dead_code))]
-    pub broadcast_capacity: Option<usize>,
-    /// Maximum wait time to establish a connection with the OBS instance. If this limit is
-    /// exceeded, the connection ([`Client::connect_with_config`]) call will cancel the attempt and
-    /// return an [`Error::Timeout`].
+    #[cfg_attr(feature = "builder", builder(default = DEFAULT_BROADCAST_CAPACITY))]
+    pub broadcast_capacity: usize,
+    /// Maximum wait time to establish a connection with the OBS instance. The default is
+    /// [`DEFAULT_CONNECT_TIMEOUT`].
+    ///
+    /// If this limit is exceeded, the connection ([`Client::connect_with_config`]) call will
+    /// cancel the attempt and return an [`Error::Timeout`].
+    #[cfg_attr(feature = "builder", builder(default = DEFAULT_CONNECT_TIMEOUT))]
     pub connect_timeout: Duration,
 }
 
@@ -147,6 +158,7 @@ const OBS_STUDIO_VERSION: Comparator = Comparator {
     patch: None,
     pre: Prerelease::EMPTY,
 };
+
 const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
     op: Op::Caret,
     major: 5,
@@ -154,6 +166,7 @@ const OBS_WEBSOCKET_VERSION: Comparator = Comparator {
     patch: None,
     pre: Prerelease::EMPTY,
 };
+
 const RPC_VERSION: u32 = 1;
 
 impl<H, P> ConnectConfig<H, P>
@@ -195,8 +208,8 @@ impl Client {
             },
             #[cfg(feature = "tls")]
             tls: false,
-            broadcast_capacity: None,
-            connect_timeout: Duration::from_secs(30),
+            broadcast_capacity: DEFAULT_BROADCAST_CAPACITY,
+            connect_timeout: DEFAULT_CONNECT_TIMEOUT,
         })
         .await
     }
@@ -229,8 +242,7 @@ impl Client {
         let reidentify_receivers2 = Arc::clone(&reidentify_receivers);
 
         #[cfg(feature = "events")]
-        let (event_sender, _) =
-            broadcast::channel(config.broadcast_capacity.unwrap_or(DEFAULT_CAPACITY));
+        let (event_sender, _) = broadcast::channel(config.broadcast_capacity);
         #[cfg(feature = "events")]
         let event_sender = Arc::new(event_sender);
         #[cfg(feature = "events")]
