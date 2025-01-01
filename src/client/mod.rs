@@ -291,10 +291,7 @@ impl Client {
         let (mut write, mut read) = socket.split();
 
         let receivers = Arc::new(ReceiverList::default());
-        let receivers2 = Arc::clone(&receivers);
-
         let reidentify_receivers = Arc::new(ReidentifyReceiverList::default());
-        let reidentify_receivers2 = Arc::clone(&reidentify_receivers);
 
         #[cfg(feature = "events")]
         let (event_sender, _) = broadcast::channel(config.broadcast_capacity);
@@ -315,8 +312,8 @@ impl Client {
             read,
             #[cfg(feature = "events")]
             events_tx,
-            receivers2,
-            reidentify_receivers2,
+            Arc::clone(&receivers),
+            Arc::clone(&reidentify_receivers),
         ));
 
         let write = Mutex::new(write);

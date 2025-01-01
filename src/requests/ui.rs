@@ -1,5 +1,7 @@
 //! Requests related to the user interface.
 
+use std::fmt::{self, Display};
+
 use bitflags::bitflags;
 use serde::Serialize;
 
@@ -231,6 +233,12 @@ impl Default for QtGeometry {
             screen_width: 0,
             rect: QtRect::default(),
         }
+    }
+}
+
+impl Display for QtGeometry {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.serialize())
     }
 }
 

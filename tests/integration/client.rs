@@ -1,13 +1,14 @@
 use anyhow::Result;
 use obws::requests::EventSubscription;
+use test_log::test;
 
 use crate::common;
 
-#[tokio::test]
+#[test(tokio::test)]
 async fn client() -> Result<()> {
-    let client = common::new_client().await?;
+    let (client, server) = common::new_client().await?;
 
     client.reidentify(EventSubscription::ALL).await?;
 
-    Ok(())
+    server.stop().await
 }

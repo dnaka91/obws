@@ -57,8 +57,10 @@ uuid = { version = "1.11.0", features = ["serde"] }
 anyhow = "1.0.95"
 dotenvy = "0.15.7"
 serde_test = "1.0.177"
+test-log = { version = "0.2.14", default-features = false, features = ["trace"] }
 tokio = { version = "1.38.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+uuid = { version = "1.11.0", features = ["v8"] }
 
 [features]
 default = []

@@ -1,19 +1,35 @@
-use std::{env, sync::Once};
+use std::net::Ipv4Addr;
 
-use anyhow::{ensure, Result};
+use anyhow::{bail, ensure, Context, Result};
+use base64::{engine::general_purpose, Engine};
+use futures_util::{SinkExt, StreamExt};
 use obws::{
-    requests::{inputs::InputId, scenes::SceneId},
-    responses::{filters::SourceFilter, inputs::Input, scenes::Scene},
+    events::Event,
+    requests::{inputs::InputId, scenes::SceneId, EventSubscription},
+    responses::StatusCode,
     Client,
 };
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde_json::json;
+use serde_repr::{Deserialize_repr, Serialize_repr};
+use sha2::{Digest, Sha256};
+use tokio::{
+    net::{TcpListener, TcpStream},
+    select,
+    sync::{mpsc, oneshot},
+    task::JoinHandle,
+};
+use tokio_tungstenite::{
+    tungstenite::{self, Message},
+    WebSocketStream,
+};
+use tracing::{debug, error, info};
 
-pub const TEST_PROFILE: &str = "OBWS-TEST";
 pub const TEST_SCENE: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene");
 pub const TEST_SCENE_2: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene2");
 pub const TEST_SCENE_RENAME: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene-Renamed");
 pub const TEST_SCENE_CREATE: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene-Created");
 pub const TEST_TEXT: InputId<'_> = InputId::Name("OBWS-TEST-Text");
-pub const TEST_TEXT_2: InputId<'_> = InputId::Name("OBWS-TEST-Text2");
 pub const TEST_BROWSER: InputId<'_> = InputId::Name("OBWS-TEST-Browser");
 pub const TEST_BROWSER_RENAME: InputId<'_> = InputId::Name("OBWS-TEST-Browser-Renamed");
 pub const TEST_MEDIA: InputId<'_> = InputId::Name("OBWS-TEST-Media");
@@ -22,209 +38,15 @@ pub const TEST_TRANSITION: &str = "OBWS-TEST-Transition";
 pub const TEST_FILTER: &str = "OBWS-TEST-Filter";
 pub const TEST_FILTER_2: &str = "OBWS-TEST-Filter2";
 pub const TEST_FILTER_RENAME: &str = "OBWS-TEST-Filter-Renamed";
-pub const INPUT_KIND_TEXT_FT2: &str = "text_ft2_source_v2";
 pub const INPUT_KIND_BROWSER: &str = "browser_source";
 pub const INPUT_KIND_VLC: &str = "vlc_source";
 pub const FILTER_COLOR: &str = "color_filter";
 
-static INIT: Once = Once::new();
+pub async fn new_client() -> Result<(Client, MockServer)> {
+    let (server, port) = MockServer::start().await?;
+    let client = Client::connect("localhost", port, Some("mock-password")).await?;
 
-pub async fn new_client() -> Result<Client> {
-    INIT.call_once(|| {
-        dotenvy::dotenv().ok();
-        tracing_subscriber::fmt::init();
-    });
-
-    let host = env::var("OBS_HOST").unwrap_or_else(|_| "localhost".to_owned());
-    let port = env::var("OBS_PORT")
-        .map(|p| p.parse())
-        .unwrap_or(Ok(4455))?;
-    let client = Client::connect(host, port, env::var("OBS_PASSWORD").ok()).await?;
-
-    ensure_obs_setup(&client).await?;
-
-    Ok(client)
-}
-
-async fn ensure_obs_setup(client: &Client) -> Result<()> {
-    let scenes = client.scenes().list().await?;
-    ensure!(
-        scenes.scenes.iter().any(is_required_scene),
-        "scene `{}` not found, required for scenes tests",
-        TEST_SCENE
-    );
-    ensure!(
-        scenes.scenes.iter().any(is_required_scene_2),
-        "scene `{}` not found, required for scenes tests",
-        TEST_SCENE
-    );
-    ensure!(
-        !scenes.scenes.iter().any(is_renamed_scene),
-        "scene `{}` found, must NOT be present for scenes tests",
-        TEST_SCENE_RENAME
-    );
-    ensure!(
-        !scenes.scenes.iter().any(is_created_scene),
-        "scene `{}` found, must NOT be present for scenes tests",
-        TEST_SCENE_CREATE
-    );
-
-    let groups = client.scenes().list_groups().await?;
-    ensure!(
-        groups.iter().map(String::as_str).any(is_required_group),
-        "group `{}` not found, required for scenes and scene items tests",
-        TEST_GROUP
-    );
-
-    let inputs = client.inputs().list(None).await?;
-    ensure!(
-        inputs.iter().any(is_required_text_input),
-        "text input `{}` not found, required for inputs tests",
-        TEST_TEXT
-    );
-    ensure!(
-        inputs.iter().any(is_required_text_2_input),
-        "text input `{}` not found, required for inputs tests",
-        TEST_TEXT_2
-    );
-    ensure!(
-        inputs.iter().any(is_required_browser_input),
-        "media input `{}` not found, required for inputs tests",
-        TEST_BROWSER
-    );
-    ensure!(
-        inputs.iter().any(is_required_media_input),
-        "media input `{}` not found, required for inputs tests",
-        TEST_MEDIA
-    );
-    ensure!(
-        !inputs.iter().any(is_renamed_input),
-        "browser input `{}` found, must NOT be present for inputs tests",
-        TEST_BROWSER_RENAME
-    );
-
-    let filters = client.filters().list(TEST_TEXT.as_source()).await?;
-    ensure!(
-        filters.iter().any(is_required_filter),
-        "filter `{}` not found, required for filters tests",
-        TEST_FILTER
-    );
-    ensure!(
-        !filters.iter().any(is_filter_2),
-        "filter `{}` found, must NOT be present for filters tests",
-        TEST_FILTER_2
-    );
-    ensure!(
-        !filters.iter().any(is_renamed_filter),
-        "filter `{}` found, must NOT be present for filters tests",
-        TEST_FILTER_RENAME
-    );
-
-    let profiles = client.profiles().list().await?.profiles;
-    ensure!(
-        profiles.iter().map(String::as_str).any(is_required_profile),
-        "profile `{}` not found, required for profiles tests",
-        TEST_PROFILE
-    );
-
-    let studio_mode_enabled = client.ui().studio_mode_enabled().await?;
-    ensure!(
-        !studio_mode_enabled,
-        "studio mode enabled, required to be disabled for studio mode tests"
-    );
-
-    let recording_active = client.recording().status().await?.active;
-    ensure!(
-        !recording_active,
-        "recording active, required to be stopped for recording tests"
-    );
-
-    let virtual_cam_active = client.virtual_cam().status().await?;
-    ensure!(
-        !virtual_cam_active,
-        "virtual cam active, required to be stopped for outputs tests"
-    );
-
-    let replay_buffer_active = client.replay_buffer().status().await?;
-    ensure!(
-        !replay_buffer_active,
-        "replay buffer active, required to be stopped for outputs tests"
-    );
-
-    client
-        .scenes()
-        .set_current_program_scene(TEST_SCENE)
-        .await?;
-
-    Ok(())
-}
-
-fn is_required_scene(scene: &Scene) -> bool {
-    scene.id == TEST_SCENE
-}
-
-fn is_required_scene_2(scene: &Scene) -> bool {
-    scene.id == TEST_SCENE_2
-}
-
-fn is_renamed_scene(scene: &Scene) -> bool {
-    scene.id == TEST_SCENE_RENAME
-}
-
-fn is_created_scene(scene: &Scene) -> bool {
-    scene.id == TEST_SCENE_CREATE
-}
-
-fn is_required_group(group: &str) -> bool {
-    group == TEST_GROUP
-}
-
-fn is_required_text_input(input: &Input) -> bool {
-    input.id == TEST_TEXT && is_text_input(input)
-}
-
-fn is_required_text_2_input(input: &Input) -> bool {
-    input.id == TEST_TEXT_2 && is_text_input(input)
-}
-
-fn is_required_browser_input(input: &Input) -> bool {
-    input.id == TEST_BROWSER && is_browser_input(input)
-}
-
-fn is_required_media_input(input: &Input) -> bool {
-    input.id == TEST_MEDIA && is_media_input(input)
-}
-
-fn is_renamed_input(input: &Input) -> bool {
-    input.id == TEST_BROWSER_RENAME
-}
-
-fn is_text_input(input: &Input) -> bool {
-    input.kind == INPUT_KIND_TEXT_FT2
-}
-
-fn is_browser_input(input: &Input) -> bool {
-    input.kind == INPUT_KIND_BROWSER
-}
-
-fn is_media_input(input: &Input) -> bool {
-    input.kind == INPUT_KIND_VLC
-}
-
-fn is_required_filter(filter: &SourceFilter) -> bool {
-    filter.name == TEST_FILTER
-}
-
-fn is_filter_2(filter: &SourceFilter) -> bool {
-    filter.name == TEST_FILTER_2
-}
-
-fn is_renamed_filter(filter: &SourceFilter) -> bool {
-    filter.name == TEST_FILTER_RENAME
-}
-
-fn is_required_profile(profile: &str) -> bool {
-    profile == TEST_PROFILE
+    Ok((client, server))
 }
 
 #[macro_export]
@@ -238,4 +60,400 @@ macro_rules! wait_for {
             }
         }
     }};
+}
+
+pub struct MockServer {
+    handle: JoinHandle<Result<()>>,
+    shutdown: Option<oneshot::Sender<()>>,
+    expectations: mpsc::UnboundedSender<Expectation>,
+    events: mpsc::UnboundedSender<Event>,
+}
+
+impl MockServer {
+    pub async fn start() -> Result<(Self, u16)> {
+        let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await?;
+        let port = listener.local_addr()?.port();
+        debug!("server started");
+
+        let (shutdown_tx, mut shutdown_rx) = oneshot::channel();
+        let (expect_tx, mut expect_rx) = mpsc::unbounded_channel();
+        let (event_tx, mut event_rx) = mpsc::unbounded_channel();
+
+        let handle = tokio::spawn(async move {
+            let (stream, _) = listener.accept().await?;
+            let mut stream = tokio_tungstenite::accept_async(stream).await?;
+            debug!("connected");
+
+            handshake(&mut stream).await?;
+            debug!("handshake done");
+            version_check(&mut stream).await?;
+            debug!("version check done");
+
+            loop {
+                select! {
+                    _ = &mut shutdown_rx => break,
+                    Some(msg) = stream.next() => {
+                        handle_ws_message(&mut stream, &mut expect_rx, msg).await?;
+                    }
+                    Some(event) = event_rx.recv() => {
+                        handle_event(&mut stream, event).await?;
+                    }
+                }
+            }
+
+            anyhow::Ok(())
+        });
+
+        Ok((
+            Self {
+                handle,
+                shutdown: Some(shutdown_tx),
+                expectations: expect_tx,
+                events: event_tx,
+            },
+            port,
+        ))
+    }
+
+    pub async fn stop(mut self) -> Result<()> {
+        if let Some(tx) = self.shutdown.take() {
+            tx.send(()).ok();
+        }
+        self.handle.await?
+    }
+
+    pub fn expect<Req, Rsp>(&self, name: &str, req: Req, rsp: Rsp)
+    where
+        Req: Serialize,
+        Rsp: Serialize,
+    {
+        self.expectations
+            .send(Expectation {
+                name: name.to_owned(),
+                req: serde_json::to_value(req).unwrap(),
+                rsp: serde_json::to_value(rsp).unwrap(),
+            })
+            .unwrap();
+    }
+
+    pub fn send_event(&self, event: Event) {
+        self.events.send(event).unwrap();
+    }
+}
+
+struct Expectation {
+    name: String,
+    req: serde_json::Value,
+    rsp: serde_json::Value,
+}
+
+async fn handshake(stream: &mut WebSocketStream<TcpStream>) -> Result<()> {
+    let hello = ServerMessage::Hello(Hello {
+        obs_web_socket_version: semver::Version::new(5, 5, 0),
+        rpc_version: 1,
+        authentication: Some(Authentication {
+            challenge: "mock-challenge".to_owned(),
+            salt: "mock-salt".to_owned(),
+        }),
+    });
+
+    stream
+        .send(Message::text(serde_json::to_string(&hello)?))
+        .await?;
+
+    let identify = stream.next().await.context("no message from client")??;
+    let ClientMessage::Identify(identify) =
+        serde_json::from_str::<ClientMessage>(identify.to_text()?)?
+    else {
+        bail!("unexpected client message");
+    };
+
+    ensure!(identify.rpc_version == 1);
+    ensure!(identify.event_subscriptions == None);
+    verify_auth(&identify)?;
+
+    let identified = ServerMessage::Identified(Identified {
+        negotiated_rpc_version: 1,
+    });
+
+    stream
+        .send(Message::text(serde_json::to_string(&identified)?))
+        .await?;
+
+    Ok(())
+}
+
+fn verify_auth(identify: &Identify) -> Result<()> {
+    let mut hasher = Sha256::new();
+    hasher.update(b"mock-password");
+    hasher.update(b"mock-salt");
+
+    let intermediate = general_purpose::STANDARD.encode(hasher.finalize_reset());
+    hasher.update(intermediate.as_bytes());
+    hasher.update(b"mock-challenge");
+
+    let auth = general_purpose::STANDARD.encode(hasher.finalize());
+    ensure!(Some(auth) == identify.authentication);
+
+    Ok(())
+}
+
+async fn version_check(stream: &mut WebSocketStream<TcpStream>) -> Result<()> {
+    let request = stream.next().await.context("no message from client")??;
+    let request = serde_json::from_str::<ClientMessage>(request.to_text()?)?;
+
+    let ClientMessage::Request(request) = request else {
+        bail!("unexpected client message");
+    };
+
+    ensure!(request.request_type == "GetVersion");
+
+    let response = ServerMessage::RequestResponse(RequestResponse {
+        request_type: request.request_type,
+        request_id: request.request_id,
+        request_status: Status::ok(),
+        response_data: json! {{
+            "obsVersion": "31.0.0",
+            "obsWebSocketVersion": "5.5.0",
+            "rpcVersion": 1,
+            "availableRequests": [],
+            "supportedImageFormats": [],
+            "platform": "mock",
+            "platformDescription": "",
+        }},
+    });
+
+    stream
+        .send(Message::text(serde_json::to_string(&response)?))
+        .await?;
+
+    Ok(())
+}
+
+async fn handle_ws_message(
+    stream: &mut WebSocketStream<TcpStream>,
+    expect_rx: &mut mpsc::UnboundedReceiver<Expectation>,
+    msg: tungstenite::Result<Message>,
+) -> Result<()> {
+    match msg {
+        Ok(msg) => {
+            let msg = serde_json::from_str::<ClientMessage>(msg.to_text()?)?;
+            info!(message = ?msg);
+
+            match msg {
+                ClientMessage::Identify(identify) => {
+                    bail!("should never get a second `Identify` message: {identify:?}")
+                }
+                ClientMessage::Reidentify(reidentify) => {
+                    debug!(?reidentify, "received reidentification request");
+                    ensure!(reidentify.event_subscriptions != None);
+
+                    let identified = ServerMessage::Identified(Identified {
+                        negotiated_rpc_version: 1,
+                    });
+
+                    stream
+                        .send(Message::text(serde_json::to_string(&identified)?))
+                        .await?;
+                }
+                ClientMessage::Request(request) => {
+                    let expect = expect_rx
+                        .recv()
+                        .await
+                        .context("no expectations for request")?;
+
+                    ensure!(expect.name == request.request_type);
+                    ensure!(expect.req == request.request_data);
+
+                    stream
+                        .send(Message::text(serde_json::to_string(
+                            &ServerMessage::RequestResponse(RequestResponse {
+                                request_type: request.request_type,
+                                request_id: request.request_id,
+                                request_status: Status::ok(),
+                                response_data: expect.rsp,
+                            }),
+                        )?))
+                        .await?;
+                }
+            }
+        }
+        Err(err) => error!(?err),
+    }
+
+    Ok(())
+}
+
+async fn handle_event(stream: &mut WebSocketStream<TcpStream>, event: Event) -> Result<()> {
+    let msg = ServerMessage::Event(event);
+
+    stream
+        .send(Message::text(serde_json::to_string(&msg)?))
+        .await
+        .map_err(Into::into)
+}
+
+enum ServerMessage {
+    Hello(Hello),
+    Identified(Identified),
+    Event(Event),
+    RequestResponse(RequestResponse),
+}
+
+impl Serialize for ServerMessage {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        #[derive(Serialize)]
+        struct RawMessage<T> {
+            op: OpCode,
+            d: T,
+        }
+
+        #[derive(Serialize_repr)]
+        #[repr(u8)]
+        enum OpCode {
+            Hello = 0,
+            Identified = 2,
+            Event = 5,
+            RequestResponse = 7,
+        }
+
+        match self {
+            ServerMessage::Hello(d) => RawMessage {
+                op: OpCode::Hello,
+                d,
+            }
+            .serialize(serializer),
+            ServerMessage::Identified(d) => RawMessage {
+                op: OpCode::Identified,
+                d,
+            }
+            .serialize(serializer),
+            ServerMessage::Event(d) => RawMessage {
+                op: OpCode::Event,
+                d,
+            }
+            .serialize(serializer),
+            ServerMessage::RequestResponse(d) => RawMessage {
+                op: OpCode::RequestResponse,
+                d,
+            }
+            .serialize(serializer),
+        }
+    }
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Hello {
+    obs_web_socket_version: semver::Version,
+    rpc_version: u32,
+    authentication: Option<Authentication>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Authentication {
+    challenge: String,
+    salt: String,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Identified {
+    pub negotiated_rpc_version: u32,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RequestResponse {
+    request_type: String,
+    request_id: String,
+    request_status: Status,
+    response_data: serde_json::Value,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct Status {
+    result: bool,
+    code: StatusCode,
+    comment: Option<String>,
+}
+
+impl Status {
+    const fn ok() -> Self {
+        Self {
+            result: true,
+            code: StatusCode::NoError,
+            comment: None,
+        }
+    }
+}
+
+#[derive(Debug)]
+enum ClientMessage {
+    Identify(Identify),
+    Reidentify(Reidentify),
+    Request(Request),
+}
+
+impl<'de> Deserialize<'de> for ClientMessage {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct RawMessage {
+            op: OpCode,
+            d: serde_json::Value,
+        }
+
+        #[derive(Deserialize_repr)]
+        #[repr(u8)]
+        enum OpCode {
+            Identify = 1,
+            Reidentify = 3,
+            Request = 6,
+        }
+
+        let raw = RawMessage::deserialize(deserializer)?;
+
+        Ok(match raw.op {
+            OpCode::Identify => {
+                ClientMessage::Identify(serde_json::from_value(raw.d).map_err(de::Error::custom)?)
+            }
+            OpCode::Reidentify => {
+                ClientMessage::Reidentify(serde_json::from_value(raw.d).map_err(de::Error::custom)?)
+            }
+            OpCode::Request => {
+                ClientMessage::Request(serde_json::from_value(raw.d).map_err(de::Error::custom)?)
+            }
+        })
+    }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Identify {
+    rpc_version: u32,
+    authentication: Option<String>,
+    event_subscriptions: Option<EventSubscription>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Reidentify {
+    event_subscriptions: Option<EventSubscription>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Request {
+    request_id: String,
+    request_type: String,
+    #[serde(default)]
+    request_data: serde_json::Value,
 }

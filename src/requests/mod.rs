@@ -138,6 +138,11 @@ pub(crate) struct RequestBatch<'a> {
 /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
 /// instance.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[cfg_attr(
+    feature = "test-integration",
+    derive(serde::Deserialize),
+    serde(from = "u32")
+)]
 #[serde(into = "u32")]
 pub struct EventSubscription(u32);
 
@@ -208,6 +213,13 @@ bitflags! {
 impl From<EventSubscription> for u32 {
     fn from(value: EventSubscription) -> Self {
         value.bits()
+    }
+}
+
+#[cfg(feature = "test-integration")]
+impl From<u32> for EventSubscription {
+    fn from(value: u32) -> Self {
+        Self::from_bits_truncate(value)
     }
 }
 

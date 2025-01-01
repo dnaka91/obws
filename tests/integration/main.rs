@@ -1,5 +1,3 @@
-#![cfg(feature = "test-integration")]
-
 mod client;
 mod common;
 mod config;

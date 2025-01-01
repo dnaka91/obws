@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Improve feature flag documentation and enable feature markers on items in docs.rs, that show under what conditions certain items are available.
+- Revamp the integration tests to use a mocking server instead of running against a real OBS instance. This was long overdue as the tests didn't work anymore and it became harder and harder to make all tests work due to bugs or behavior in OBS.
 
 ## [0.14.0] - 2025-01-01
 
