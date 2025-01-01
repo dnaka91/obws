@@ -1,3 +1,4 @@
+allow-branch = ["*"]
 sign-commit = true
 sign-tag = true
 
