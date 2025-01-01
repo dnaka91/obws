@@ -78,7 +78,7 @@ pub struct BrowserSource<'a> {
     pub restart_when_active: bool,
 }
 
-impl<'a> Default for BrowserSource<'a> {
+impl Default for BrowserSource<'_> {
     fn default() -> Self {
         Self {
             is_local_file: false,
@@ -179,7 +179,7 @@ pub enum CropMode<'a> {
     },
 }
 
-impl<'a> Serialize for CropMode<'a> {
+impl Serialize for CropMode<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -253,7 +253,7 @@ pub struct ImageSource<'a> {
     pub unload: bool,
 }
 
-impl<'a> Default for ImageSource<'a> {
+impl Default for ImageSource<'_> {
     fn default() -> Self {
         Self {
             file: Path::new(""),
@@ -290,7 +290,7 @@ pub struct Slideshow<'a> {
     pub files: &'a [SlideshowFile<'a>],
 }
 
-impl<'a> Default for Slideshow<'a> {
+impl Default for Slideshow<'_> {
     fn default() -> Self {
         Self {
             playback_behavior: PlaybackBehavior::AlwaysPlay,
@@ -318,7 +318,7 @@ pub struct SlideshowFile<'a> {
     pub selected: bool,
 }
 
-impl<'a> Default for SlideshowFile<'a> {
+impl Default for SlideshowFile<'_> {
     fn default() -> Self {
         Self {
             value: Path::new(""),
@@ -506,7 +506,7 @@ pub struct TextFt2SourceV2<'a> {
     pub word_wrap: bool,
 }
 
-impl<'a> Default for TextFt2SourceV2<'a> {
+impl Default for TextFt2SourceV2<'_> {
     fn default() -> Self {
         Self {
             antialiasing: true,
@@ -543,7 +543,7 @@ pub struct Font<'a> {
     pub style: &'a str,
 }
 
-impl<'a> Default for Font<'a> {
+impl Default for Font<'_> {
     fn default() -> Self {
         Self {
             face: "Helvetica",
@@ -577,7 +577,7 @@ pub struct VlcSource<'a> {
     pub subtitle: u32,
 }
 
-impl<'a> Default for VlcSource<'a> {
+impl Default for VlcSource<'_> {
     fn default() -> Self {
         Self {
             loop_: true,

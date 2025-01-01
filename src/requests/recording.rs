@@ -21,7 +21,7 @@ pub(crate) enum Request {
     Resume,
 }
 
-impl<'a> From<Request> for super::RequestType<'a> {
+impl From<Request> for super::RequestType<'_> {
     fn from(value: Request) -> Self {
         super::RequestType::Recording(value)
     }

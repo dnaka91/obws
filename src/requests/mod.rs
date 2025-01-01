@@ -41,7 +41,7 @@ pub(crate) enum ClientRequest<'a> {
     RequestBatch(RequestBatch<'a>),
 }
 
-impl<'a> Serialize for ClientRequest<'a> {
+impl Serialize for ClientRequest<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -242,7 +242,7 @@ pub(crate) enum RequestType<'a> {
     VirtualCam(self::virtual_cam::Request),
 }
 
-impl<'a> Serialize for RequestType<'a> {
+impl Serialize for RequestType<'_> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,

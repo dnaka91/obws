@@ -43,7 +43,7 @@ where
 
 struct DurationTimecodeVisitor;
 
-impl<'de> Visitor<'de> for DurationTimecodeVisitor {
+impl Visitor<'_> for DurationTimecodeVisitor {
     type Value = Duration;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {

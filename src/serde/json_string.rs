@@ -31,7 +31,7 @@ where
 
 struct JsonStringVisitor<T>(PhantomData<T>);
 
-impl<'de, T> Visitor<'de> for JsonStringVisitor<T>
+impl<T> Visitor<'_> for JsonStringVisitor<T>
 where
     T: DeserializeOwned,
 {

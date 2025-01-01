@@ -15,7 +15,7 @@ pub(crate) enum Request {
     Stop,
 }
 
-impl<'a> From<Request> for super::RequestType<'a> {
+impl From<Request> for super::RequestType<'_> {
     fn from(value: Request) -> Self {
         super::RequestType::VirtualCam(value)
     }

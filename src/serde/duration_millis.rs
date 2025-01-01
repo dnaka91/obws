@@ -30,7 +30,7 @@ where
 
 struct DurationMillisVisitor;
 
-impl<'de> Visitor<'de> for DurationMillisVisitor {
+impl Visitor<'_> for DurationMillisVisitor {
     type Value = Duration;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {

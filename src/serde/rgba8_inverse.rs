@@ -31,7 +31,7 @@ where
 
 struct Rgba8InverseVisitor;
 
-impl<'de> Visitor<'de> for Rgba8InverseVisitor {
+impl Visitor<'_> for Rgba8InverseVisitor {
     type Value = RGBA8;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
