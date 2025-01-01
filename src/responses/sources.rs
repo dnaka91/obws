@@ -15,7 +15,7 @@ pub struct SourceActive {
     pub showing: bool,
 }
 
-/// Response value for [`crate::client::Sources::get_screenshot`].
+/// Response value for [`crate::client::Sources::take_screenshot`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct ImageData {
     /// Base64-encoded screenshot.

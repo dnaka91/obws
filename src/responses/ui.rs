@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-/// Response value for [`crate::client::Ui::get_studio_mode_enabled`].
+/// Response value for [`crate::client::Ui::studio_mode_enabled`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct StudioModeEnabled {
     /// Whether studio mode is enabled.
@@ -10,7 +10,7 @@ pub(crate) struct StudioModeEnabled {
     pub enabled: bool,
 }
 
-/// Response value for [`crate::client::Ui::get_monitor_list`].
+/// Response value for [`crate::client::Ui::list_monitors`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct MonitorList {
     #[serde(rename = "monitors")]

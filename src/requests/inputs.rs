@@ -196,7 +196,7 @@ pub struct SetSettings<'a, T> {
     pub overlay: Option<bool>,
 }
 
-/// Request information for [`crate::client::Inputs::set_input_settings`].
+/// Request information for [`crate::client::Inputs::set_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct SetSettingsInternal<'a> {
@@ -239,7 +239,7 @@ pub struct Create<'a, T> {
     pub enabled: Option<bool>,
 }
 
-/// Request information for [`crate::client::Inputs::create_input`].
+/// Request information for [`crate::client::Inputs::create`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct CreateInputInternal<'a> {

@@ -384,8 +384,7 @@ pub struct SetPrivateSettings<'a, T> {
     pub settings: &'a T,
 }
 
-/// Request information for
-/// [`crate::client::SceneItems::set_scene_item_private_settings`].
+/// Request information for [`crate::client::SceneItems::set_private_settings`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct SetPrivateSettingsInternal<'a> {

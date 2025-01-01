@@ -71,7 +71,7 @@ pub struct Create<'a, T> {
     pub settings: Option<T>,
 }
 
-/// Request information for [`crate::client::Filters::create_source_filter`].
+/// Request information for [`crate::client::Filters::create`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct CreateInternal<'a> {

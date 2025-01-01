@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-/// Response value for [`crate::client::Filters::get_source_filter_kind_list`].
+/// Response value for [`crate::client::Filters::list_kinds`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct FilterKinds {
     /// Array of source filter kinds.
@@ -10,7 +10,7 @@ pub(crate) struct FilterKinds {
     pub kinds: Vec<String>,
 }
 
-/// Response value for [`crate::client::Filters::get_source_filter_list`].
+/// Response value for [`crate::client::Filters::list`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct Filters {
     /// Array of filters.
@@ -38,8 +38,7 @@ pub struct SourceFilter {
     pub settings: serde_json::Value,
 }
 
-/// Response value for
-/// [`crate::client::Filters::get_source_filter_default_settings`].
+/// Response value for [`crate::client::Filters::default_settings`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct DefaultFilterSettings<T> {
     /// Object of default settings for the filter kind.

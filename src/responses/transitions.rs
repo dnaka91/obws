@@ -5,8 +5,7 @@ use time::Duration;
 
 pub use super::ids::{CurrentSceneTransitionId, TransitionId};
 
-/// Response value for
-/// [`crate::client::Transitions::get_transition_kind_list`].
+/// Response value for [`crate::client::Transitions::list_kinds`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct TransitionKinds {
     /// Array of transition kinds.
@@ -71,8 +70,7 @@ pub struct CurrentSceneTransition {
     pub settings: Option<serde_json::Value>,
 }
 
-/// Response value for
-/// [`crate::client::Transitions::get_current_scene_transition_cursor`].
+/// Response value for [`crate::client::Transitions::current_cursor`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct TransitionCursor {
     /// Cursor position, between `0.0` and `1.0`.

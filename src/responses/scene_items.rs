@@ -11,8 +11,8 @@ pub(crate) struct SceneItemId {
     pub id: i64,
 }
 
-/// Response value for [`crate::client::SceneItems::get_list`] and
-/// [`crate::client::SceneItems::get_group_list`].
+/// Response value for [`crate::client::SceneItems::list`] and
+/// [`crate::client::SceneItems::list_group`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct SceneItemList {
     /// Array of scene items in the scene or group.
@@ -62,8 +62,7 @@ pub enum SourceType {
     Scene,
 }
 
-/// Response value for
-/// [`crate::client::SceneItems::get_scene_item_transform`].
+/// Response value for [`crate::client::SceneItems::transform`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct GetSceneItemTransform {
     #[serde(rename = "sceneItemTransform")]

@@ -31,7 +31,6 @@ pub struct Scene {
     pub index: usize,
 }
 
-/// Response value for [`crate::client::Scenes::get_group_list`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct Groups {
     /// Array of group names.
@@ -39,8 +38,7 @@ pub(crate) struct Groups {
     pub groups: Vec<String>,
 }
 
-/// Response value for
-/// [`crate::client::Scenes::get_current_program_scene`].
+/// Response value for [`crate::client::Scenes::current_program_scene`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CurrentProgramScene {
     /// Current program scene identifier.
@@ -48,8 +46,7 @@ pub struct CurrentProgramScene {
     pub id: SceneId,
 }
 
-/// Response value for
-/// [`crate::client::Scenes::get_current_preview_scene`].
+/// Response value for [`crate::client::Scenes::current_preview_scene`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct CurrentPreviewScene {
     /// Current preview scene identifier.

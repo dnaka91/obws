@@ -7,7 +7,7 @@ use uuid::Uuid;
 pub use super::ids::InputId;
 use crate::common::MonitorType;
 
-/// Response value for [`crate::client::Inputs::get_input_list`].
+/// Response value for [`crate::client::Inputs::list`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct Inputs {
     /// Array of inputs.
@@ -60,8 +60,7 @@ pub struct SpecialInputs {
     pub mic4: Option<String>,
 }
 
-/// Response value for
-/// [`crate::client::Inputs::get_input_default_settings`].
+/// Response value for [`crate::client::Inputs::default_settings`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct DefaultInputSettings<T> {
     /// Object of default settings for the input kind.
@@ -80,8 +79,7 @@ pub struct InputSettings<T> {
     pub kind: String,
 }
 
-/// Response value for [`crate::client::Inputs::get_input_mute`] and
-/// [`crate::client::Inputs::toggle_input_mute`].
+/// Response value for [`crate::client::Inputs::muted`] and [`crate::client::Inputs::toggle_mute`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct InputMuted {
     /// Whether the input is muted.
@@ -134,7 +132,7 @@ pub(crate) struct AudioTracks {
     pub audio_tracks: [bool; 6],
 }
 
-/// Response value for [`crate::client::Inputs::get_properties_list_property_items`].
+/// Response value for [`crate::client::Inputs::properties_list_property_items`].
 #[derive(Debug, Deserialize)]
 pub(crate) struct ListPropertyItems {
     /// Array of items in the list property.
