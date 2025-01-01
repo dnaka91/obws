@@ -24,9 +24,9 @@ pub const SOURCE_DISPLAY_CAPTURE: &str = "display_capture";
 pub const SOURCE_IMAGE_SOURCE: &str = "image_source";
 /// Identifier for image slide-show sources.
 pub const SOURCE_SLIDESHOW: &str = "slideshow";
-/// Identifier for FFmpeg video sources.
+/// Identifier for `FFmpeg` video sources.
 pub const SOURCE_FFMPEG_SOURCE: &str = "ffmpeg_source";
-/// Identifier for FreeType2 text sources.
+/// Identifier for `FreeType2` text sources.
 pub const SOURCE_TEXT_FT2_SOURCE_V2: &str = "text_ft2_source_v2";
 /// Identifier for VLC video sources.
 pub const SOURCE_VLC_SOURCE: &str = "vlc_source";
@@ -35,7 +35,7 @@ pub const SOURCE_AV_CAPTURE_INPUT_V2: &str = "av_capture_input_v2";
 /// Identifier for source window capture sources.
 pub const SOURCE_WINDOW_CAPTURE: &str = "window_capture";
 
-/// Settings specific to a **CoreAudio** input capture source.
+/// Settings specific to a **`CoreAudio`** input capture source.
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CoreaudioInputCapture<'a> {
@@ -43,7 +43,7 @@ pub struct CoreaudioInputCapture<'a> {
     pub device_id: &'a str,
 }
 
-/// Settings specific to a **CoreAudio** output capture source.
+/// Settings specific to a **`CoreAudio`** output capture source.
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CoreaudioOutputCapture<'a> {
@@ -413,7 +413,7 @@ impl From<CustomSize> for String {
     }
 }
 
-/// Settings specific to a **FFmpeg** video source.
+/// Settings specific to a **`FFmpeg`** video source.
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct FfmpegSource<'a> {
@@ -461,7 +461,7 @@ pub enum ColorRange {
     Full = 2,
 }
 
-/// Settings specific to a **FreeType2** text source.
+/// Settings specific to a **`FreeType2`** text source.
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct TextFt2SourceV2<'a> {

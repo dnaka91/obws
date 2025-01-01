@@ -1,5 +1,7 @@
 //! All requests that can be send to the API.
 
+#![expect(clippy::ref_option_ref)]
+
 use bitflags::bitflags;
 use serde::{ser::SerializeStruct, Serialize};
 use serde_repr::Serialize_repr;
@@ -46,7 +48,7 @@ impl Serialize for ClientRequest<'_> {
     where
         S: serde::Serializer,
     {
-        #[derive(Serialize_repr)]
+        #[derive(Clone, Copy, Serialize_repr)]
         #[repr(u8)]
         enum OpCode {
             /// The message sent by a newly connected client to obs-websocket in response to a

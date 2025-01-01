@@ -159,6 +159,7 @@ impl QtGeometry {
     pub const DEFAULT_SCREEN: i32 = -1;
 
     /// Create a new geometry instance without only size information set.
+    #[must_use]
     pub fn new(rect: QtRect) -> Self {
         Self {
             rect,
@@ -187,7 +188,7 @@ impl QtGeometry {
         use base64::engine::{general_purpose, Engine};
 
         /// Indicator for serialized Qt geometry data.
-        const MAGIC_NUMBER: u32 = 0x1D9D0CB;
+        const MAGIC_NUMBER: u32 = 0x01D9_D0CB;
         /// Major version of this format.
         const MAJOR_VERSION: u16 = 3;
         /// Minor version of this format.

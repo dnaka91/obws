@@ -80,7 +80,7 @@ mod tests {
                 Token::Str(r#"{"value":5}"#),
                 Token::StructEnd,
             ],
-        )
+        );
     }
 
     #[test]

@@ -11,11 +11,9 @@ use std::{
     time::Duration,
 };
 
-#[cfg(feature = "events")]
-use futures_util::stream::Stream;
 use futures_util::{
     sink::SinkExt,
-    stream::{SplitSink, StreamExt},
+    stream::{SplitSink, Stream, StreamExt},
 };
 use semver::{Comparator, Op, Prerelease};
 use serde::de::DeserializeOwned;
@@ -23,7 +21,7 @@ use serde::de::DeserializeOwned;
 use tokio::sync::broadcast;
 use tokio::{net::TcpStream, sync::Mutex, task::JoinHandle};
 use tokio_tungstenite::{
-    tungstenite::{protocol::CloseFrame, Message},
+    tungstenite::{self, protocol::CloseFrame, Message},
     MaybeTlsStream, WebSocketStream,
 };
 use tracing::{debug, error, info, trace, warn};
@@ -228,6 +226,7 @@ where
     }
 
     #[cfg(not(feature = "tls"))]
+    #[expect(clippy::unused_self)]
     fn tls(&self) -> bool {
         false
     }
@@ -312,70 +311,13 @@ impl Client {
         )
         .await?;
 
-        let handle = tokio::spawn(async move {
-            while let Some(Ok(msg)) = read.next().await {
-                if let Message::Close(info) = &msg {
-                    if let Some(CloseFrame { reason, .. }) = info {
-                        info!(%reason, "connection closed with reason");
-                    }
-
-                    #[cfg(feature = "events")]
-                    events_tx.send(Event::ServerStopping).ok();
-                    continue;
-                }
-
-                let res: Result<(), InnerError> = async {
-                    let text = msg.into_text().map_err(InnerError::IntoText)?;
-
-                    let message = serde_json::from_str::<ServerMessage>(&text)
-                        .map_err(InnerError::DeserializeMessage)?;
-
-                    match message {
-                        ServerMessage::RequestResponse(response) => {
-                            trace!(
-                                id = %response.id,
-                                status = ?response.status,
-                                data = %response.data,
-                                "got request-response message",
-                            );
-                            receivers2.notify(response).await?;
-                        }
-                        #[cfg(feature = "events")]
-                        ServerMessage::Event(event) => {
-                            trace!(?event, "got OBS event");
-                            events_tx.send(event).ok();
-                        }
-                        #[cfg(not(feature = "events"))]
-                        ServerMessage::Event => {
-                            trace!("got OBS event");
-                        }
-                        ServerMessage::Identified(identified) => {
-                            trace!(?identified, "got identified message");
-                            reidentify_receivers2.notify(identified).await;
-                        }
-                        _ => {
-                            trace!(?message, "got unexpected message");
-                            return Err(InnerError::UnexpectedMessage(message));
-                        }
-                    }
-
-                    Ok(())
-                }
-                .await;
-
-                if let Err(error) = res {
-                    error!(?error, "failed handling message");
-                }
-            }
-
+        let handle = tokio::spawn(recv_loop(
+            read,
             #[cfg(feature = "events")]
-            events_tx.send(Event::ServerStopped).ok();
-
-            // clear all outstanding receivers to stop them from waiting forever on responses
-            // they'll never receive.
-            receivers2.reset().await;
-            reidentify_receivers2.reset().await;
-        });
+            events_tx,
+            receivers2,
+            reidentify_receivers2,
+        ));
 
         let write = Mutex::new(write);
         let id_counter = AtomicU64::new(1);
@@ -648,4 +590,75 @@ impl Drop for Client {
         // to wait for it to fully shut down (except spinning up a new tokio runtime).
         drop(self.disconnect());
     }
+}
+
+/// Run the receiving side of the WebSocket connection.
+async fn recv_loop(
+    mut read: impl Stream<Item = tungstenite::Result<Message>> + Unpin,
+    #[cfg(feature = "events")] events_tx: Arc<broadcast::Sender<Event>>,
+    receivers: Arc<ReceiverList>,
+    reidentify_receivers: Arc<ReidentifyReceiverList>,
+) {
+    while let Some(Ok(msg)) = read.next().await {
+        if let Message::Close(info) = &msg {
+            if let Some(CloseFrame { reason, .. }) = info {
+                info!(%reason, "connection closed with reason");
+            }
+
+            #[cfg(feature = "events")]
+            events_tx.send(Event::ServerStopping).ok();
+            continue;
+        }
+
+        let res: Result<(), InnerError> = async {
+            let text = msg.into_text().map_err(InnerError::IntoText)?;
+
+            let message = serde_json::from_str::<ServerMessage>(&text)
+                .map_err(InnerError::DeserializeMessage)?;
+
+            match message {
+                ServerMessage::RequestResponse(response) => {
+                    trace!(
+                        id = %response.id,
+                        status = ?response.status,
+                        data = %response.data,
+                        "got request-response message",
+                    );
+                    receivers.notify(response).await?;
+                }
+                #[cfg(feature = "events")]
+                ServerMessage::Event(event) => {
+                    trace!(?event, "got OBS event");
+                    events_tx.send(event).ok();
+                }
+                #[cfg(not(feature = "events"))]
+                ServerMessage::Event => {
+                    trace!("got OBS event");
+                }
+                ServerMessage::Identified(identified) => {
+                    trace!(?identified, "got identified message");
+                    reidentify_receivers.notify(identified).await;
+                }
+                _ => {
+                    trace!(?message, "got unexpected message");
+                    return Err(InnerError::UnexpectedMessage(message));
+                }
+            }
+
+            Ok(())
+        }
+        .await;
+
+        if let Err(error) = res {
+            error!(?error, "failed handling message");
+        }
+    }
+
+    #[cfg(feature = "events")]
+    events_tx.send(Event::ServerStopped).ok();
+
+    // clear all outstanding receivers to stop them from waiting forever on responses
+    // they'll never receive.
+    receivers.reset().await;
+    reidentify_receivers.reset().await;
 }

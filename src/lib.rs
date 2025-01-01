@@ -35,7 +35,12 @@
 //! ## Feature flags
 #![cfg_attr(feature = "doc", doc = document_features::document_features!())]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
-#![warn(missing_docs, rust_2018_idioms, clippy::all)]
+#![warn(missing_docs, rust_2018_idioms, clippy::all, clippy::pedantic)]
+#![allow(
+    clippy::missing_errors_doc,
+    clippy::module_name_repetitions,
+    clippy::struct_excessive_bools
+)]
 
 pub use self::client::Client;
 

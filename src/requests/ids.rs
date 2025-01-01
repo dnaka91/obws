@@ -18,6 +18,7 @@ macro_rules! item_id {
             /// If the identifier is a name, returns the associated value.
             ///
             /// Will return [`None`] if this identifier is not a name.
+            #[must_use]
             pub fn as_name(&self) -> Option<&str> {
                 match *self {
                     Self::Name(name) => Some(name),
@@ -28,6 +29,7 @@ macro_rules! item_id {
             /// If the identifier is a UUID, returns the associated value.
             ///
             /// Will return [`None`] if this identifier is not a UUID.
+            #[must_use]
             pub fn as_uuid(&self) -> Option<Uuid> {
                 match *self {
                     Self::Name(_) => None,
@@ -165,6 +167,7 @@ impl<'a> InputId<'a> {
     ///
     /// This is a one-way operation, as there is no way of telling whether a source ID is an actual
     /// input.
+    #[must_use]
     pub fn as_source(self) -> SourceId<'a> {
         match self {
             Self::Name(name) => SourceId::Name(name),

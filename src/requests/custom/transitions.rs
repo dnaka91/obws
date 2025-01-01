@@ -38,7 +38,7 @@ pub struct Slide {
     pub direction: Direction,
 }
 
-/// The direction for a [`Swipe`] or [`Slide].
+/// The direction for a [`Swipe`] or [`Slide`].
 #[derive(Clone, Copy, Debug, Default, Serialize)]
 #[serde(rename_all = "lowercase")]
 #[non_exhaustive]

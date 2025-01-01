@@ -16,8 +16,7 @@ pub fn serialize<S>(value: &RGBA8, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let abgr =
-        (value.a as u32) << 24 | (value.b as u32) << 16 | (value.g as u32) << 8 | (value.r as u32);
+    let abgr = u32::from_be_bytes([value.a, value.b, value.g, value.r]);
     serializer.serialize_u32(abgr)
 }
 
@@ -51,11 +50,12 @@ impl Visitor<'_> for Rgba8InverseVisitor {
     where
         E: de::Error,
     {
+        let v = v.to_be_bytes();
         Ok(RGBA8 {
-            r: (v & 0xff) as u8,
-            g: (v >> 8 & 0xff) as u8,
-            b: (v >> 16 & 0xff) as u8,
-            a: (v >> 24 & 0xff) as u8,
+            r: v[3],
+            g: v[2],
+            b: v[1],
+            a: v[0],
         })
     }
 
@@ -93,7 +93,7 @@ mod tests {
                     len: 1,
                 },
                 Token::Str("value"),
-                Token::U32(0x04030201),
+                Token::U32(0x0403_0201),
                 Token::StructEnd,
             ],
         );
