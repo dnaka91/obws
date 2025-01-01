@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
 
+### Changed
+
+- Improve feature flag documentation and enable feature markers on items in docs.rs, that show under what conditions certain items are available.
+
 ## [0.14.0] - 2025-01-01
 
 ### Added

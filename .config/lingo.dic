@@ -16,6 +16,7 @@ JSON
 kilobits
 libobs
 luma
+MP4
 mul
 Mul
 namespace
@@ -42,4 +43,5 @@ URI
 username
 UUID
 VLC
+WebSocket
 YUV
