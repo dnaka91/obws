@@ -31,7 +31,10 @@
 //!
 //! You may notice that several functions are named differently from the original `obs-websocket`
 //! documentation. To help you find the right functions, have a look at [`docs::mapping`].
-
+//!
+//! ## Feature flags
+#![cfg_attr(feature = "doc", doc = document_features::document_features!())]
+#![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 #![warn(missing_docs, rust_2018_idioms, clippy::all)]
 
 pub use self::client::Client;
