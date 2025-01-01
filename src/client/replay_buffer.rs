@@ -1,5 +1,7 @@
 use super::Client;
-use crate::{requests::replay_buffer::Request, responses::replay_buffer as responses, Result};
+use crate::{
+    error::Result, requests::replay_buffer::Request, responses::replay_buffer as responses,
+};
 
 /// API functions related to the replay buffer.
 pub struct ReplayBuffer<'a> {

@@ -3,6 +3,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use super::Client;
 use crate::{
     common::BlendMode,
+    error::Result,
     requests::{
         scene_items::{
             CreateSceneItem, Duplicate, Id, Request, SetBlendMode, SetEnabled, SetIndex, SetLocked,
@@ -11,7 +12,6 @@ use crate::{
         scenes::SceneId,
     },
     responses::{scene_items as responses, sources as source_responses},
-    Error, Result,
 };
 
 /// API functions related to scene items.
@@ -193,7 +193,7 @@ impl<'a> SceneItems<'a> {
                 scene: settings.scene,
                 item_id: settings.item_id,
                 settings: serde_json::to_value(settings.settings)
-                    .map_err(Error::SerializeCustomData)?,
+                    .map_err(crate::error::SerializeCustomDataError)?,
             }))
             .await
     }

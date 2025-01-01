@@ -1,7 +1,7 @@
 use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
-use crate::{requests::outputs::Request, responses::outputs as responses, Error, Result};
+use crate::{error::Result, requests::outputs::Request, responses::outputs as responses};
 
 /// API functions related to outputs.
 pub struct Outputs<'a> {
@@ -66,7 +66,8 @@ impl<'a> Outputs<'a> {
         self.client
             .send_message(Request::SetSettings {
                 name,
-                settings: serde_json::to_value(&settings).map_err(Error::SerializeCustomData)?,
+                settings: serde_json::to_value(&settings)
+                    .map_err(crate::error::SerializeCustomDataError)?,
             })
             .await
     }

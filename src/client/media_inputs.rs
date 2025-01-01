@@ -3,9 +3,9 @@ use time::Duration;
 use super::Client;
 use crate::{
     common::MediaAction,
+    error::Result,
     requests::{inputs::InputId, media_inputs::Request},
     responses::media_inputs as responses,
-    Result,
 };
 
 /// API functions related to media inputs.

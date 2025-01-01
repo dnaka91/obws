@@ -30,18 +30,32 @@ use tracing::{debug, error, info, trace, warn};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
-    config::Config, connection::HandshakeError, filters::Filters, general::General,
-    hotkeys::Hotkeys, inputs::Inputs, media_inputs::MediaInputs, outputs::Outputs,
-    profiles::Profiles, recording::Recording, replay_buffer::ReplayBuffer,
-    scene_collections::SceneCollections, scene_items::SceneItems, scenes::Scenes, sources::Sources,
-    streaming::Streaming, transitions::Transitions, ui::Ui, virtual_cam::VirtualCam,
+    config::Config,
+    connection::{HandshakeError, IntoTextError, ReceiveError},
+    filters::Filters,
+    general::General,
+    hotkeys::Hotkeys,
+    inputs::Inputs,
+    media_inputs::MediaInputs,
+    outputs::Outputs,
+    profiles::Profiles,
+    recording::Recording,
+    replay_buffer::ReplayBuffer,
+    scene_collections::SceneCollections,
+    scene_items::SceneItems,
+    scenes::Scenes,
+    sources::Sources,
+    streaming::Streaming,
+    transitions::Transitions,
+    ui::Ui,
+    virtual_cam::VirtualCam,
 };
 #[cfg(feature = "events")]
 use crate::events::Event;
 use crate::{
+    error::{Error, Result},
     requests::{ClientRequest, EventSubscription, Reidentify, Request, RequestType},
     responses::ServerMessage,
-    Error, Result,
 };
 
 mod config;
@@ -273,7 +287,7 @@ impl Client {
         )
         .await
         .map_err(|_| Error::Timeout)?
-        .map_err(Error::Connect)?;
+        .map_err(crate::error::ConnectError)?;
 
         let (mut write, mut read) = socket.split();
 
@@ -430,7 +444,7 @@ impl Client {
                 request_id: &id_str,
                 ty: req,
             });
-            let json = serde_json::to_string(&req).map_err(Error::SerializeMessage)?;
+            let json = serde_json::to_string(&req).map_err(crate::error::SerializeMessageError)?;
 
             let rx = receivers.add(id).await;
 
@@ -440,14 +454,14 @@ impl Client {
                 .await
                 .send(Message::text(json))
                 .await
-                .map_err(Error::Send);
+                .map_err(crate::error::SendError);
 
             if let Err(e) = write_result {
                 receivers.remove(id).await;
-                return Err(e);
+                return Err(e.into());
             }
 
-            let (status, resp) = rx.await.map_err(Error::ReceiveMessage)?;
+            let (status, resp) = rx.await.map_err(crate::error::ReceiveMessageError)?;
             if !status.result {
                 return Err(Error::Api {
                     code: status.code,
@@ -459,7 +473,9 @@ impl Client {
         }
 
         let resp = send(&self.id_counter, &self.receivers, &self.write, req.into()).await?;
-        serde_json::from_value(resp).map_err(Error::DeserializeResponse)
+        serde_json::from_value(resp)
+            .map_err(crate::error::DeserializeResponseError)
+            .map_err(Into::into)
     }
 
     /// Disconnect from obs-websocket and shut down all machinery.
@@ -489,7 +505,7 @@ impl Client {
         let json = serde_json::to_string(&ClientRequest::Reidentify(Reidentify {
             event_subscriptions: Some(event_subscriptions),
         }))
-        .map_err(Error::SerializeMessage)?;
+        .map_err(crate::error::SerializeMessageError)?;
 
         let rx = self.reidentify_receivers.add().await;
 
@@ -498,9 +514,9 @@ impl Client {
             .await
             .send(Message::text(json))
             .await
-            .map_err(Error::Send)?;
+            .map_err(crate::error::SendError)?;
 
-        let resp = rx.await.map_err(Error::ReceiveMessage)?;
+        let resp = rx.await.map_err(crate::error::ReceiveMessageError)?;
         debug!(
             rpc_version = %resp.negotiated_rpc_version,
             "re-identified against obs-websocket",
@@ -531,7 +547,7 @@ impl Client {
                 }
             })
         } else {
-            Err(crate::Error::Disconnected)
+            Err(crate::error::Error::Disconnected)
         }
     }
 

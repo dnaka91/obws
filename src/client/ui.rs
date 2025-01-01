@@ -1,5 +1,6 @@
 use super::Client;
 use crate::{
+    error::Result,
     requests::{
         inputs::InputId,
         ui::{
@@ -8,7 +9,6 @@ use crate::{
         },
     },
     responses::ui as responses,
-    Result,
 };
 
 /// API functions related to the user interface.

@@ -1,6 +1,6 @@
 use super::Client;
 use crate::{
-    requests::scene_collections::Request, responses::scene_collections as responses, Result,
+    error::Result, requests::scene_collections::Request, responses::scene_collections as responses,
 };
 
 /// API functions related to scene collections.

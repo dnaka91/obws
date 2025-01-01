@@ -2,9 +2,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
+    error::{Error, Result},
     requests::general::{CallVendorRequest, CallVendorRequestInternal, Request},
     responses::general as responses,
-    Error, Result,
 };
 
 /// General functions of the API.
@@ -32,7 +32,8 @@ impl<'a> General<'a> {
     where
         T: Serialize,
     {
-        let event_data = serde_json::to_value(event_data).map_err(Error::SerializeCustomData)?;
+        let event_data =
+            serde_json::to_value(event_data).map_err(crate::error::SerializeCustomDataError)?;
         if !event_data.is_object() {
             return Err(Error::InvalidCustomData);
         }
@@ -61,7 +62,7 @@ impl<'a> General<'a> {
                 vendor_name: request.vendor_name,
                 request_type: request.request_type,
                 request_data: serde_json::to_value(request.request_data)
-                    .map_err(Error::SerializeCustomData)?,
+                    .map_err(crate::error::SerializeCustomDataError)?,
             }))
             .await
     }

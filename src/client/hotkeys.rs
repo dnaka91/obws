@@ -1,8 +1,8 @@
 use super::Client;
 use crate::{
+    error::Result,
     requests::hotkeys::{KeyModifiers, Request},
     responses::hotkeys as responses,
-    Result,
 };
 
 /// API functions related to hotkeys.

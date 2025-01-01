@@ -2,9 +2,9 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
+    error::Result,
     requests::config::{Realm, Request, SetPersistentData, SetVideoSettings},
     responses::config as responses,
-    Error, Result,
 };
 
 /// API functions related to OBS configuration.
@@ -77,7 +77,8 @@ impl<'a> Config<'a> {
         self.client
             .send_message(Request::SetStreamServiceSettings {
                 r#type,
-                settings: serde_json::to_value(settings).map_err(Error::SerializeCustomData)?,
+                settings: serde_json::to_value(settings)
+                    .map_err(crate::error::SerializeCustomDataError)?,
             })
             .await
     }

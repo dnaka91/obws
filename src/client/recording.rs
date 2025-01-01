@@ -1,5 +1,5 @@
 use super::Client;
-use crate::{requests::recording::Request, responses::recording as responses, Result};
+use crate::{error::Result, requests::recording::Request, responses::recording as responses};
 
 /// API functions related to recording.
 pub struct Recording<'a> {

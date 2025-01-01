@@ -2,6 +2,7 @@ use serde::{de::DeserializeOwned, Serialize};
 
 use super::Client;
 use crate::{
+    error::Result,
     requests::{
         filters::{
             Create, CreateInternal, Request, SetEnabled, SetIndex, SetName, SetSettings,
@@ -10,7 +11,6 @@ use crate::{
         sources::SourceId,
     },
     responses::filters as responses,
-    Error, Result,
 };
 
 /// API functions related to filters.
@@ -66,7 +66,7 @@ impl<'a> Filters<'a> {
                     .settings
                     .map(|settings| serde_json::to_value(&settings))
                     .transpose()
-                    .map_err(Error::SerializeCustomData)?,
+                    .map_err(crate::error::SerializeCustomDataError)?,
             }))
             .await
     }
@@ -110,7 +110,7 @@ impl<'a> Filters<'a> {
                 source: settings.source,
                 filter: settings.filter,
                 settings: serde_json::to_value(&settings.settings)
-                    .map_err(Error::SerializeCustomData)?,
+                    .map_err(crate::error::SerializeCustomDataError)?,
                 overlay: settings.overlay,
             }))
             .await

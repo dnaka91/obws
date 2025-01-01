@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated tokio-tungstenite to the latest `v0.26.1`.
 - Updated all dependencies to their latest version.
 - **BREAKING CHANGE:** Reworked the `ConnectConfig` struct to provide a nice builder for it, available behind the new `builder` feature.
+- **BREAKING CHANGE:** Refactor several APIs to reduce the amount of external types exposed in the public API.
 
 ## [0.13.0] - 2024-09-23
 

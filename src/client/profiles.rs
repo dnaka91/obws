@@ -1,8 +1,8 @@
 use super::Client;
 use crate::{
+    error::Result,
     requests::profiles::{Request, SetParameter},
     responses::profiles as responses,
-    Result,
 };
 
 /// API functions related to profiles.

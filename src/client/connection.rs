@@ -97,19 +97,19 @@ pub enum HandshakeError {
     ConnectionClosed(Option<CloseDetails>),
     /// Receiving a message did not succeed.
     #[error("failed reading websocket message")]
-    Receive(#[source] tokio_tungstenite::tungstenite::Error),
+    Receive(#[from] ReceiveError),
     /// The web-socket message was not convertible to text.
     #[error("websocket message not convertible to text")]
-    IntoText(#[source] tokio_tungstenite::tungstenite::Error),
+    IntoText(#[from] IntoTextError),
     /// A message from obs-websocket could not be deserialized.
     #[error("failed deserializing message")]
-    DeserializeMessage(#[source] serde_json::Error),
+    DeserializeMessage(#[from] crate::error::DeserializeResponseError),
     /// A message could not be serialized for sending.
     #[error("failed serializing message")]
-    SerializeMessage(#[source] serde_json::Error),
+    SerializeMessage(#[from] crate::error::SerializeMessageError),
     /// Sending a message to obs-websocket failed.
     #[error("failed to send message to obs-websocket")]
-    Send(#[source] tokio_tungstenite::tungstenite::Error),
+    Send(#[from] crate::error::SendError),
     /// Didn't receive the initial `Hello` message from obs-websocket after connecting.
     #[error("didn't receive a `Hello` message after connecting")]
     NoHello,
@@ -117,6 +117,16 @@ pub enum HandshakeError {
     #[error("didn't receive a `Identified` message")]
     NoIdentified,
 }
+
+/// Receiving a message did not succeed.
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub struct ReceiveError(tokio_tungstenite::tungstenite::Error);
+
+/// The web-socket message was not convertible to text.
+#[derive(Debug, thiserror::Error)]
+#[error(transparent)]
+pub struct IntoTextError(tokio_tungstenite::tungstenite::Error);
 
 /// Description about the reason of why the web-socket connection was closed.
 #[derive(Debug)]
@@ -144,7 +154,7 @@ pub(super) async fn handshake(
             .next()
             .await
             .ok_or(HandshakeError::ConnectionClosed(None))?
-            .map_err(HandshakeError::Receive)?;
+            .map_err(ReceiveError)?;
 
         if let Message::Close(info) = &mut message {
             return Err(HandshakeError::ConnectionClosed(info.take().map(|i| {
@@ -155,9 +165,11 @@ pub(super) async fn handshake(
             })));
         }
 
-        let message = message.into_text().map_err(HandshakeError::IntoText)?;
+        let message = message.into_text().map_err(IntoTextError)?;
 
-        serde_json::from_str::<ServerMessage>(&message).map_err(HandshakeError::DeserializeMessage)
+        serde_json::from_str::<ServerMessage>(&message)
+            .map_err(crate::error::DeserializeResponseError)
+            .map_err(Into::into)
     }
 
     let server_message = time::timeout(Duration::from_secs(5), read_message(read))
@@ -179,12 +191,12 @@ pub(super) async fn handshake(
                 authentication,
                 event_subscriptions,
             }))
-            .map_err(HandshakeError::SerializeMessage)?;
+            .map_err(crate::error::SerializeMessageError)?;
 
             write
                 .send(Message::text(req))
                 .await
-                .map_err(HandshakeError::Send)?;
+                .map_err(crate::error::SendError)?;
         }
         _ => return Err(HandshakeError::NoHello),
     }

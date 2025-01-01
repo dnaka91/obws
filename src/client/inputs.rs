@@ -4,11 +4,11 @@ use time::Duration;
 use super::Client;
 use crate::{
     common::MonitorType,
+    error::Result,
     requests::inputs::{
         Create, CreateInputInternal, InputId, Request, SetSettings, SetSettingsInternal, Volume,
     },
     responses::inputs as responses,
-    Error, Result,
 };
 
 /// API functions related to inputs.
@@ -77,7 +77,7 @@ impl<'a> Inputs<'a> {
             .send_message(Request::SetSettings(SetSettingsInternal {
                 input: settings.input,
                 settings: serde_json::to_value(settings.settings)
-                    .map_err(Error::SerializeCustomData)?,
+                    .map_err(crate::error::SerializeCustomDataError)?,
                 overlay: settings.overlay,
             }))
             .await
@@ -145,7 +145,8 @@ impl<'a> Inputs<'a> {
                 settings: input
                     .settings
                     .map(|settings| {
-                        serde_json::to_value(&settings).map_err(Error::SerializeCustomData)
+                        serde_json::to_value(&settings)
+                            .map_err(crate::error::SerializeCustomDataError)
                     })
                     .transpose()?,
                 enabled: input.enabled,

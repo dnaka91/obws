@@ -133,12 +133,16 @@ pub(crate) struct RequestBatch<'a> {
     pub execution_type: Option<ExecutionType>,
 }
 
+/// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
+/// instance.
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[serde(into = "u32")]
+pub struct EventSubscription(u32);
+
 bitflags! {
     /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
     /// instance.
-    #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
-    #[serde(into = "u32")]
-    pub struct EventSubscription: u32 {
+    impl EventSubscription: u32 {
         /// Subscription value used to disable all events.
         const NONE = 0;
         /// Subscription value to receive events in the `General` category.

@@ -3,7 +3,7 @@
 use bitflags::bitflags;
 use serde::{Deserialize, Serialize};
 
-use crate::Error;
+use crate::error::Error;
 
 /// Monitoring type for audio outputs.
 #[derive(
@@ -23,13 +23,15 @@ pub enum MonitorType {
     MonitorAndOutput,
 }
 
+/// Different flags for font display that can be combined.
+#[derive(
+    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+)]
+#[serde(try_from = "u8", into = "u8")]
+pub struct FontFlags(u8);
+
 bitflags! {
-    /// Different flags for font display that can be combined.
-    #[derive(
-        Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
-    )]
-    #[serde(try_from = "u8", into = "u8")]
-    pub struct FontFlags: u8 {
+    impl FontFlags: u8 {
         /// Make the text appear thicker.
         const BOLD = 1;
         /// Make the text appear cursive.
@@ -55,18 +57,20 @@ impl From<FontFlags> for u8 {
     }
 }
 
+/// Alignment for different items on the scene that is described in two axis. The default is
+/// center for both axis.
+///
+/// For example, only using `LEFT` would arrange the target to the left horizontally and
+/// centered vertically. To align to the top right, the alignments can be combined to
+/// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
+#[derive(
+    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+)]
+#[serde(try_from = "u8", into = "u8")]
+pub struct Alignment(u8);
+
 bitflags! {
-    /// Alignment for different items on the scene that is described in two axis. The default is
-    /// center for both axis.
-    ///
-    /// For example, only using `LEFT` would arrange the target to the left horizontally and
-    /// centered vertically. To align to the top right, the alignments can be combined to
-    /// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
-    #[derive(
-        Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
-    )]
-    #[serde(try_from = "u8", into = "u8")]
-    pub struct Alignment: u8 {
+    impl Alignment: u8 {
         /// Align to the center.
         const CENTER = 0;
         /// Align to the left side.

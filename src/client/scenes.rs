@@ -2,9 +2,9 @@ use uuid::Uuid;
 
 use super::Client;
 use crate::{
+    error::Result,
     requests::scenes::{Request, SceneId, SetTransitionOverride},
     responses::scenes as responses,
-    Result,
 };
 
 /// API functions related to scenes.

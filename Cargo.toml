@@ -16,6 +16,22 @@ include = ["examples/**/*", "tests/**/*", "src/**/*", "LICENSE", "README.md", "C
 [package.metadata.docs.rs]
 features = ["builder", "events", "tls"]
 
+[package.metadata.cargo_check_external_types]
+allowed_external_types = [
+    "bitflags::iter::Iter", # TODO
+    "bitflags::iter::IterNames", # TODO
+    "bitflags::traits::Flags", # TODO
+    "rgb::RGBA8", # TODO
+    "semver::Comparator", # TODO
+    "semver::Version", # TODO
+    "serde::de::Deserialize", # TODO
+    "serde::de::DeserializeOwned", # TODO
+    "serde::ser::Serialize", # TODO
+    "serde_json::value::Value", # TODO
+    "time::duration::Duration", # TODO
+    "uuid::Uuid", # TODO
+]
+
 [dependencies]
 async-stream = { version = "0.3.6", optional = true }
 base64 = "0.22.1"

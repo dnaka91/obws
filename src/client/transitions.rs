@@ -2,7 +2,7 @@ use serde::Serialize;
 use time::Duration;
 
 use super::Client;
-use crate::{requests::transitions::Request, responses::transitions as responses, Error, Result};
+use crate::{error::Result, requests::transitions::Request, responses::transitions as responses};
 
 /// API functions related to transitions.
 pub struct Transitions<'a> {
@@ -62,7 +62,8 @@ impl<'a> Transitions<'a> {
     {
         self.client
             .send_message(Request::SetCurrentSceneTransitionSettings {
-                settings: serde_json::to_value(&settings).map_err(Error::SerializeCustomData)?,
+                settings: serde_json::to_value(&settings)
+                    .map_err(crate::error::SerializeCustomDataError)?,
                 overlay,
             })
             .await
