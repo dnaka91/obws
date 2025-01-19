@@ -73,7 +73,7 @@ impl Visitor<'_> for Rgba8InverseVisitor {
 mod tests {
     use rgb::RGBA8;
     use serde::{Deserialize, Serialize};
-    use serde_test::{assert_tokens, Token};
+    use serde_test::{assert_de_tokens, assert_tokens, Token};
 
     #[derive(Debug, PartialEq, Serialize, Deserialize)]
     struct SimpleDuration {
@@ -94,6 +94,36 @@ mod tests {
                 },
                 Token::Str("value"),
                 Token::U32(0x0403_0201),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: RGBA8::new(1, 2, 3, 4),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::U64(0x0403_0201),
+                Token::StructEnd,
+            ],
+        );
+
+        assert_de_tokens(
+            &SimpleDuration {
+                value: RGBA8::new(1, 2, 3, 4),
+            },
+            &[
+                Token::Struct {
+                    name: "SimpleDuration",
+                    len: 1,
+                },
+                Token::Str("value"),
+                Token::I64(0x0403_0201),
                 Token::StructEnd,
             ],
         );

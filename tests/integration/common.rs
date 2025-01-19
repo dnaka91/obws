@@ -43,7 +43,7 @@ pub const INPUT_KIND_VLC: &str = "vlc_source";
 pub const FILTER_COLOR: &str = "color_filter";
 
 pub async fn new_client() -> Result<(Client, MockServer)> {
-    let (server, port) = MockServer::start().await?;
+    let (server, port) = MockServer::start(Version::builder().build()).await?;
     let client = Client::connect("localhost", port, Some("mock-password")).await?;
 
     Ok((client, server))
@@ -69,8 +69,18 @@ pub struct MockServer {
     events: mpsc::UnboundedSender<Event>,
 }
 
+#[derive(Clone, Copy, bon::Builder)]
+pub struct Version {
+    #[builder(default = "31.0.0")]
+    pub obs: &'static str,
+    #[builder(default = "5.5.0")]
+    pub websocket: &'static str,
+    #[builder(default = 1)]
+    pub rpc: u32,
+}
+
 impl MockServer {
-    pub async fn start() -> Result<(Self, u16)> {
+    pub async fn start(version: Version) -> Result<(Self, u16)> {
         let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await?;
         let port = listener.local_addr()?.port();
         debug!("server started");
@@ -86,7 +96,7 @@ impl MockServer {
 
             handshake(&mut stream).await?;
             debug!("handshake done");
-            version_check(&mut stream).await?;
+            version_check(&mut stream, version).await?;
             debug!("version check done");
 
             loop {
@@ -198,7 +208,7 @@ fn verify_auth(identify: &Identify) -> Result<()> {
     Ok(())
 }
 
-async fn version_check(stream: &mut WebSocketStream<TcpStream>) -> Result<()> {
+async fn version_check(stream: &mut WebSocketStream<TcpStream>, version: Version) -> Result<()> {
     let request = stream.next().await.context("no message from client")??;
     let request = serde_json::from_str::<ClientMessage>(request.to_text()?)?;
 
@@ -213,9 +223,9 @@ async fn version_check(stream: &mut WebSocketStream<TcpStream>) -> Result<()> {
         request_id: request.request_id,
         request_status: Status::ok(),
         response_data: json! {{
-            "obsVersion": "31.0.0",
-            "obsWebSocketVersion": "5.5.0",
-            "rpcVersion": 1,
+            "obsVersion": version.obs,
+            "obsWebSocketVersion": version.websocket,
+            "rpcVersion": version.rpc,
             "availableRequests": [],
             "supportedImageFormats": [],
             "platform": "mock",

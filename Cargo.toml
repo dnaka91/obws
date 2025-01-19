@@ -92,4 +92,4 @@ required-features = ["events"]
 
 [[test]]
 name = "integration"
-required-features = ["events"]
+required-features = ["builder", "events"]
