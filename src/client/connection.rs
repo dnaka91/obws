@@ -1,5 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 
+use base64::engine::Config;
 use futures_util::{Sink, SinkExt, Stream, StreamExt};
 use tokio::{
     sync::{oneshot, Mutex},
@@ -221,7 +222,13 @@ fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
     hasher.update(password.as_bytes());
     hasher.update(salt.as_bytes());
 
-    let mut auth = String::with_capacity(Sha256::output_size() * 4 / 3 + 4);
+    let mut auth = String::with_capacity(
+        base64::encoded_len(
+            Sha256::output_size(),
+            general_purpose::STANDARD.config().encode_padding(),
+        )
+        .unwrap_or_default(),
+    );
 
     general_purpose::STANDARD.encode_string(hasher.finalize_reset(), &mut auth);
 
