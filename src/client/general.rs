@@ -12,7 +12,7 @@ pub struct General<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> General<'a> {
+impl General<'_> {
     /// Gets data about the current plugin and RPC version.
     #[doc(alias = "GetVersion")]
     pub async fn version(&self) -> Result<responses::Version> {

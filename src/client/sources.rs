@@ -10,7 +10,7 @@ pub struct Sources<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Sources<'a> {
+impl Sources<'_> {
     /// Gets the active and show state of a source.
     #[doc(alias = "GetSourceActive")]
     pub async fn active(&self, source: SourceId<'_>) -> Result<responses::SourceActive> {

@@ -8,7 +8,7 @@ pub struct SceneCollections<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> SceneCollections<'a> {
+impl SceneCollections<'_> {
     /// Gets an array of all scene collections.
     #[doc(alias = "GetSceneCollectionList")]
     pub async fn list(&self) -> Result<responses::SceneCollections> {

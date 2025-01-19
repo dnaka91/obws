@@ -18,7 +18,7 @@ pub struct Filters<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Filters<'a> {
+impl Filters<'_> {
     /// Gets an array of all available source filter kinds.
     #[doc(alias = "GetSourceFilterKindList")]
     pub async fn list_kinds(&self) -> Result<Vec<String>> {

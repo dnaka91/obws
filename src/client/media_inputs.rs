@@ -13,7 +13,7 @@ pub struct MediaInputs<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> MediaInputs<'a> {
+impl MediaInputs<'_> {
     /// Gets the status of a media input.
     #[doc(alias = "GetMediaInputStatus")]
     pub async fn status(&self, input: InputId<'_>) -> Result<responses::MediaStatus> {

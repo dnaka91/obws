@@ -10,7 +10,7 @@ pub struct Profiles<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Profiles<'a> {
+impl Profiles<'_> {
     /// Gets an array of all profiles.
     #[doc(alias = "GetProfileList")]
     pub async fn list(&self) -> Result<responses::Profiles> {

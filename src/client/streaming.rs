@@ -6,7 +6,7 @@ pub struct Streaming<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Streaming<'a> {
+impl Streaming<'_> {
     /// Gets the status of the stream output.
     #[doc(alias = "GetStreamStatus")]
     pub async fn status(&self) -> Result<responses::StreamStatus> {

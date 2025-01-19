@@ -6,7 +6,7 @@ pub struct VirtualCam<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> VirtualCam<'a> {
+impl VirtualCam<'_> {
     /// Gets the status of the virtual cam output.
     #[doc(alias = "GetVirtualCamStatus")]
     pub async fn status(&self) -> Result<bool> {

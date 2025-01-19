@@ -12,7 +12,7 @@ pub struct Scenes<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Scenes<'a> {
+impl Scenes<'_> {
     /// Gets an array of all scenes in OBS.
     #[doc(alias = "GetSceneList")]
     pub async fn list(&self) -> Result<responses::Scenes> {

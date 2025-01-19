@@ -16,7 +16,7 @@ pub struct Inputs<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Inputs<'a> {
+impl Inputs<'_> {
     /// Gets an array of all inputs in OBS.
     #[doc(alias = "GetInputList")]
     pub async fn list(&self, kind: Option<&str>) -> Result<Vec<responses::Input>> {

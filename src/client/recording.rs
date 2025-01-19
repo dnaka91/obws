@@ -6,7 +6,7 @@ pub struct Recording<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Recording<'a> {
+impl Recording<'_> {
     /// Gets the status of the record output.
     #[doc(alias = "GetRecordStatus")]
     pub async fn status(&self) -> Result<responses::RecordStatus> {

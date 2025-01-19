@@ -10,7 +10,7 @@ pub struct Hotkeys<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Hotkeys<'a> {
+impl Hotkeys<'_> {
     /// Gets an array of all hotkey names in OBS.
     #[doc(alias = "GetHotkeyList")]
     pub async fn list(&self) -> Result<Vec<String>> {

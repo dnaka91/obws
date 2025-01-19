@@ -9,7 +9,7 @@ pub struct Transitions<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Transitions<'a> {
+impl Transitions<'_> {
     /// Gets an array of all available transition kinds.
     #[doc(alias = "GetTransitionKindList")]
     pub async fn list_kinds(&self) -> Result<Vec<String>> {

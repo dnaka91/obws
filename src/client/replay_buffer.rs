@@ -8,7 +8,7 @@ pub struct ReplayBuffer<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> ReplayBuffer<'a> {
+impl ReplayBuffer<'_> {
     /// Gets the status of the replay buffer output.
     #[doc(alias = "GetReplayBufferStatus")]
     pub async fn status(&self) -> Result<bool> {

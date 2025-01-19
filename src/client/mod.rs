@@ -371,11 +371,11 @@ impl Client {
         R: Into<RequestType<'a>>,
         T: DeserializeOwned,
     {
-        async fn send<'a>(
+        async fn send(
             id_counter: &AtomicU64,
             receivers: &Arc<ReceiverList>,
             write: &Mutex<MessageWriter>,
-            req: RequestType<'a>,
+            req: RequestType<'_>,
         ) -> Result<serde_json::Value> {
             let id = id_counter.fetch_add(1, Ordering::SeqCst);
             let id_str = id.to_string();

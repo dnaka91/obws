@@ -8,7 +8,7 @@ pub struct Outputs<'a> {
     pub(super) client: &'a Client,
 }
 
-impl<'a> Outputs<'a> {
+impl Outputs<'_> {
     /// Gets the list of available outputs.
     #[doc(alias = "GetOutputList")]
     pub async fn list(&self) -> Result<Vec<responses::Output>> {
