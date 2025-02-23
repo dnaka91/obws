@@ -187,7 +187,7 @@ impl QtGeometry {
     /// | 4      | Screen width                                             |
     /// | 16     | Main rectangle (left, top, right, bottom) 4 bytes each   |
     pub(crate) fn serialize(&self) -> String {
-        use base64::engine::{general_purpose, Engine};
+        use base64::engine::{Engine, general_purpose};
 
         /// Indicator for serialized Qt geometry data.
         const MAGIC_NUMBER: u32 = 0x01D9_D0CB;

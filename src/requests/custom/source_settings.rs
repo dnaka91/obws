@@ -4,7 +4,7 @@
 use std::path::Path;
 
 use rgb::RGBA8;
-use serde::{ser::SerializeStruct, Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeStruct};
 use serde_repr::Serialize_repr;
 use time::Duration;
 

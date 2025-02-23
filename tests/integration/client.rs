@@ -1,5 +1,5 @@
-use anyhow::{anyhow, Result};
-use obws::{client::ConnectConfig, error::Error, requests::EventSubscription, Client};
+use anyhow::{Result, anyhow};
+use obws::{Client, client::ConnectConfig, error::Error, requests::EventSubscription};
 use test_log::test;
 
 use crate::common::{self, MockServer, Version};

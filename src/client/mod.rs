@@ -3,10 +3,9 @@
 #[cfg(feature = "events")]
 use std::sync::Weak;
 use std::{
-    future::Future,
     sync::{
-        atomic::{AtomicU64, Ordering},
         Arc,
+        atomic::{AtomicU64, Ordering},
     },
     time::Duration,
 };
@@ -21,8 +20,8 @@ use serde::de::DeserializeOwned;
 use tokio::sync::broadcast;
 use tokio::{net::TcpStream, sync::Mutex, task::JoinHandle};
 use tokio_tungstenite::{
-    tungstenite::{self, protocol::CloseFrame, Message},
     MaybeTlsStream, WebSocketStream,
+    tungstenite::{self, Message, protocol::CloseFrame},
 };
 use tracing::{debug, error, info, trace, warn};
 
@@ -422,10 +421,9 @@ impl Client {
     /// This is called automatically when dropping the client but doesn't wait for all background
     /// tasks to complete. Therefore, it is recommended to call this manually once the client is
     /// no longer needed.
-    pub fn disconnect(&mut self) -> impl Future {
-        let handle = self.handle.take().map(|h| {
+    pub fn disconnect(&mut self) -> impl Future + use<> {
+        let handle = self.handle.take().inspect(|h| {
             h.abort();
-            h
         });
 
         async {

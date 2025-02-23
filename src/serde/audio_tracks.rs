@@ -68,7 +68,7 @@ pub mod option {
 #[cfg(test)]
 mod tests {
     use serde::{Deserialize, Serialize};
-    use serde_test::{assert_de_tokens, assert_de_tokens_error, assert_ser_tokens, Token};
+    use serde_test::{Token, assert_de_tokens, assert_de_tokens_error, assert_ser_tokens};
 
     #[derive(Debug, PartialEq, Serialize)]
     struct SimpleTracksSer {

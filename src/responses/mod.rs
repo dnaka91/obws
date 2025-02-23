@@ -20,7 +20,7 @@ pub mod transitions;
 pub mod ui;
 pub(crate) mod virtual_cam;
 
-use serde::{de, Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, de};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug)]

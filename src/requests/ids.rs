@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-use serde::{ser::SerializeStruct, Serialize};
+use serde::{Serialize, ser::SerializeStruct};
 use uuid::Uuid;
 
 macro_rules! item_id {

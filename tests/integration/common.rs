@@ -1,15 +1,15 @@
 use std::net::Ipv4Addr;
 
-use anyhow::{bail, ensure, Context, Result};
-use base64::{engine::general_purpose, Engine};
+use anyhow::{Context, Result, bail, ensure};
+use base64::{Engine, engine::general_purpose};
 use futures_util::{SinkExt, StreamExt};
 use obws::{
-    events::Event,
-    requests::{inputs::InputId, scenes::SceneId, EventSubscription},
-    responses::StatusCode,
     Client,
+    events::Event,
+    requests::{EventSubscription, inputs::InputId, scenes::SceneId},
+    responses::StatusCode,
 };
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de};
 use serde_json::json;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use sha2::{Digest, Sha256};
@@ -20,8 +20,8 @@ use tokio::{
     task::JoinHandle,
 };
 use tokio_tungstenite::{
-    tungstenite::{self, Message},
     WebSocketStream,
+    tungstenite::{self, Message},
 };
 use tracing::{debug, error, info};
 

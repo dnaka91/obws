@@ -1,14 +1,12 @@
 use std::env;
 
 use anyhow::Result;
-use futures_util::{pin_mut, StreamExt};
+use futures_util::{StreamExt, pin_mut};
 use obws::Client;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenvy::dotenv().ok();
-
-    env::set_var("RUST_LOG", "obws=debug");
     tracing_subscriber::fmt::init();
 
     let client = Client::connect("localhost", 4455, env::var("OBS_PASSWORD").ok()).await?;

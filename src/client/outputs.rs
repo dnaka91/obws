@@ -1,4 +1,4 @@
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 
 use super::Client;
 use crate::{error::Result, requests::outputs::Request, responses::outputs as responses};

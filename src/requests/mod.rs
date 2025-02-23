@@ -3,7 +3,7 @@
 #![expect(clippy::ref_option_ref)]
 
 use bitflags::bitflags;
-use serde::{ser::SerializeStruct, Serialize};
+use serde::{Serialize, ser::SerializeStruct};
 use serde_repr::Serialize_repr;
 use serde_with::skip_serializing_none;
 

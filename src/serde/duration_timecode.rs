@@ -77,7 +77,7 @@ impl Visitor<'_> for DurationTimecodeVisitor {
 #[cfg(test)]
 mod tests {
     use serde::{Deserialize, Serialize};
-    use serde_test::{assert_tokens, Token};
+    use serde_test::{Token, assert_tokens};
     use time::Duration;
 
     #[derive(Debug, PartialEq, Serialize, Deserialize)]

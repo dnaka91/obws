@@ -3,11 +3,11 @@ use std::collections::{HashMap, VecDeque};
 use base64::engine::Config;
 use futures_util::{Sink, SinkExt, Stream, StreamExt};
 use tokio::{
-    sync::{oneshot, Mutex},
+    sync::{Mutex, oneshot},
     time::{self, Duration},
 };
-pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tokio_tungstenite::tungstenite::Message;
+pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
 use tracing::debug;
 
 use super::InnerError;
@@ -215,7 +215,7 @@ pub(super) async fn handshake(
 }
 
 fn create_auth_response(challenge: &str, salt: &str, password: &str) -> String {
-    use base64::engine::{general_purpose, Engine};
+    use base64::engine::{Engine, general_purpose};
     use sha2::{Digest, Sha256};
 
     let mut hasher = Sha256::new();
