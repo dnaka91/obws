@@ -90,14 +90,14 @@ the equivalent function calls.
 | ToggleInputMute                     | [`Inputs::toggle_mute`](crate::client::Inputs::toggle_mute)                                       |
 | GetInputVolume                      | [`Inputs::volume`](crate::client::Inputs::volume)                                                 |
 | SetInputVolume                      | [`Inputs::set_volume`](crate::client::Inputs::set_volume)                                         |
-| GetInputAudioBalance                | [`Inputs::audio_balance](crate::client::Inputs::audio_balance)                                    |
-| SetInputAudioBalance                | [`Inputs::set_audio_balance](crate::client::Inputs::set_audio_balance)                            |
+| GetInputAudioBalance                | [`Inputs::audio_balance`](crate::client::Inputs::audio_balance)                                   |
+| SetInputAudioBalance                | [`Inputs::set_audio_balance`](crate::client::Inputs::set_audio_balance)                           |
 | GetInputAudioSyncOffset             | [`Inputs::audio_sync_offset`](crate::client::Inputs::audio_sync_offset)                           |
 | SetInputAudioSyncOffset             | [`Inputs::set_audio_sync_offset`](crate::client::Inputs::set_audio_sync_offset)                   |
 | GetInputAudioMonitorType            | [`Inputs::audio_monitor_type`](crate::client::Inputs::audio_monitor_type)                         |
 | SetInputAudioMonitorType            | [`Inputs::set_audio_monitor_type`](crate::client::Inputs::set_audio_monitor_type)                 |
-| GetInputAudioTracks                 | [`Inputs::audio_tracks](crate::client::Inputs::audio_tracks)                                      |
-| SetInputAudioTracks                 | [`Inputs::set_audio_tracks](crate::client::Inputs::set_audio_tracks)                              |
+| GetInputAudioTracks                 | [`Inputs::audio_tracks`](crate::client::Inputs::audio_tracks)                                     |
+| SetInputAudioTracks                 | [`Inputs::set_audio_tracks`](crate::client::Inputs::set_audio_tracks)                             |
 | GetInputPropertiesListPropertyItems | [`Inputs::properties_list_property_items`](crate::client::Inputs::properties_list_property_items) |
 | PressInputPropertiesButton          | [`Inputs::press_properties_button`](crate::client::Inputs::press_properties_button)               |
 
