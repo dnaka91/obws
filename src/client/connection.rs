@@ -122,12 +122,12 @@ pub enum HandshakeError {
 /// Receiving a message did not succeed.
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct ReceiveError(tokio_tungstenite::tungstenite::Error);
+pub struct ReceiveError(Box<tokio_tungstenite::tungstenite::Error>);
 
 /// The web-socket message was not convertible to text.
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct IntoTextError(tokio_tungstenite::tungstenite::Error);
+pub struct IntoTextError(Box<tokio_tungstenite::tungstenite::Error>);
 
 /// Description about the reason of why the web-socket connection was closed.
 #[derive(Debug)]
@@ -155,7 +155,7 @@ pub(super) async fn handshake(
             .next()
             .await
             .ok_or(HandshakeError::ConnectionClosed(None))?
-            .map_err(ReceiveError)?;
+            .map_err(|e| ReceiveError(e.into()))?;
 
         if let Message::Close(info) = &mut message {
             return Err(HandshakeError::ConnectionClosed(info.take().map(|i| {
@@ -166,7 +166,7 @@ pub(super) async fn handshake(
             })));
         }
 
-        let message = message.into_text().map_err(IntoTextError)?;
+        let message = message.into_text().map_err(|e| IntoTextError(e.into()))?;
 
         serde_json::from_str::<ServerMessage>(&message)
             .map_err(crate::error::DeserializeResponseError)
@@ -197,7 +197,7 @@ pub(super) async fn handshake(
             write
                 .send(Message::text(req))
                 .await
-                .map_err(crate::error::SendError)?;
+                .map_err(|e| crate::error::SendError(e.into()))?;
         }
         _ => return Err(HandshakeError::NoHello),
     }

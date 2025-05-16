@@ -71,7 +71,7 @@ pub enum Error {
 /// An error occurred while trying to connect to the web-socket.
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct ConnectError(pub(crate) tokio_tungstenite::tungstenite::Error);
+pub struct ConnectError(pub(crate) Box<tokio_tungstenite::tungstenite::Error>);
 
 /// Failed to serialize the message to be send to the web-socket.
 #[derive(Debug, thiserror::Error)]
@@ -81,7 +81,7 @@ pub struct SerializeMessageError(pub(crate) serde_json::Error);
 /// A message could not be send through the web-socket.
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct SendError(pub(crate) tokio_tungstenite::tungstenite::Error);
+pub struct SendError(pub(crate) Box<tokio_tungstenite::tungstenite::Error>);
 
 /// Tried to receive data while the send side was already closed.
 #[derive(Debug, thiserror::Error)]

@@ -285,7 +285,7 @@ impl Client {
         )
         .await
         .map_err(|_| Error::Timeout)?
-        .map_err(crate::error::ConnectError)?;
+        .map_err(|e| crate::error::ConnectError(e.into()))?;
 
         let (mut write, mut read) = socket.split();
 
@@ -392,7 +392,7 @@ impl Client {
                 .await
                 .send(Message::text(json))
                 .await
-                .map_err(crate::error::SendError);
+                .map_err(|e| crate::error::SendError(e.into()));
 
             if let Err(e) = write_result {
                 receivers.remove(id).await;
@@ -451,7 +451,7 @@ impl Client {
             .await
             .send(Message::text(json))
             .await
-            .map_err(crate::error::SendError)?;
+            .map_err(|e| crate::error::SendError(e.into()))?;
 
         let resp = rx.await.map_err(crate::error::ReceiveMessageError)?;
         debug!(
