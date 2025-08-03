@@ -39,6 +39,7 @@ bitflags = { version = "2.9.1", features = ["serde"] }
 bon = { version = "3.6.5", optional = true }
 document-features = { version = "0.2.11", optional = true }
 futures-util = { version = "0.3.31", features = ["sink"] }
+http = "1.3.1"
 rgb = { version = "0.8.52", default-features = false }
 semver = { version = "1.0.26", features = ["serde"] }
 serde = { version = "1.0.219", features = ["derive"] }
@@ -49,7 +50,7 @@ sha2 = "0.10.9"
 thiserror = "2.0.12"
 time = "0.3.41"
 tokio = { version = "1.47.1", features = ["net", "rt", "sync", "time"] }
-tokio-tungstenite = "0.27.0"
+tokio-websockets = { version = "0.12.0", features = ["client", "fastrand", "sha1_smol"] }
 tracing = "0.1.41"
 uuid = { version = "1.17.0", features = ["serde"] }
 
@@ -59,6 +60,7 @@ dotenvy = "0.15.7"
 serde_test = "1.0.177"
 test-log = { version = "0.2.18", default-features = false, features = ["trace"] }
 tokio = { version = "1.47.1", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tokio-websockets = { version = "0.12.0", features = ["server"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 uuid = { version = "1.17.0", features = ["v8"] }
 
@@ -84,7 +86,7 @@ doc = ["builder", "events", "tls", "dep:document-features"]
 events = ["dep:async-stream"]
 ## The tls feature enables Transport Layer Security support for the connection to OBS, helpful when
 ## securing the connection to a remote instance.
-tls = ["tokio-tungstenite/rustls-tls-webpki-roots"]
+tls = ["tokio-websockets/ring", "tokio-websockets/rustls-webpki-roots"]
 
 [[example]]
 name = "events"

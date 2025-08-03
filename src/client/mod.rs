@@ -19,16 +19,13 @@ use serde::de::DeserializeOwned;
 #[cfg(feature = "events")]
 use tokio::sync::broadcast;
 use tokio::{net::TcpStream, sync::Mutex, task::JoinHandle};
-use tokio_tungstenite::{
-    MaybeTlsStream, WebSocketStream,
-    tungstenite::{self, Message, protocol::CloseFrame},
-};
+use tokio_websockets::{MaybeTlsStream, Message, WebSocketStream};
 use tracing::{debug, error, info, trace, warn};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
     config::Config,
-    connection::{HandshakeError, IntoTextError, ReceiveError},
+    connection::{HandshakeError, ReceiveError},
     filters::Filters,
     general::General,
     hotkeys::Hotkeys,
@@ -78,7 +75,7 @@ mod virtual_cam;
 #[derive(Debug, thiserror::Error)]
 enum InnerError {
     #[error("websocket message not convertible to text")]
-    IntoText(#[source] tokio_tungstenite::tungstenite::Error),
+    IntoText,
     #[error("failed deserializing message")]
     DeserializeMessage(#[source] serde_json::Error),
     #[error("the request ID `{0}` is not an integer")]
@@ -131,7 +128,7 @@ where
     P: AsRef<str>,
 {
     #[cfg_attr(feature = "builder", builder(start_fn))]
-    /// The host name, usually `localhost` unless the OBS instance is on a remote machine.
+    /// The host name, usually `127.0.0.1`/`[::1]` unless the OBS instance is on a remote machine.
     pub host: H,
     /// Port to connect to.
     #[cfg_attr(feature = "builder", builder(start_fn))]
@@ -139,7 +136,7 @@ where
     /// Dangerous configuration options that are not given any support for.
     #[cfg_attr(feature = "builder", builder(field))]
     pub dangerous: Option<DangerousConnectConfig>,
-    /// The host name, usually `localhost` unless the OBS instance is on a remote machine.
+    /// The host name, usually `127.0.0.1`/`[::1]` unless the OBS instance is on a remote machine.
     /// Optional password to authenticate against `obs-websocket`.
     pub password: Option<P>,
     /// Optional list of event subscriptions, controlling what events to receive. By default all
@@ -276,16 +273,19 @@ impl Client {
 
         let (socket, _) = tokio::time::timeout(
             config.connect_timeout,
-            tokio_tungstenite::connect_async(format!(
-                "{}://{}:{}",
-                if config.tls() { "wss" } else { "ws" },
-                config.host.as_ref(),
-                config.port
-            )),
+            tokio_websockets::ClientBuilder::new()
+                .uri(&format!(
+                    "{}://{}:{}",
+                    if config.tls() { "wss" } else { "ws" },
+                    config.host.as_ref(),
+                    config.port
+                ))
+                .map_err(crate::error::InvalidUriError)?
+                .connect(),
         )
         .await
         .map_err(|_| Error::Timeout)?
-        .map_err(|e| crate::error::ConnectError(e.into()))?;
+        .map_err(crate::error::ConnectError)?;
 
         let (mut write, mut read) = socket.split();
 
@@ -392,7 +392,7 @@ impl Client {
                 .await
                 .send(Message::text(json))
                 .await
-                .map_err(|e| crate::error::SendError(e.into()));
+                .map_err(crate::error::SendError);
 
             if let Err(e) = write_result {
                 receivers.remove(id).await;
@@ -451,7 +451,7 @@ impl Client {
             .await
             .send(Message::text(json))
             .await
-            .map_err(|e| crate::error::SendError(e.into()))?;
+            .map_err(crate::error::SendError)?;
 
         let resp = rx.await.map_err(crate::error::ReceiveMessageError)?;
         debug!(
@@ -589,14 +589,14 @@ impl Drop for Client {
 
 /// Run the receiving side of the WebSocket connection.
 async fn recv_loop(
-    mut read: impl Stream<Item = tungstenite::Result<Message>> + Unpin,
+    mut read: impl Stream<Item = Result<Message, tokio_websockets::Error>> + Unpin,
     #[cfg(feature = "events")] events_tx: Arc<broadcast::Sender<Event>>,
     receivers: Arc<ReceiverList>,
     reidentify_receivers: Arc<ReidentifyReceiverList>,
 ) {
     while let Some(Ok(msg)) = read.next().await {
-        if let Message::Close(info) = &msg {
-            if let Some(CloseFrame { reason, .. }) = info {
+        if let Some((_, reason)) = msg.as_close() {
+            if !reason.is_empty() {
                 info!(%reason, "connection closed with reason");
             }
 
@@ -606,9 +606,9 @@ async fn recv_loop(
         }
 
         let res: Result<(), InnerError> = async {
-            let text = msg.into_text().map_err(InnerError::IntoText)?;
+            let text = msg.as_text().ok_or(InnerError::IntoText)?;
 
-            let message = serde_json::from_str::<ServerMessage>(&text)
+            let message = serde_json::from_str::<ServerMessage>(text)
                 .map_err(InnerError::DeserializeMessage)?;
 
             match message {

@@ -19,10 +19,7 @@ use tokio::{
     sync::{mpsc, oneshot},
     task::JoinHandle,
 };
-use tokio_tungstenite::{
-    WebSocketStream,
-    tungstenite::{self, Message},
-};
+use tokio_websockets::{Message, WebSocketStream};
 use tracing::{debug, error, info};
 
 pub const TEST_SCENE: SceneId<'_> = SceneId::Name("OBWS-TEST-Scene");
@@ -44,7 +41,7 @@ pub const FILTER_COLOR: &str = "color_filter";
 
 pub async fn new_client() -> Result<(Client, MockServer)> {
     let (server, port) = MockServer::start(Version::builder().build()).await?;
-    let client = Client::connect("localhost", port, Some("mock-password")).await?;
+    let client = Client::connect("127.0.0.1", port, Some("mock-password")).await?;
 
     Ok((client, server))
 }
@@ -91,7 +88,9 @@ impl MockServer {
 
         let handle = tokio::spawn(async move {
             let (stream, _) = listener.accept().await?;
-            let mut stream = tokio_tungstenite::accept_async(stream).await?;
+            let (_, mut stream) = tokio_websockets::ServerBuilder::new()
+                .accept(stream)
+                .await?;
             debug!("connected");
 
             handshake(&mut stream).await?;
@@ -173,7 +172,7 @@ async fn handshake(stream: &mut WebSocketStream<TcpStream>) -> Result<()> {
 
     let identify = stream.next().await.context("no message from client")??;
     let ClientMessage::Identify(identify) =
-        serde_json::from_str::<ClientMessage>(identify.to_text()?)?
+        serde_json::from_str::<ClientMessage>(identify.as_text().context("not a text message")?)?
     else {
         bail!("unexpected client message");
     };
@@ -210,7 +209,8 @@ fn verify_auth(identify: &Identify) -> Result<()> {
 
 async fn version_check(stream: &mut WebSocketStream<TcpStream>, version: Version) -> Result<()> {
     let request = stream.next().await.context("no message from client")??;
-    let request = serde_json::from_str::<ClientMessage>(request.to_text()?)?;
+    let request =
+        serde_json::from_str::<ClientMessage>(request.as_text().context("not a text message")?)?;
 
     let ClientMessage::Request(request) = request else {
         bail!("unexpected client message");
@@ -243,11 +243,13 @@ async fn version_check(stream: &mut WebSocketStream<TcpStream>, version: Version
 async fn handle_ws_message(
     stream: &mut WebSocketStream<TcpStream>,
     expect_rx: &mut mpsc::UnboundedReceiver<Expectation>,
-    msg: tungstenite::Result<Message>,
+    msg: Result<Message, tokio_websockets::Error>,
 ) -> Result<()> {
     match msg {
         Ok(msg) => {
-            let msg = serde_json::from_str::<ClientMessage>(msg.to_text()?)?;
+            let msg = serde_json::from_str::<ClientMessage>(
+                msg.as_text().context("not a text message")?,
+            )?;
             info!(message = ?msg);
 
             match msg {

@@ -6,8 +6,8 @@ use tokio::{
     sync::{Mutex, oneshot},
     time::{self, Duration},
 };
-use tokio_tungstenite::tungstenite::Message;
-pub use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode;
+use tokio_websockets::Message;
+pub use tokio_websockets::proto::CloseCode;
 use tracing::debug;
 
 use super::InnerError;
@@ -101,7 +101,7 @@ pub enum HandshakeError {
     Receive(#[from] ReceiveError),
     /// The web-socket message was not convertible to text.
     #[error("websocket message not convertible to text")]
-    IntoText(#[from] IntoTextError),
+    IntoText,
     /// A message from obs-websocket could not be deserialized.
     #[error("failed deserializing message")]
     DeserializeMessage(#[from] crate::error::DeserializeResponseError),
@@ -122,12 +122,7 @@ pub enum HandshakeError {
 /// Receiving a message did not succeed.
 #[derive(Debug, thiserror::Error)]
 #[error(transparent)]
-pub struct ReceiveError(Box<tokio_tungstenite::tungstenite::Error>);
-
-/// The web-socket message was not convertible to text.
-#[derive(Debug, thiserror::Error)]
-#[error(transparent)]
-pub struct IntoTextError(Box<tokio_tungstenite::tungstenite::Error>);
+pub struct ReceiveError(tokio_websockets::Error);
 
 /// Description about the reason of why the web-socket connection was closed.
 #[derive(Debug)]
@@ -143,32 +138,30 @@ pub struct CloseDetails {
 }
 
 pub(super) async fn handshake(
-    write: &mut (impl Sink<Message, Error = tokio_tungstenite::tungstenite::Error> + Unpin),
-    read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
+    write: &mut (impl Sink<Message, Error = tokio_websockets::Error> + Unpin),
+    read: &mut (impl Stream<Item = Result<Message, tokio_websockets::Error>> + Unpin),
     password: Option<&str>,
     event_subscriptions: Option<EventSubscription>,
 ) -> Result<(), HandshakeError> {
     async fn read_message(
-        read: &mut (impl Stream<Item = tokio_tungstenite::tungstenite::Result<Message>> + Unpin),
+        read: &mut (impl Stream<Item = Result<Message, tokio_websockets::Error>> + Unpin),
     ) -> Result<ServerMessage, HandshakeError> {
-        let mut message = read
+        let message = read
             .next()
             .await
             .ok_or(HandshakeError::ConnectionClosed(None))?
-            .map_err(|e| ReceiveError(e.into()))?;
+            .map_err(ReceiveError)?;
 
-        if let Message::Close(info) = &mut message {
-            return Err(HandshakeError::ConnectionClosed(info.take().map(|i| {
-                CloseDetails {
-                    code: i.code,
-                    reason: i.reason.as_str().to_owned(),
-                }
+        if let Some((code, reason)) = message.as_close() {
+            return Err(HandshakeError::ConnectionClosed(Some(CloseDetails {
+                code,
+                reason: reason.to_owned(),
             })));
         }
 
-        let message = message.into_text().map_err(|e| IntoTextError(e.into()))?;
+        let message = message.as_text().ok_or(HandshakeError::IntoText)?;
 
-        serde_json::from_str::<ServerMessage>(&message)
+        serde_json::from_str::<ServerMessage>(message)
             .map_err(crate::error::DeserializeResponseError)
             .map_err(Into::into)
     }
@@ -197,7 +190,7 @@ pub(super) async fn handshake(
             write
                 .send(Message::text(req))
                 .await
-                .map_err(|e| crate::error::SendError(e.into()))?;
+                .map_err(crate::error::SendError)?;
         }
         _ => return Err(HandshakeError::NoHello),
     }
