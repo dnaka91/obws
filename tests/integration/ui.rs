@@ -62,7 +62,7 @@ async fn ui() -> Result<()> {
                 "monitorWidth": 640,
                 "monitorHeight": 480,
                 "monitorPositionX": 5,
-                "monitorPositionY": 10,
+                "monitorPositionY": -10,
             }],
         }),
     );
