@@ -50,8 +50,8 @@ pub struct MonitorSize {
 pub struct MonitorPosition {
     /// Horizontal position on the screen.
     #[serde(rename = "monitorPositionX")]
-    pub x: u16,
+    pub x: i32,
     /// Vertical position on the screen.
     #[serde(rename = "monitorPositionY")]
-    pub y: u16,
+    pub y: i32,
 }
