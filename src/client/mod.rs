@@ -474,7 +474,7 @@ impl Client {
     /// disconnected from obs-websocket. That can happen either by manually disconnecting, stopping
     /// obs-websocket or closing OBS.
     #[cfg(feature = "events")]
-    pub fn events(&self) -> Result<impl Stream<Item = Event>> {
+    pub fn events(&self) -> Result<impl Stream<Item = Event> + use<>> {
         if let Some(sender) = &self.event_sender.upgrade() {
             let mut receiver = sender.subscribe();
 
