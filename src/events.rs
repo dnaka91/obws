@@ -1,9 +1,17 @@
 //! All events that can be received from the API.
 
-use std::{collections::BTreeMap, path::PathBuf};
+use std::{
+    collections::BTreeMap,
+    path::PathBuf,
+    pin::Pin,
+    task::{Context, Poll},
+};
 
+use futures_util::{Stream, StreamExt, stream::Fuse};
 use serde::{Deserialize, Serialize};
 use time::Duration;
+use tokio::sync::broadcast;
+use tokio_stream::wrappers::BroadcastStream;
 use uuid::Uuid;
 
 use crate::{
@@ -663,4 +671,28 @@ pub struct Scene {
     /// Positional index in the scene list.
     #[serde(rename = "sceneIndex")]
     pub index: usize,
+}
+
+/// Event stream returned by [`Client::events`](crate::Client::events).
+pub struct EventStream {
+    inner: Fuse<BroadcastStream<Event>>,
+}
+
+impl EventStream {
+    pub(crate) fn new(receiver: broadcast::Receiver<Event>) -> Self {
+        Self {
+            inner: BroadcastStream::new(receiver).fuse(),
+        }
+    }
+}
+
+impl Stream for EventStream {
+    type Item = Event;
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        self.get_mut()
+            .inner
+            .poll_next_unpin(cx)
+            .map(|v| v.and_then(Result::ok))
+    }
 }

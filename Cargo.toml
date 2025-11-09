@@ -33,7 +33,6 @@ allowed_external_types = [
 ]
 
 [dependencies]
-async-stream = { version = "0.3.6", optional = true }
 base64 = "0.22.1"
 bitflags = { version = "2.9.1", features = ["serde"] }
 bon = { version = "3.6.5", optional = true }
@@ -50,6 +49,7 @@ sha2 = "0.10.9"
 thiserror = "2.0.12"
 time = "0.3.41"
 tokio = { version = "1.47.1", features = ["net", "rt", "sync", "time"] }
+tokio-stream = { version = "0.1.17", optional = true, features = ["sync"] }
 tokio-websockets = { version = "0.12.0", features = ["client", "fastrand", "sha1_smol"] }
 tracing = "0.1.41"
 uuid = { version = "1.17.0", features = ["serde"] }
@@ -83,7 +83,7 @@ doc = ["builder", "events", "tls", "dep:document-features"]
 ## This is not enabled by default, as it has a large impact on the compilation time. Enabling it is
 ## crucial for reacting to user interactions in OBS, but be warned about the noticable compliation
 ## time increase.
-events = ["dep:async-stream"]
+events = ["dep:tokio-stream"]
 ## The tls feature enables Transport Layer Security support for the connection to OBS, helpful when
 ## securing the connection to a remote instance.
 tls = ["tokio-websockets/ring", "tokio-websockets/rustls-webpki-roots"]

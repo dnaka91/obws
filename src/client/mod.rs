@@ -465,24 +465,16 @@ impl Client {
     /// Get a stream of events. Each call to this function creates a new listener, therefore it's
     /// recommended to keep the stream around and iterate over it.
     ///
-    /// **Note**: To be able to iterate over the stream you have to pin it with
-    /// [`futures_util::pin_mut`] for example.
-    ///
     /// # Errors
     ///
     /// Getting a new stream of events fails with [`Error::Disconnected`] if the client is
     /// disconnected from obs-websocket. That can happen either by manually disconnecting, stopping
     /// obs-websocket or closing OBS.
     #[cfg(feature = "events")]
-    pub fn events(&self) -> Result<impl Stream<Item = Event> + use<>> {
+    pub fn events(&self) -> Result<crate::events::EventStream> {
         if let Some(sender) = &self.event_sender.upgrade() {
-            let mut receiver = sender.subscribe();
-
-            Ok(async_stream::stream! {
-                while let Ok(event) = receiver.recv().await {
-                    yield event;
-                }
-            })
+            let receiver = sender.subscribe();
+            Ok(crate::events::EventStream::new(receiver))
         } else {
             Err(crate::error::Error::Disconnected)
         }

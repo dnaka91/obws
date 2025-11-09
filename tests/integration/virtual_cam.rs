@@ -8,10 +8,8 @@ use crate::{common, wait_for};
 #[test(tokio::test)]
 async fn virtual_cam() -> Result<()> {
     let (client, server) = common::new_client().await?;
-    let events = client.events()?;
+    let mut events = client.events()?;
     let client = client.virtual_cam();
-
-    tokio::pin!(events);
 
     server.expect(
         "GetVirtualCamStatus",
