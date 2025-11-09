@@ -7,6 +7,7 @@ use std::{
     task::{Context, Poll},
 };
 
+use bitflags::bitflags;
 use futures_util::{Stream, StreamExt, stream::Fuse};
 use serde::{Deserialize, Serialize};
 use time::Duration;
@@ -195,6 +196,9 @@ pub enum Event {
         /// The unversioned kind of input (aka no `_v2` stuff).
         #[serde(rename = "unversionedInputKind")]
         unversioned_kind: String,
+        /// Bitflag value for the capabilities that an input supports.
+        #[serde(rename = "inputKindCaps", default)]
+        caps: OutputFlags,
         /// The settings configured to the input when it was created.
         #[serde(rename = "inputSettings")]
         settings: serde_json::Value,
@@ -671,6 +675,105 @@ pub struct Scene {
     /// Positional index in the scene list.
     #[serde(rename = "sceneIndex")]
     pub index: usize,
+}
+
+/// These flags determine what type of data the source outputs and expects.
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
+#[serde(from = "u32", into = "u32")]
+pub struct OutputFlags(u32);
+
+bitflags! {
+    impl OutputFlags: u32 {
+        /// Source has video.
+        ///
+        /// Unless SOURCE_ASYNC_VIDEO is specified, the source must include the video_render
+        /// callback in the source definition structure.
+        const VIDEO = 1 << 0;
+        /// Source has audio.
+        ///
+        /// Use the obs_source_output_audio function to pass raw audio data, which will be
+        /// automatically converted and uploaded.  If used with SOURCE_ASYNC_VIDEO, audio will
+        /// automatically be synced up to the video output.
+        const AUDIO = 1 << 1;
+        /// Async video flag (use [`Self::ASYNC_VIDEO`]).
+        const ASYNC = 1 << 2;
+        /// Source passes raw video data via RAM.
+        ///
+        /// Use the obs_source_output_video function to pass raw video data, which will be
+        /// automatically uploaded at the specified timestamp.
+        ///
+        /// If this flag is specified, it is not necessary to include the video_render callback.
+        /// However, if you wish to use that function as well, you must call obs_source_getframe to
+        /// get the current frame data, and obs_source_releaseframe to release the data when
+        /// complete.
+        const ASYNC_VIDEO = Self::ASYNC.bits() | Self::VIDEO.bits();
+        /// Source uses custom drawing, rather than a default effect.
+        ///
+        /// If this flag is specified, the video_render callback will pass a NULL effect, and
+        /// effect-based filters will not use direct rendering.
+        const CUSTOM_DRAW = 1 << 3;
+        /// Source supports interaction.
+        ///
+        /// When this is used, the source will receive interaction events if they provide the
+        /// necessary callbacks in the source definition structure.
+        const INTERACTION = 1 << 5;
+        /// Source composites sub-sources
+        ///
+        /// When used specifies that the source composites one or more sub-sources. Sources that
+        /// render sub-sources must implement the audio_render callback in order to perform custom
+        /// mixing of sub-sources.
+        ///
+        /// This capability flag is always set for transitions.
+        const COMPOSITE = 1 << 6;
+        /// Source should not be fully duplicated
+        ///
+        /// When this is used, specifies that the source should not be fully duplicated, and should
+        /// prefer to duplicate via holding references rather than full duplication.
+        const DO_NOT_DUPLICATE = 1 << 7;
+        /// Source is deprecated and should not be used.
+        const DEPRECATED = 1 << 8;
+        /// Source cannot have its audio monitored
+        ///
+        /// Specifies that this source may cause a feedback loop if audio is monitored with a device
+        /// selected as desktop audio.
+        ///
+        /// This is used primarily with desktop audio capture sources.
+        const DO_NOT_SELF_MONITOR = 1 << 9;
+        /// Source type is currently disabled and should not be shown to the user.
+        const CAP_DISABLED = 1 << 10;
+        /// Source type is obsolete (has been updated with new defaults/properties/etc).
+        const CAP_OBSOLETE = Self::CAP_DISABLED.bits();
+        /// Source should enable monitoring by default.  Monitoring should be set by the frontend if
+        /// this flag is set.
+        const MONITOR_BY_DEFAULT = 1 << 11;
+        /// Used internally for audio submixing.
+        const SUBMIX = 1 << 12;
+        /// Source type can be controlled by media controls.
+        const CONTROLLABLE_MEDIA = 1 << 13;
+        /// Source type provides cea708 data.
+        const CEA_708 = 1 << 14;
+        /// Source understands SRGB rendering.
+        const SRGB = 1 << 15;
+        /// Source type prefers not to have its properties shown on creation (prefers to rely on
+        /// defaults first).
+        const CAP_DONT_SHOW_PROPERTIES = 1 << 16;
+        /// Source requires a canvas to operate.
+        const REQUIRES_CANVAS = 1 << 17;
+    }
+}
+
+impl From<OutputFlags> for u32 {
+    fn from(value: OutputFlags) -> Self {
+        value.bits()
+    }
+}
+
+impl From<u32> for OutputFlags {
+    fn from(value: u32) -> Self {
+        Self::from_bits_truncate(value)
+    }
 }
 
 /// Event stream returned by [`Client::events`](crate::Client::events).

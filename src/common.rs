@@ -187,3 +187,52 @@ pub enum BlendMode {
     #[serde(rename = "OBS_BLEND_DARKEN")]
     Darken,
 }
+
+/// Different kinds of input deinterlace modes.
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
+pub enum DeinterlaceMode {
+    /// Disables deinterlacing.
+    #[default]
+    #[serde(rename = "OBS_DEINTERLACE_MODE_DISABLE")]
+    Disable,
+    /// Discard.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_DISCARD")]
+    Discard,
+    /// Retro.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_RETRO")]
+    Retro,
+    /// Blend.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_BLEND")]
+    Blend,
+    /// Blend 2x.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_BLEND_2X")]
+    Blend2X,
+    /// Linear.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_LINEAR")]
+    Linear,
+    /// Linear 2x.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_LINEAR_2X")]
+    Linear2X,
+    /// Yadif.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_YADIF")]
+    Yadif,
+    /// Yadif 2x.
+    #[serde(rename = "OBS_DEINTERLACE_MODE_YADIF_2X")]
+    Yadif2X,
+}
+
+/// Different kinds of input deinterlace field orders.
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+)]
+pub enum DeinterlaceFieldOrder {
+    /// Start from top.
+    #[default]
+    #[serde(rename = "OBS_DEINTERLACE_FIELD_ORDER_TOP")]
+    Top,
+    /// Start from bottom.
+    #[serde(rename = "OBS_DEINTERLACE_FIELD_ORDER_BOTTOM")]
+    Bottom,
+}

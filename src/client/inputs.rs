@@ -3,7 +3,7 @@ use time::Duration;
 
 use super::Client;
 use crate::{
-    common::MonitorType,
+    common::{DeinterlaceFieldOrder, DeinterlaceMode, MonitorType},
     error::Result,
     requests::inputs::{
         Create, CreateInputInternal, InputId, Request, SetSettings, SetSettingsInternal, Volume,
@@ -240,6 +240,61 @@ impl Inputs<'_> {
     ) -> Result<()> {
         self.client
             .send_message(Request::SetAudioTracks { input, tracks })
+            .await
+    }
+
+    /// Gets the deinterlace mode of an input.
+    ///
+    /// **Note:** Deinterlacing functionality is restricted to async inputs only.
+    #[doc(alias = "GetInputDeinterlaceMode")]
+    pub async fn deinterlace_mode(&self, input: InputId<'_>) -> Result<DeinterlaceMode> {
+        self.client
+            .send_message::<_, responses::GetDeinterlaceMode>(Request::DeinterlaceMode { input })
+            .await
+            .map(|dm| dm.mode)
+    }
+
+    /// Sets the deinterlace mode of an input.
+    ///
+    /// **Note:** Deinterlacing functionality is restricted to async inputs only.
+    #[doc(alias = "SetInputDeinterlaceMode")]
+    pub async fn set_deinterlace_mode(
+        &self,
+        input: InputId<'_>,
+        mode: DeinterlaceMode,
+    ) -> Result<()> {
+        self.client
+            .send_message(Request::SetDeinterlaceMode { input, mode })
+            .await
+    }
+
+    /// Gets the deinterlace field order of an input.
+    ///
+    /// **Note:** Deinterlacing functionality is restricted to async inputs only.
+    #[doc(alias = "GetInputDeinterlaceFieldOrder")]
+    pub async fn deinterlace_field_order(
+        &self,
+        input: InputId<'_>,
+    ) -> Result<DeinterlaceFieldOrder> {
+        self.client
+            .send_message::<_, responses::GetDeinterlaceFieldOrder>(
+                Request::DeinterlaceFieldOrder { input },
+            )
+            .await
+            .map(|dfo| dfo.field_order)
+    }
+
+    /// Sets the deinterlace field order of an input.
+    ///
+    /// **Note:** Deinterlacing functionality is restricted to async inputs only.
+    #[doc(alias = "SetInputDeinterlaceFieldOrder")]
+    pub async fn set_deinterlace_field_order(
+        &self,
+        input: InputId<'_>,
+        field_order: DeinterlaceFieldOrder,
+    ) -> Result<()> {
+        self.client
+            .send_message(Request::SetDeinterlaceFieldOrder { input, field_order })
             .await
     }
 

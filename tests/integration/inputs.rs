@@ -1,6 +1,6 @@
 use anyhow::Result;
 use obws::{
-    common::MonitorType,
+    common::{DeinterlaceFieldOrder, MonitorType},
     requests::inputs::{Create, SetSettings, Volume},
 };
 use serde_json::json;
@@ -272,6 +272,48 @@ async fn inputs() -> Result<()> {
 
     client
         .set_audio_tracks(TEST_MEDIA, [Some(!tracks[0]), None, None, None, None, None])
+        .await?;
+
+    server.expect(
+        "GetInputDeinterlaceMode",
+        json!({"inputName": "OBWS-TEST-Media"}),
+        json!({"inputDeinterlaceMode": "OBS_DEINTERLACE_MODE_BLEND"}),
+    );
+
+    client.deinterlace_mode(TEST_MEDIA).await?;
+
+    server.expect(
+        "SetInputDeinterlaceMode",
+        json!({
+            "inputName": "OBWS-TEST-Media",
+            "inputDeinterlaceMode": "OBS_DEINTERLACE_MODE_LINEAR_2X",
+        }),
+        json!(null),
+    );
+
+    client
+        .set_deinterlace_mode(TEST_MEDIA, obws::common::DeinterlaceMode::Linear2X)
+        .await?;
+
+    server.expect(
+        "GetInputDeinterlaceFieldOrder",
+        json!({"inputName": "OBWS-TEST-Media"}),
+        json!({"inputDeinterlaceFieldOrder": "OBS_DEINTERLACE_FIELD_ORDER_TOP"}),
+    );
+
+    client.deinterlace_field_order(TEST_MEDIA).await?;
+
+    server.expect(
+        "SetInputDeinterlaceFieldOrder",
+        json!({
+            "inputName": "OBWS-TEST-Media",
+            "inputDeinterlaceFieldOrder": "OBS_DEINTERLACE_FIELD_ORDER_BOTTOM",
+        }),
+        json!(null),
+    );
+
+    client
+        .set_deinterlace_field_order(TEST_MEDIA, DeinterlaceFieldOrder::Bottom)
         .await?;
 
     server.expect(

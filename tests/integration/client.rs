@@ -14,8 +14,8 @@ async fn client() -> Result<()> {
 }
 
 #[test(tokio::test)]
-async fn invalid_obs_version() -> Result<()> {
-    let (server, port) = MockServer::start(Version::builder().obs("1.0.0").build()).await?;
+async fn invalid_studio_version() -> Result<()> {
+    let (server, port) = MockServer::start(Version::builder().studio("1.0.0").build()).await?;
 
     let result = match Client::connect("127.0.0.1", port, Some("mock-password")).await {
         Err(Error::ObsStudioVersion(_, _)) => Ok(()),
@@ -57,8 +57,13 @@ async fn invalid_rpc_version() -> Result<()> {
 
 #[test(tokio::test)]
 async fn ignore_version() -> Result<()> {
-    let (server, port) =
-        MockServer::start(Version::builder().obs("1.0.0").websocket("1.0.0").build()).await?;
+    let (server, port) = MockServer::start(
+        Version::builder()
+            .studio("1.0.0")
+            .websocket("1.0.0")
+            .build(),
+    )
+    .await?;
 
     let config = ConnectConfig::builder("127.0.0.1", port)
         .password("mock-password")

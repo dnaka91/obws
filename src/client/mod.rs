@@ -338,10 +338,10 @@ impl Client {
         let version = self.general().version().await?;
 
         if !self.dangerous.skip_studio_version_check
-            && !OBS_STUDIO_VERSION.matches(&version.obs_version)
+            && !OBS_STUDIO_VERSION.matches(&version.obs_studio_version)
         {
             return Err(Error::ObsStudioVersion(
-                version.obs_version,
+                version.obs_studio_version,
                 OBS_STUDIO_VERSION,
             ));
         }

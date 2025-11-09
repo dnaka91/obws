@@ -6,7 +6,7 @@ use time::Duration;
 
 pub use super::ids::InputId;
 use super::scenes::SceneId;
-use crate::common::MonitorType;
+use crate::common::{DeinterlaceFieldOrder, DeinterlaceMode, MonitorType};
 
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
@@ -157,6 +157,36 @@ pub(crate) enum Request<'a> {
             with = "crate::serde::audio_tracks::option"
         )]
         tracks: [Option<bool>; 6],
+    },
+    #[serde(rename = "GetInputDeinterlaceMode")]
+    DeinterlaceMode {
+        /// Identifier of the input.
+        #[serde(flatten)]
+        input: InputId<'a>,
+    },
+    #[serde(rename = "SetInputDeinterlaceMode")]
+    SetDeinterlaceMode {
+        /// Identifier of the input.
+        #[serde(flatten)]
+        input: InputId<'a>,
+        /// Deinterlace mode for the input.
+        #[serde(rename = "inputDeinterlaceMode")]
+        mode: DeinterlaceMode,
+    },
+    #[serde(rename = "GetInputDeinterlaceFieldOrder")]
+    DeinterlaceFieldOrder {
+        /// Identifier of the input.
+        #[serde(flatten)]
+        input: InputId<'a>,
+    },
+    #[serde(rename = "SetInputDeinterlaceFieldOrder")]
+    SetDeinterlaceFieldOrder {
+        /// Identifier of the input.
+        #[serde(flatten)]
+        input: InputId<'a>,
+        /// Deinterlace field order for the input.
+        #[serde(rename = "inputDeinterlaceFieldOrder")]
+        field_order: DeinterlaceFieldOrder,
     },
     #[serde(rename = "GetInputPropertiesListPropertyItems")]
     PropertiesListPropertyItems {

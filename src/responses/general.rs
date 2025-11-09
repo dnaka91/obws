@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Version {
     /// Current OBS Studio version.
-    #[serde(rename = "obsVersion")]
-    pub obs_version: semver::Version,
+    #[serde(rename = "obsStudioVersion", alias = "obsVersion")]
+    pub obs_studio_version: semver::Version,
     /// Current obs-websocket version.
     #[serde(rename = "obsWebSocketVersion")]
     pub obs_web_socket_version: semver::Version,

@@ -69,7 +69,7 @@ pub struct MockServer {
 #[derive(Clone, Copy, bon::Builder)]
 pub struct Version {
     #[builder(default = "31.0.0")]
-    pub obs: &'static str,
+    pub studio: &'static str,
     #[builder(default = "5.5.0")]
     pub websocket: &'static str,
     #[builder(default = 1)]
@@ -223,7 +223,7 @@ async fn version_check(stream: &mut WebSocketStream<TcpStream>, version: Version
         request_id: request.request_id,
         request_status: Status::ok(),
         response_data: json! {{
-            "obsVersion": version.obs,
+            "obsStudioVersion": version.studio,
             "obsWebSocketVersion": version.websocket,
             "rpcVersion": version.rpc,
             "availableRequests": [],

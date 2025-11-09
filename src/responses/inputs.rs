@@ -5,7 +5,7 @@ use time::Duration;
 use uuid::Uuid;
 
 pub use super::ids::InputId;
-use crate::common::MonitorType;
+use crate::common::{DeinterlaceFieldOrder, DeinterlaceMode, MonitorType};
 
 /// Response value for [`crate::client::Inputs::list`].
 #[derive(Debug, Deserialize)]
@@ -130,6 +130,20 @@ pub(crate) struct AudioTracks {
     /// Object of audio tracks and associated enable states.
     #[serde(rename = "inputAudioTracks", with = "crate::serde::audio_tracks")]
     pub audio_tracks: [bool; 6],
+}
+
+/// Response value for [`crate::client::Inputs::deinterlace_mode`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct GetDeinterlaceMode {
+    #[serde(rename = "inputDeinterlaceMode")]
+    pub mode: DeinterlaceMode,
+}
+
+/// Response value for [`crate::client::Inputs::deinterlace_field_order`].
+#[derive(Debug, Deserialize)]
+pub(crate) struct GetDeinterlaceFieldOrder {
+    #[serde(rename = "inputDeinterlaceFieldOrder")]
+    pub field_order: DeinterlaceFieldOrder,
 }
 
 /// Response value for [`crate::client::Inputs::properties_list_property_items`].
