@@ -1,3 +1,4 @@
+mod canvases;
 mod client;
 mod common;
 mod config;

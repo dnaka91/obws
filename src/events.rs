@@ -19,7 +19,7 @@ use crate::{
     common::{MediaAction, MonitorType},
     responses::{
         filters::SourceFilter,
-        ids::{SceneId, TransitionId},
+        ids::{CanvasId, SceneId, TransitionId},
         inputs::InputId,
         scene_items::SceneItemTransform,
         sources::SourceId,
@@ -598,6 +598,33 @@ pub enum Event {
         /// Path of the saved image file.
         #[serde(rename = "savedScreenshotPath")]
         path: String,
+    },
+    // --------------------------------
+    // Canvases
+    // --------------------------------
+    /// A new canvas has been created.
+    CanvasCreated {
+        /// Identifier of the new canvas.
+        #[serde(flatten)]
+        id: CanvasId,
+    },
+    /// A canvas has been removed.
+    CavnasRemoved {
+        /// Identifier of the removed canvas.
+        #[serde(flatten)]
+        id: CanvasId,
+    },
+    /// The name of a canvas has changed.
+    CanvasNameChanged {
+        /// UUID of the canvas.
+        #[serde(rename = "canvasUuid")]
+        uuid: Uuid,
+        /// Old name of the canvas.
+        #[serde(rename = "oldCanvasName")]
+        old_name: String,
+        /// New name of the canvas.
+        #[serde(rename = "canvasName")]
+        new_name: String,
     },
     // --------------------------------
     // Custom

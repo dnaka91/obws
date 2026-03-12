@@ -24,6 +24,7 @@ use tracing::{debug, error, info, trace, warn};
 
 use self::connection::{ReceiverList, ReidentifyReceiverList};
 pub use self::{
+    canvases::Canvases,
     config::Config,
     connection::{HandshakeError, ReceiveError},
     filters::Filters,
@@ -52,6 +53,7 @@ use crate::{
     responses::ServerMessage,
 };
 
+mod canvases;
 mod config;
 mod connection;
 mod filters;
@@ -478,6 +480,11 @@ impl Client {
         } else {
             Err(crate::error::Error::Disconnected)
         }
+    }
+
+    /// Access API functions related to canvases.
+    pub fn canvases(&self) -> Canvases<'_> {
+        Canvases { client: self }
     }
 
     /// Access API functions related to OBS configuration.

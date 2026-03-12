@@ -6,6 +6,7 @@ use bitflags::bitflags;
 use serde::{Serialize, ser::SerializeStruct};
 use serde_with::skip_serializing_none;
 
+pub mod canvases;
 pub mod config;
 pub mod custom;
 pub mod filters;
@@ -182,6 +183,8 @@ bitflags! {
         const VENDORS = 1 << 9;
         /// Subscription value to receive events in the `Ui` category.
         const UI = 1 << 10;
+        /// Subscription value to receive events in the `Canvases` category.
+        const CANVASES = 1 << 11;
 
         /// Helper to receive all non-high-volume events.
         const ALL = Self::GENERAL.bits()
@@ -194,7 +197,8 @@ bitflags! {
             | Self::SCENE_ITEMS.bits()
             | Self::MEDIA_INPUTS.bits()
             | Self::VENDORS.bits()
-            | Self::UI.bits();
+            | Self::UI.bits()
+            | Self::CANVASES.bits();
 
         /// Subscription value to receive the [`InputVolumeMeters`] high-volume event.
         ///
@@ -253,6 +257,7 @@ impl From<ExecutionType> for i8 {
 }
 
 pub(crate) enum RequestType<'a> {
+    Canvases(self::canvases::Request),
     Config(self::config::Request<'a>),
     Filters(self::filters::Request<'a>),
     General(self::general::Request<'a>),
@@ -279,6 +284,7 @@ impl Serialize for RequestType<'_> {
         S: serde::Serializer,
     {
         match self {
+            Self::Canvases(req) => req.serialize(serializer),
             Self::Config(req) => req.serialize(serializer),
             Self::Filters(req) => req.serialize(serializer),
             Self::General(req) => req.serialize(serializer),

@@ -1,5 +1,6 @@
 //! All responses that can be received from the API.
 
+pub mod canvases;
 pub mod config;
 pub mod filters;
 pub mod general;

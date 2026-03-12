@@ -57,6 +57,7 @@ item_id!(
     "transitionName",
     "transitionUuid"
 );
+item_id!(CanvasId, "canvas", "canvasName", "canvasUuid");
 
 item_id!(
     CurrentPreviewSceneId,
