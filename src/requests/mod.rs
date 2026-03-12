@@ -3,8 +3,11 @@
 #![expect(clippy::ref_option_ref)]
 
 use bitflags::bitflags;
+use derive_more::Debug;
 use serde::{Serialize, ser::SerializeStruct};
 use serde_with::skip_serializing_none;
+
+use crate::common::FlagsDebug;
 
 pub mod canvases;
 pub mod config;
@@ -144,14 +147,14 @@ pub(crate) struct RequestBatch<'a> {
 
 /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS
 /// instance.
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[derive(Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Serialize)]
 #[cfg_attr(
     feature = "test-integration",
     derive(serde::Deserialize),
     serde(from = "u32")
 )]
 #[serde(into = "u32")]
-pub struct EventSubscription(u32);
+pub struct EventSubscription(#[debug("{:?}", FlagsDebug(self))] u32);
 
 bitflags! {
     /// Bit flags for possible event subscriptions, that can be enabled when connecting to the OBS

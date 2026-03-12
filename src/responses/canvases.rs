@@ -1,10 +1,12 @@
 //! Responses related to scenes.
 
 use bitflags::bitflags;
+use derive_more::Debug;
 use serde::{Deserialize, Serialize};
 
 use super::config::VideoSettings;
 pub use super::ids::CanvasId;
+use crate::common::FlagsDebug;
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct Canvases {
@@ -29,10 +31,10 @@ pub struct Canvas {
 
 /// Different flags for canvases defining their properties.
 #[derive(
-    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Deserialize, Serialize,
 )]
 #[serde(from = "Flags", into = "Flags")]
-pub struct CanvasFlags(u8);
+pub struct CanvasFlags(#[debug("{:?}", FlagsDebug(self))] u8);
 
 bitflags! {
     impl CanvasFlags: u8 {

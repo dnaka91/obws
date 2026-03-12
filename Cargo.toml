@@ -36,7 +36,7 @@ allowed_external_types = [
 base64 = "0.22.1"
 bitflags = { version = "2.11.0", features = ["serde"] }
 bon = { version = "3.9.0", optional = true }
-derive_more = { version = "2.1.1", features = ["try_from"] }
+derive_more = { version = "2.1.1", features = ["debug", "try_from"] }
 document-features = { version = "0.2.12", optional = true }
 futures-util = { version = "0.3.32", features = ["sink"] }
 http = "1.4.0"

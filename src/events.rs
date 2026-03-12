@@ -8,6 +8,7 @@ use std::{
 };
 
 use bitflags::bitflags;
+use derive_more::Debug;
 use futures_util::{Stream, StreamExt, stream::Fuse};
 use serde::{Deserialize, Serialize};
 use time::Duration;
@@ -16,7 +17,7 @@ use tokio_stream::wrappers::BroadcastStream;
 use uuid::Uuid;
 
 use crate::{
-    common::{MediaAction, MonitorType},
+    common::{FlagsDebug, MediaAction, MonitorType},
     responses::{
         filters::SourceFilter,
         ids::{CanvasId, SceneId, TransitionId},
@@ -706,10 +707,10 @@ pub struct Scene {
 
 /// These flags determine what type of data the source outputs and expects.
 #[derive(
-    Clone, Copy, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
+    Clone, Copy, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Serialize,
 )]
 #[serde(from = "u32", into = "u32")]
-pub struct OutputFlags(u32);
+pub struct OutputFlags(#[debug("{:?}", FlagsDebug(self))] u32);
 
 bitflags! {
     impl OutputFlags: u32 {

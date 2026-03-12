@@ -1,6 +1,9 @@
 //! Common data structures shared between requests, responses and events.
 
+use std::fmt;
+
 use bitflags::bitflags;
+use derive_more::Debug;
 use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
@@ -25,10 +28,10 @@ pub enum MonitorType {
 
 /// Different flags for font display that can be combined.
 #[derive(
-    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Deserialize, Serialize,
 )]
 #[serde(try_from = "u8", into = "u8")]
-pub struct FontFlags(u8);
+pub struct FontFlags(#[debug("{:?}", FlagsDebug(self))] u8);
 
 bitflags! {
     impl FontFlags: u8 {
@@ -64,10 +67,10 @@ impl From<FontFlags> for u8 {
 /// centered vertically. To align to the top right, the alignments can be combined to
 /// `LEFT | TOP`. Combining both values for a single axis is invalid, like `LEFT | RIGHT`.
 #[derive(
-    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
+    Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Deserialize, Serialize,
 )]
 #[serde(try_from = "u8", into = "u8")]
-pub struct Alignment(u8);
+pub struct Alignment(#[debug("{:?}", FlagsDebug(self))] u8);
 
 bitflags! {
     impl Alignment: u8 {
@@ -235,4 +238,18 @@ pub enum DeinterlaceFieldOrder {
     /// Start from bottom.
     #[serde(rename = "OBS_DEINTERLACE_FIELD_ORDER_BOTTOM")]
     Bottom,
+}
+
+/// Custom formatter helper that formats [`bitflags`] struct values in a stringified form rather
+/// than then plain numeric value.
+#[expect(
+    unused,
+    reason = "only used for improved debug formatting and never constructed directly"
+)]
+pub(crate) struct FlagsDebug<'a, B>(pub &'a B);
+
+impl<B: bitflags::Flags<Bits: bitflags::parser::WriteHex>> fmt::Debug for FlagsDebug<'_, B> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        bitflags::parser::to_writer(self.0, f)
+    }
 }

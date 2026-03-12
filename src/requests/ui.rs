@@ -3,9 +3,11 @@
 use std::fmt::{self, Display};
 
 use bitflags::bitflags;
+use derive_more::Debug;
 use serde::Serialize;
 
 use super::{inputs::InputId, sources::SourceId};
+use crate::common::FlagsDebug;
 
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
@@ -244,8 +246,8 @@ impl Display for QtGeometry {
 
 /// Request information for [`crate::client::Ui::open_video_mix_projector`] and
 /// [`crate::client::Ui::open_source_projector`] as part of [`QtGeometry`].
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
-pub struct QtWindowState(u32);
+#[derive(Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Debug)]
+pub struct QtWindowState(#[debug("{:?}", FlagsDebug(self))] u32);
 
 bitflags! {
     impl QtWindowState: u32 {
