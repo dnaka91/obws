@@ -14,9 +14,8 @@ exceptions = [
 ]
 
 [bans]
-skip = [
-    "windows-sys@0.60",
-]
+skip = []
 skip-tree = [
+    { crate = "darling@0.21", depth = 2 },
     { crate = "windows-sys@0.52", depth = 3 },
 ]

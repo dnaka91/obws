@@ -3,7 +3,7 @@ name = "obws"
 version = "0.14.0"
 authors = ["Dominik Nakamura <dnaka91@gmail.com>"]
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.89"
 license = "MIT"
 readme = "README.md"
 description = "The obws (obvious) remote control library for OBS."
@@ -34,35 +34,35 @@ allowed_external_types = [
 
 [dependencies]
 base64 = "0.22.1"
-bitflags = { version = "2.10.0", features = ["serde"] }
-bon = { version = "3.8.1", optional = true }
-derive_more = { version = "2.0.1", features = ["try_from"] }
+bitflags = { version = "2.11.0", features = ["serde"] }
+bon = { version = "3.9.0", optional = true }
+derive_more = { version = "2.1.1", features = ["try_from"] }
 document-features = { version = "0.2.12", optional = true }
-futures-util = { version = "0.3.31", features = ["sink"] }
-http = "1.3.1"
-rgb = { version = "0.8.52", default-features = false }
+futures-util = { version = "0.3.32", features = ["sink"] }
+http = "1.4.0"
+rgb = { version = "0.8.53", default-features = false }
 semver = { version = "1.0.27", features = ["serde"] }
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.145"
-serde_with = "3.15.1"
+serde_json = "1.0.149"
+serde_with = "3.17.0"
 sha2 = "0.10.9"
-thiserror = "2.0.17"
-time = "0.3.44"
-tokio = { version = "1.48.0", features = ["net", "rt", "sync", "time"] }
-tokio-stream = { version = "0.1.17", optional = true, features = ["sync"] }
-tokio-websockets = { version = "0.12.3", features = ["client", "fastrand", "sha1_smol"] }
-tracing = "0.1.41"
-uuid = { version = "1.18.1", features = ["serde"] }
+thiserror = "2.0.18"
+time = "0.3.47"
+tokio = { version = "1.50.0", features = ["net", "rt", "sync", "time"] }
+tokio-stream = { version = "0.1.18", optional = true, features = ["sync"] }
+tokio-websockets = { version = "0.13.1", features = ["client", "fastrand", "sha1_smol"] }
+tracing = "0.1.44"
+uuid = { version = "1.22.0", features = ["serde"] }
 
 [dev-dependencies]
-anyhow = "1.0.100"
+anyhow = "1.0.102"
 dotenvy = "0.15.7"
 serde_test = "1.0.177"
-test-log = { version = "0.2.18", default-features = false, features = ["trace"] }
-tokio = { version = "1.48.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
-tokio-websockets = { version = "0.12.3", features = ["server"] }
-tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
-uuid = { version = "1.18.1", features = ["v8"] }
+test-log = { version = "0.2.19", default-features = false, features = ["trace"] }
+tokio = { version = "1.50.0", features = ["fs", "macros", "rt-multi-thread", "time"] }
+tokio-websockets = { version = "0.13.1", features = ["server"] }
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
+uuid = { version = "1.22.0", features = ["v8"] }
 
 [features]
 default = []
