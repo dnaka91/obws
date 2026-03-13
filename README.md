@@ -15,6 +15,11 @@ Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 
 [obs-websocket]: https://github.com/obsproject/obs-websocket
 
+> [!IMPORTANT]
+> If you're viewing this project from GitHub, please note that the source is now living [at my own forge](https://forge.dnaka91.rocks/dnaka91/obws) and this is a mirror. Issues and PRs can still be opened here as well for the time being.
+>
+> An article about this move will be posted at some point in the future.
+
 ## Usage
 
 Add `obws` to your project with `cargo add obws@0.15.0` or add it manually to your
