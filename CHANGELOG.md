@@ -305,24 +305,24 @@ is currently in progress on the `v5-api` branch and the release is expected to b
 - Initial release.
 
 <!-- next-url -->
-[Unreleased]: https://github.com/dnaka91/obws/compare/v0.14.0...HEAD
-[0.14.0]: https://github.com/dnaka91/obws/compare/v0.13.0...v0.14.0
-[0.13.0]: https://github.com/dnaka91/obws/compare/v0.12.0...v0.13.0
-[0.12.0]: https://github.com/dnaka91/obws/compare/v0.11.5...v0.12.0
-[0.11.5]: https://github.com/dnaka91/obws/compare/v0.11.4...v0.11.5
-[0.11.4]: https://github.com/dnaka91/obws/compare/v0.11.3...v0.11.4
-[0.11.3]: https://github.com/dnaka91/obws/compare/v0.11.2...v0.11.3
-[0.11.2]: https://github.com/dnaka91/obws/compare/v0.11.1...v0.11.2
-[0.11.1]: https://github.com/dnaka91/obws/compare/v0.11.0...v0.11.1
-[0.11.0]: https://github.com/dnaka91/obws/compare/v0.10.0...v0.11.0
-[0.10.0]: https://github.com/dnaka91/obws/compare/v0.9.1...v0.10.0
-[0.9.1]: https://github.com/dnaka91/obws/compare/v0.9.0...v0.9.1
-[0.9.0]: https://github.com/dnaka91/obws/compare/v0.8.0...v0.9.0
-[0.8.0]: https://github.com/dnaka91/obws/compare/v0.7.0...v0.8.0
-[0.7.0]: https://github.com/dnaka91/obws/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/dnaka91/obws/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/dnaka91/obws/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/dnaka91/obws/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/dnaka91/obws/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/dnaka91/obws/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/dnaka91/obws/releases/tag/v0.1.0
+[Unreleased]: https://home.dnaka91.rocks/obws/compare/v0.14.0...HEAD
+[0.14.0]: https://home.dnaka91.rocks/obws/compare/v0.13.0...v0.14.0
+[0.13.0]: https://home.dnaka91.rocks/obws/compare/v0.12.0...v0.13.0
+[0.12.0]: https://home.dnaka91.rocks/obws/compare/v0.11.5...v0.12.0
+[0.11.5]: https://home.dnaka91.rocks/obws/compare/v0.11.4...v0.11.5
+[0.11.4]: https://home.dnaka91.rocks/obws/compare/v0.11.3...v0.11.4
+[0.11.3]: https://home.dnaka91.rocks/obws/compare/v0.11.2...v0.11.3
+[0.11.2]: https://home.dnaka91.rocks/obws/compare/v0.11.1...v0.11.2
+[0.11.1]: https://home.dnaka91.rocks/obws/compare/v0.11.0...v0.11.1
+[0.11.0]: https://home.dnaka91.rocks/obws/compare/v0.10.0...v0.11.0
+[0.10.0]: https://home.dnaka91.rocks/obws/compare/v0.9.1...v0.10.0
+[0.9.1]: https://home.dnaka91.rocks/obws/compare/v0.9.0...v0.9.1
+[0.9.0]: https://home.dnaka91.rocks/obws/compare/v0.8.0...v0.9.0
+[0.8.0]: https://home.dnaka91.rocks/obws/compare/v0.7.0...v0.8.0
+[0.7.0]: https://home.dnaka91.rocks/obws/compare/v0.6.0...v0.7.0
+[0.6.0]: https://home.dnaka91.rocks/obws/compare/v0.5.0...v0.6.0
+[0.5.0]: https://home.dnaka91.rocks/obws/compare/v0.4.0...v0.5.0
+[0.4.0]: https://home.dnaka91.rocks/obws/compare/v0.3.0...v0.4.0
+[0.3.0]: https://home.dnaka91.rocks/obws/compare/v0.2.0...v0.3.0
+[0.2.0]: https://home.dnaka91.rocks/obws/compare/v0.1.0...v0.2.0
+[0.1.0]: https://home.dnaka91.rocks/obws/releases/tag/v0.1.0

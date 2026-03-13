@@ -2,7 +2,7 @@
 //!
 //! Remote control OBS with the [obs-websocket] plugin from Rust 🦀.
 //!
-//! [obs-websocket]: https://github.com/Palakis/obs-websocket
+//! [obs-websocket]: https://github.com/obsproject/obs-websocket
 //!
 //! ## Example
 //!

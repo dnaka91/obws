@@ -49,5 +49,5 @@ file = "CHANGELOG.md"
 search = '<!-- next-url -->'
 replace = '''
 <!-- next-url -->
-[Unreleased]: https://github.com/dnaka91/obws/compare/{{tag_name}}...HEAD'''
+[Unreleased]: https://forge.dnaka91.rocks/dnaka91/obws/compare/{{tag_name}}...HEAD'''
 exactly = 1
