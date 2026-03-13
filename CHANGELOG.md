@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve feature flag documentation and enable feature markers on items in docs.rs, that show under what conditions certain items are available.
 - Revamp the integration tests to use a mocking server instead of running against a real OBS instance. This was long overdue as the tests didn't work anymore and it became harder and harder to make all tests work due to bugs or behavior in OBS.
 - Update to use the Rust Edition 2024. This mostly means internal changes for a more modern approach and a bump in the MSRV to 1.85.
+- Overall better documentation of the features flags available.
+- Switch from unsigned to signed integers for position coordinates, as well as some fixes to lifetime captures for the event stream. (Thanks [@tgrekov-mhl](https://github.com/tgrekov-mhl))
+- Fixes to unclosed delimiters in docs. (Thanks [@carlocorradini](https://github.com/carlocorradini))
+- Switch over from `tokio-tungstenite` to `tokio-websockets` which is a more lightweight alternative and promises to be faster at the same time. It's heavily used in the [`twilight`](https://github.com/twilight-rs/twilight) crate and originated from there, so hopes are high.
+- Bumped all dependencies and the MSRV due to requirements in the deps, which is now **1.89**.
+- Add APIs for the latest additions in **obs-websocket**, so all features up to and including v5.7 are no supported.
+- Better output of bitflag values which were previously printed as integers in the debug output and now have a textual representation that shows all enabled flags.
+- Various minor fixes and improvements.
 
 ## [0.14.0] - 2025-01-01
 
