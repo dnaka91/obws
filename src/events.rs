@@ -1,4 +1,5 @@
 //! All events that can be received from the API.
+#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs)]
 
 use std::{
     collections::BTreeMap,
@@ -641,6 +642,7 @@ pub enum Event {
 
 /// Volume meter information for a single input, describing the current volume level.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct InputVolumeMeter {
     /// Name of this input.
     #[serde(rename = "inputName")]
@@ -685,6 +687,7 @@ pub enum OutputState {
 
 /// A basic scene item, only describing identifier and position.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct BasicSceneItem {
     /// Identifier of this scene item.
     #[serde(rename = "sceneItemId")]
@@ -696,6 +699,7 @@ pub struct BasicSceneItem {
 
 /// The scene describes basic details about a single scene setup in OBS.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Scene {
     /// Name of this scene.
     #[serde(rename = "sceneName")]

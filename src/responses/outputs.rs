@@ -10,6 +10,7 @@ pub(crate) struct OutputList {
 
 /// Response value for [`crate::client::Outputs::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Output {
     /// Name of this output.
     #[serde(rename = "outputName")]
@@ -33,6 +34,7 @@ pub struct Output {
 
 /// Response value for [`crate::client::Outputs::list`] as part of [`Output`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct OutputFlags {
     /// Output supports audio.
     #[serde(rename = "OBS_OUTPUT_AUDIO")]
@@ -53,6 +55,7 @@ pub struct OutputFlags {
 
 /// Response value for [`crate::client::Outputs::status`].
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct OutputStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

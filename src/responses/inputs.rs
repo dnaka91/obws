@@ -17,6 +17,7 @@ pub(crate) struct Inputs {
 
 /// Response value for [`crate::client::Inputs::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Input {
     /// Identifier of the input source.
     #[serde(flatten)]
@@ -39,6 +40,7 @@ pub(crate) struct InputKinds {
 
 /// Response value for [`crate::client::Inputs::specials`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SpecialInputs {
     /// Name of the Desktop Audio input.
     #[serde(rename = "desktop1")]
@@ -70,6 +72,7 @@ pub(crate) struct DefaultInputSettings<T> {
 
 /// Response value for [`crate::client::Inputs::settings`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct InputSettings<T> {
     /// Object of settings for the input.
     #[serde(rename = "inputSettings")]
@@ -89,6 +92,7 @@ pub(crate) struct InputMuted {
 
 /// Response value for [`crate::client::Inputs::volume`].
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct InputVolume {
     /// Volume setting in mul.
     #[serde(rename = "inputVolumeMul")]
@@ -156,6 +160,7 @@ pub(crate) struct ListPropertyItems {
 
 /// Response value for [`crate::client::Inputs::properties_list_property_items`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[non_exhaustive]
 pub struct ListPropertyItem {
     /// Name of the item.
     #[serde(rename = "itemName")]
@@ -170,6 +175,7 @@ pub struct ListPropertyItem {
 
 /// Response value for [`crate::client::Inputs::create`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SceneItemId {
     ///  UUID of the newly created input.
     #[serde(rename = "inputUuid")]

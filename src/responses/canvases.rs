@@ -17,6 +17,7 @@ pub(crate) struct Canvases {
 
 /// Response value for [`crate::client::Canvases::list`].
 #[derive(Clone, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Canvas {
     /// Identifier of the canvas.
     #[serde(flatten)]

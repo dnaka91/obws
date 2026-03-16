@@ -20,6 +20,7 @@ pub(crate) struct Filters {
 
 /// Response value for [`crate::client::Filters::list`] and [`crate::client::Filters::get`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[non_exhaustive]
 pub struct SourceFilter {
     /// Whether the filter is enabled.
     #[serde(rename = "filterEnabled")]

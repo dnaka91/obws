@@ -19,6 +19,7 @@ pub(crate) struct MonitorList {
 
 /// Response value for [`crate::client::Ui::list_monitors`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Monitor {
     /// Name of this monitor.
     #[serde(rename = "monitorName")]
@@ -36,6 +37,7 @@ pub struct Monitor {
 
 /// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct MonitorSize {
     /// Pixel width.
     #[serde(rename = "monitorWidth")]
@@ -47,6 +49,7 @@ pub struct MonitorSize {
 
 /// Response value for [`crate::client::Ui::list_monitors`] as part of [`Monitor`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct MonitorPosition {
     /// Horizontal position on the screen.
     #[serde(rename = "monitorPositionX")]

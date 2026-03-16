@@ -19,7 +19,9 @@ async fn profiles() -> Result<()> {
         }),
     );
 
-    let Profiles { current, profiles } = client.list().await?;
+    let Profiles {
+        current, profiles, ..
+    } = client.list().await?;
 
     server.expect(
         "GetProfileList",

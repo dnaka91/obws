@@ -22,6 +22,7 @@ async fn scene_collections() -> Result<()> {
     let SceneCollections {
         current,
         collections,
+        ..
     } = client.list().await?;
 
     server.expect(

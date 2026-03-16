@@ -6,6 +6,7 @@ pub use super::ids::SourceId;
 
 /// Response value for [`crate::client::Sources::active`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SourceActive {
     /// Whether the source is showing in program.
     #[serde(rename = "videoActive")]

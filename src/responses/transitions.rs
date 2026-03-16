@@ -15,6 +15,7 @@ pub(crate) struct TransitionKinds {
 
 /// Response value for [`crate::client::Transitions::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SceneTransitionList {
     /// Identifier of the current scene transition.
     #[serde(flatten)]
@@ -29,6 +30,7 @@ pub struct SceneTransitionList {
 
 /// Response value for [`crate::client::Transitions::list`] as part of [`SceneTransitionList`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Transition {
     /// Identifier of the transition.
     #[serde(flatten)]
@@ -46,6 +48,7 @@ pub struct Transition {
 
 /// Response value for [`crate::client::Transitions::current`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[non_exhaustive]
 pub struct CurrentSceneTransition {
     /// Identifier of the transition.
     #[serde(flatten)]

@@ -5,6 +5,7 @@ use time::Duration;
 
 /// Response value for [`crate::client::Streaming::status`].
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct StreamStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

@@ -8,6 +8,7 @@ pub use super::ids::{CurrentPreviewSceneId, CurrentProgramSceneId, SceneId};
 
 /// Response value for [`crate::client::Scenes::list`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Scenes {
     /// Current program scene identifier. Can be [`None`] if internal state desync.
     #[serde(flatten)]
@@ -22,6 +23,7 @@ pub struct Scenes {
 
 /// Response value for [`crate::client::Scenes::list`] as part of [`Scenes`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Scene {
     /// Identifier of the scene.
     #[serde(flatten)]
@@ -40,6 +42,7 @@ pub(crate) struct Groups {
 
 /// Response value for [`crate::client::Scenes::current_program_scene`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct CurrentProgramScene {
     /// Current program scene identifier.
     #[serde(flatten)]
@@ -48,6 +51,7 @@ pub struct CurrentProgramScene {
 
 /// Response value for [`crate::client::Scenes::current_preview_scene`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct CurrentPreviewScene {
     /// Current preview scene identifier.
     #[serde(flatten)]
@@ -63,6 +67,7 @@ pub(crate) struct CreateScene {
 
 /// Response value for [`crate::client::Scenes::transition_override`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SceneTransitionOverride {
     /// Name of the overridden scene transition.
     #[serde(rename = "transitionName")]

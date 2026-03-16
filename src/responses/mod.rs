@@ -1,4 +1,5 @@
 //! All responses that can be received from the API.
+#![warn(clippy::exhaustive_enums, clippy::exhaustive_structs)]
 
 pub mod canvases;
 pub mod config;

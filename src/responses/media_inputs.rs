@@ -5,6 +5,7 @@ use time::Duration;
 
 /// Response value for [`crate::client::MediaInputs::status`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct MediaStatus {
     /// State of the media input.
     #[serde(rename = "mediaState")]

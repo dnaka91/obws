@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Response value for [`crate::client::General::version`].
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Version {
     /// Current OBS Studio version.
     #[serde(rename = "obsStudioVersion", alias = "obsVersion")]
@@ -31,6 +32,7 @@ pub struct Version {
 
 /// Response value for [`crate::client::General::stats`].
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct Stats {
     /// Current CPU usage in percent.
     #[serde(rename = "cpuUsage")]
@@ -69,6 +71,7 @@ pub struct Stats {
 
 /// Response value for [`crate::client::General::call_vendor_request`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct VendorResponse<T> {
     /// Name of the vendor.
     #[serde(rename = "vendorName")]

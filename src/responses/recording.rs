@@ -5,6 +5,7 @@ use time::Duration;
 
 /// Response value for [`crate::client::Recording::status`].
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct RecordStatus {
     /// Whether the output is active.
     #[serde(rename = "outputActive")]

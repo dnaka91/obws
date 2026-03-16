@@ -7,6 +7,7 @@ macro_rules! item_id {
         #[derive(
             Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
         )]
+        #[non_exhaustive]
         pub struct $ident {
             #[doc = concat!("Name of the", $name, ".")]
             #[serde(rename = $name_field)]

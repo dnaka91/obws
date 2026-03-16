@@ -23,6 +23,7 @@ pub(crate) struct SceneItemList {
 /// Response value for [`crate::client::SceneItems::list`] and
 /// [`crate::client::SceneItems::list_group`].
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SceneItem {
     /// Identifier of the scene item.
     #[serde(rename = "sceneItemId")]
@@ -71,6 +72,7 @@ pub(crate) struct GetSceneItemTransform {
 
 /// Response value for [`crate::client::SceneItems::transform`].
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, PartialOrd, Serialize)]
+#[non_exhaustive]
 pub struct SceneItemTransform {
     /// Base width (without scaling) of the source.
     #[serde(rename = "sourceWidth")]
