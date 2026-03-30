@@ -1,5 +1,5 @@
 use anyhow::Result;
-use obws::requests::scenes::SetTransitionOverride;
+use obws::requests::scenes::{SetName, SetTransitionOverride};
 use serde_json::json;
 use test_log::test;
 use time::Duration;
@@ -100,7 +100,11 @@ async fn scenes() -> Result<()> {
     );
 
     client
-        .set_name(TEST_SCENE, TEST_SCENE_RENAME.as_name().unwrap())
+        .set_name(SetName {
+            canvas: None,
+            scene: TEST_SCENE,
+            new_name: TEST_SCENE_RENAME.as_name().unwrap(),
+        })
         .await?;
 
     server.expect(
@@ -109,7 +113,9 @@ async fn scenes() -> Result<()> {
         json!({"sceneUuid": Uuid::new_v8([3; 16])}),
     );
 
-    client.create(TEST_SCENE_CREATE.as_name().unwrap()).await?;
+    client
+        .create(None, TEST_SCENE_CREATE.as_name().unwrap())
+        .await?;
 
     server.expect(
         "RemoveScene",
@@ -117,7 +123,7 @@ async fn scenes() -> Result<()> {
         json!(null),
     );
 
-    client.remove(TEST_SCENE_CREATE).await?;
+    client.remove(None, TEST_SCENE_CREATE).await?;
 
     server.expect(
         "GetSceneSceneTransitionOverride",
@@ -128,7 +134,7 @@ async fn scenes() -> Result<()> {
         }),
     );
 
-    client.transition_override(TEST_SCENE).await?;
+    client.transition_override(None, TEST_SCENE).await?;
 
     server.expect(
         "SetSceneSceneTransitionOverride",
@@ -142,6 +148,7 @@ async fn scenes() -> Result<()> {
 
     client
         .set_transition_override(SetTransitionOverride {
+            canvas: None,
             scene: TEST_SCENE,
             transition: Some(TEST_TRANSITION),
             duration: Some(Duration::seconds(5)),

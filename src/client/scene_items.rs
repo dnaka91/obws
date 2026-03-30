@@ -1,13 +1,15 @@
 use serde::{Serialize, de::DeserializeOwned};
+use uuid::Uuid;
 
 use super::Client;
 use crate::{
-    common::BlendMode,
+    common,
     error::Result,
     requests::{
         scene_items::{
-            CreateSceneItem, Duplicate, Id, Request, SetBlendMode, SetEnabled, SetIndex, SetLocked,
-            SetPrivateSettings, SetPrivateSettingsInternal, SetTransform, Source,
+            BlendMode, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, Remove, Request,
+            SetBlendMode, SetEnabled, SetIndex, SetLocked, SetPrivateSettings,
+            SetPrivateSettingsInternal, SetTransform, Source, Transform,
         },
         scenes::SceneId,
     },
@@ -22,9 +24,13 @@ pub struct SceneItems<'a> {
 impl<'a> SceneItems<'a> {
     /// Gets a list of all scene items in a scene.
     #[doc(alias = "GetSceneItemList")]
-    pub async fn list(&self, scene: SceneId<'_>) -> Result<Vec<responses::SceneItem>> {
+    pub async fn list(
+        &self,
+        canvas: Option<Uuid>,
+        scene: SceneId<'_>,
+    ) -> Result<Vec<responses::SceneItem>> {
         self.client
-            .send_message::<_, responses::SceneItemList>(Request::List { scene })
+            .send_message::<_, responses::SceneItemList>(Request::List { canvas, scene })
             .await
             .map(|sil| sil.scene_items)
     }
@@ -33,9 +39,13 @@ impl<'a> SceneItems<'a> {
     ///
     /// Using groups at all in OBS is discouraged, as they are very broken under the hood.
     #[doc(alias = "GetGroupSceneItemList")]
-    pub async fn list_group(&self, scene: SceneId<'_>) -> Result<Vec<responses::SceneItem>> {
+    pub async fn list_group(
+        &self,
+        canvas: Option<Uuid>,
+        scene: SceneId<'_>,
+    ) -> Result<Vec<responses::SceneItem>> {
         self.client
-            .send_message::<_, responses::SceneItemList>(Request::ListGroup { scene })
+            .send_message::<_, responses::SceneItemList>(Request::ListGroup { canvas, scene })
             .await
             .map(|sil| sil.scene_items)
     }
@@ -66,10 +76,8 @@ impl<'a> SceneItems<'a> {
 
     /// Removes a scene item from a scene.
     #[doc(alias = "RemoveSceneItem")]
-    pub async fn remove(&self, scene: SceneId<'_>, item_id: i64) -> Result<()> {
-        self.client
-            .send_message(Request::Remove { scene, item_id })
-            .await
+    pub async fn remove(&self, remove: Remove<'_>) -> Result<()> {
+        self.client.send_message(Request::Remove(remove)).await
     }
 
     /// Duplicates a scene item, copying all transform and crop info.
@@ -85,14 +93,10 @@ impl<'a> SceneItems<'a> {
     #[doc(alias = "GetSceneItemTransform")]
     pub async fn transform(
         &self,
-        scene: SceneId<'_>,
-        item_id: i64,
+        transform: Transform<'_>,
     ) -> Result<responses::SceneItemTransform> {
         self.client
-            .send_message::<_, responses::GetSceneItemTransform>(Request::Transform {
-                scene,
-                item_id,
-            })
+            .send_message::<_, responses::GetSceneItemTransform>(Request::Transform(transform))
             .await
             .map(|gsit| gsit.transform)
     }
@@ -107,9 +111,9 @@ impl<'a> SceneItems<'a> {
 
     /// Gets the enable state of a scene item.
     #[doc(alias = "GetSceneItemEnabled")]
-    pub async fn enabled(&self, scene: SceneId<'_>, item_id: i64) -> Result<bool> {
+    pub async fn enabled(&self, enabled: Enabled<'a>) -> Result<bool> {
         self.client
-            .send_message::<_, responses::SceneItemEnabled>(Request::Enabled { scene, item_id })
+            .send_message::<_, responses::SceneItemEnabled>(Request::Enabled(enabled))
             .await
             .map(|sie| sie.enabled)
     }
@@ -122,9 +126,9 @@ impl<'a> SceneItems<'a> {
 
     /// Gets the lock state of a scene item.
     #[doc(alias = "GetSceneItemLocked")]
-    pub async fn locked(&self, scene: SceneId<'_>, item_id: i64) -> Result<bool> {
+    pub async fn locked(&self, locked: Locked<'a>) -> Result<bool> {
         self.client
-            .send_message::<_, responses::SceneItemLocked>(Request::Locked { scene, item_id })
+            .send_message::<_, responses::SceneItemLocked>(Request::Locked(locked))
             .await
             .map(|sil| sil.locked)
     }
@@ -139,9 +143,9 @@ impl<'a> SceneItems<'a> {
     ///
     /// An index of 0 is at the bottom of the source list in the UI.
     #[doc(alias = "GetSceneItemIndex")]
-    pub async fn index(&self, scene: SceneId<'_>, item_id: i64) -> Result<u32> {
+    pub async fn index(&self, index: Index<'a>) -> Result<u32> {
         self.client
-            .send_message::<_, responses::SceneItemIndex>(Request::Index { scene, item_id })
+            .send_message::<_, responses::SceneItemIndex>(Request::Index(index))
             .await
             .map(|sii| sii.index)
     }
@@ -154,9 +158,9 @@ impl<'a> SceneItems<'a> {
 
     /// Gets the blend mode of a scene item.
     #[doc(alias = "GetSceneItemBlendMode")]
-    pub async fn blend_mode(&self, scene: SceneId<'_>, item_id: i64) -> Result<BlendMode> {
+    pub async fn blend_mode(&self, mode: BlendMode<'_>) -> Result<common::BlendMode> {
         self.client
-            .send_message::<_, responses::SceneItemBlendMode>(Request::BlendMode { scene, item_id })
+            .send_message::<_, responses::SceneItemBlendMode>(Request::BlendMode(mode))
             .await
             .map(|sibm| sibm.blend_mode)
     }

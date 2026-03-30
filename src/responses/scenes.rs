@@ -10,10 +10,11 @@ pub use super::ids::{CurrentPreviewSceneId, CurrentProgramSceneId, SceneId};
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[non_exhaustive]
 pub struct Scenes {
-    /// Current program scene identifier. Can be [`None`] if internal state desync.
+    /// Current program scene identifier. Can be [`None`] non-main canvas or if internal state
+    /// desync.
     #[serde(flatten)]
     pub current_program_scene: Option<CurrentProgramSceneId>,
-    /// Current preview scene identifier. [`None`] if not in studio mode.
+    /// Current preview scene identifier. [`None`] if not in studio mode or non-main canvas.
     #[serde(flatten)]
     pub current_preview_scene: Option<CurrentPreviewSceneId>,
     /// Array of scenes in OBS.

@@ -154,6 +154,7 @@ async fn inputs() -> Result<()> {
 
     let scene_item_id = client
         .create(Create {
+            canvas: None,
             scene: TEST_SCENE,
             input: "new-input",
             kind: INPUT_KIND_VLC,

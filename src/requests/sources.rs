@@ -4,14 +4,19 @@ use std::path::Path;
 
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use uuid::Uuid;
 
 pub use super::ids::SourceId;
 
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetSourceActive")]
     Active {
+        /// UUID of the canvas the source is in, if using a [`SourceId::Name`].
+        #[serde(rename = "canvasUuid")]
+        canvas: Option<Uuid>,
         /// Identifier of the source to get the active state of.
         #[serde(flatten)]
         source: SourceId<'a>,
@@ -33,6 +38,9 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct TakeScreenshot<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source to take a screenshot of.
     #[serde(flatten)]
     pub source: SourceId<'a>,
@@ -57,6 +65,9 @@ pub struct TakeScreenshot<'a> {
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SaveScreenshot<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source to take a screenshot of.
     #[serde(flatten)]
     pub source: SourceId<'a>,

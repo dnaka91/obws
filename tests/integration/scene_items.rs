@@ -2,8 +2,9 @@ use anyhow::Result;
 use obws::{
     common::{BlendMode, BoundsType},
     requests::scene_items::{
-        Bounds, CreateSceneItem, Duplicate, Id, SceneItemTransform, SetBlendMode, SetEnabled,
-        SetIndex, SetLocked, SetPrivateSettings, SetTransform, Source,
+        self, Bounds, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, Remove,
+        SceneItemTransform, SetBlendMode, SetEnabled, SetIndex, SetLocked, SetPrivateSettings,
+        SetTransform, Source, Transform,
     },
 };
 use serde_json::json;
@@ -23,7 +24,7 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItems": []}),
     );
 
-    client.list(TEST_SCENE).await?;
+    client.list(None, TEST_SCENE).await?;
 
     server.expect(
         "GetGroupSceneItemList",
@@ -31,7 +32,7 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItems": []}),
     );
 
-    client.list_group(TEST_GROUP).await?;
+    client.list_group(None, TEST_GROUP).await?;
 
     server.expect(
         "GetSceneItemId",
@@ -44,6 +45,7 @@ async fn scene_items() -> Result<()> {
 
     let test_text_id = client
         .id(Id {
+            canvas: None,
             scene: TEST_SCENE,
             source: TEST_TEXT.as_name().unwrap(),
             search_offset: None,
@@ -64,6 +66,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .source(Source {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
         })
@@ -81,6 +84,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .duplicate(Duplicate {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             destination: Some(TEST_SCENE_2.into()),
@@ -99,6 +103,7 @@ async fn scene_items() -> Result<()> {
 
     let id = client
         .create(CreateSceneItem {
+            canvas: None,
             scene: TEST_SCENE_2,
             source: TEST_TEXT.as_source(),
             enabled: Some(true),
@@ -114,7 +119,13 @@ async fn scene_items() -> Result<()> {
         json!(null),
     );
 
-    client.remove(TEST_SCENE_2, id).await?;
+    client
+        .remove(Remove {
+            canvas: None,
+            scene: TEST_SCENE_2,
+            item_id: id,
+        })
+        .await?;
 
     server.expect(
         "GetSceneItemTransform",
@@ -147,7 +158,13 @@ async fn scene_items() -> Result<()> {
         }),
     );
 
-    client.transform(TEST_SCENE, test_text_id).await?;
+    client
+        .transform(Transform {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
+        .await?;
 
     server.expect(
         "SetSceneItemTransform",
@@ -163,6 +180,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .set_transform(SetTransform {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             transform: SceneItemTransform {
@@ -184,7 +202,13 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItemEnabled": true}),
     );
 
-    let enabled = client.enabled(TEST_SCENE, test_text_id).await?;
+    let enabled = client
+        .enabled(Enabled {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
+        .await?;
 
     server.expect(
         "SetSceneItemEnabled",
@@ -198,6 +222,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .set_enabled(SetEnabled {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             enabled: !enabled,
@@ -213,7 +238,13 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItemLocked": false}),
     );
 
-    let locked = client.locked(TEST_SCENE, test_text_id).await?;
+    let locked = client
+        .locked(Locked {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
+        .await?;
 
     server.expect(
         "SetSceneItemLocked",
@@ -227,6 +258,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .set_locked(SetLocked {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             locked: !locked,
@@ -242,7 +274,13 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItemIndex": 1}),
     );
 
-    client.index(TEST_SCENE, test_text_id).await?;
+    client
+        .index(Index {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
+        .await?;
 
     server.expect(
         "SetSceneItemIndex",
@@ -257,6 +295,7 @@ async fn scene_items() -> Result<()> {
     client
         .set_index(SetIndex {
             scene: TEST_SCENE,
+            canvas: None,
             item_id: test_text_id,
             index: 0,
         })
@@ -271,7 +310,13 @@ async fn scene_items() -> Result<()> {
         json!({"sceneItemBlendMode": "OBS_BLEND_NORMAL"}),
     );
 
-    let mode = client.blend_mode(TEST_SCENE, test_text_id).await?;
+    let mode = client
+        .blend_mode(scene_items::BlendMode {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
+        .await?;
     assert_eq!(BlendMode::Normal, mode);
 
     server.expect(
@@ -286,6 +331,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .set_blend_mode(SetBlendMode {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             mode: BlendMode::Multiply,

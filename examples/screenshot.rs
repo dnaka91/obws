@@ -16,6 +16,7 @@ async fn main() -> Result<()> {
         .sources()
         .take_screenshot(TakeScreenshot {
             source: "OBWS-TEST-Scene".into(),
+            canvas: None,
             width: None,
             height: None,
             compression_quality: None,

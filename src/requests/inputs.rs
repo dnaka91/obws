@@ -3,6 +3,7 @@
 use serde::Serialize;
 use serde_with::skip_serializing_none;
 use time::Duration;
+use uuid::Uuid;
 
 pub use super::ids::InputId;
 use super::scenes::SceneId;
@@ -257,6 +258,8 @@ pub enum Volume {
 /// Request information for [`crate::client::Inputs::create`].
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Create<'a, T> {
+    /// UUID of the canvas the source is in, if using the [`SceneId::Name`].
+    pub canvas: Option<Uuid>,
     /// Name of the scene to add the input to as a scene item.
     pub scene: SceneId<'a>,
     /// Name of the new input to created.
@@ -273,6 +276,8 @@ pub struct Create<'a, T> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct CreateInputInternal<'a> {
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     #[serde(flatten)]
     pub scene: SceneId<'a>,
     #[serde(rename = "inputName")]

@@ -106,6 +106,7 @@ async fn ui() -> Result<()> {
 
     client
         .open_source_projector(OpenSourceProjector {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             location: Some(Location::MonitorIndex(-1)),
         })

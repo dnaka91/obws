@@ -21,7 +21,7 @@ async fn sources() -> Result<()> {
         }),
     );
 
-    client.active(TEST_TEXT.as_source()).await?;
+    client.active(None, TEST_TEXT.as_source()).await?;
 
     server.expect(
         "GetSourceScreenshot",
@@ -37,6 +37,7 @@ async fn sources() -> Result<()> {
 
     client
         .take_screenshot(TakeScreenshot {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             width: Some(100),
             height: Some(100),
@@ -57,6 +58,7 @@ async fn sources() -> Result<()> {
 
     client
         .save_screenshot(SaveScreenshot {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             file_path: Path::new("/tmp/file.png"),
             width: None,

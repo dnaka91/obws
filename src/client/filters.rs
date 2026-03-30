@@ -1,12 +1,13 @@
 use serde::{Serialize, de::DeserializeOwned};
+use uuid::Uuid;
 
 use super::Client;
 use crate::{
     error::Result,
     requests::{
         filters::{
-            Create, CreateInternal, Request, SetEnabled, SetIndex, SetName, SetSettings,
-            SetSettingsInternal,
+            Create, CreateInternal, Get, Remove, Request, SetEnabled, SetIndex, SetName,
+            SetSettings, SetSettingsInternal,
         },
         sources::SourceId,
     },
@@ -30,9 +31,13 @@ impl Filters<'_> {
 
     /// Gets an array of all of a source's filters.
     #[doc(alias = "GetSourceFilterList")]
-    pub async fn list(&self, source: SourceId<'_>) -> Result<Vec<responses::SourceFilter>> {
+    pub async fn list(
+        &self,
+        canvas: Option<Uuid>,
+        source: SourceId<'_>,
+    ) -> Result<Vec<responses::SourceFilter>> {
         self.client
-            .send_message::<_, responses::Filters>(Request::List { source })
+            .send_message::<_, responses::Filters>(Request::List { canvas, source })
             .await
             .map(|f| f.filters)
     }
@@ -60,6 +65,7 @@ impl Filters<'_> {
         self.client
             .send_message(Request::Create(CreateInternal {
                 source: filter.source,
+                canvas: filter.canvas,
                 filter: filter.filter,
                 kind: filter.kind,
                 settings: filter
@@ -73,10 +79,8 @@ impl Filters<'_> {
 
     /// Removes a filter from a source.
     #[doc(alias = "RemoveSourceFilter")]
-    pub async fn remove(&self, source: SourceId<'_>, filter: &str) -> Result<()> {
-        self.client
-            .send_message(Request::Remove { source, filter })
-            .await
+    pub async fn remove(&self, filter: Remove<'_>) -> Result<()> {
+        self.client.send_message(Request::Remove(filter)).await
     }
 
     /// Sets the name of a source filter (rename).
@@ -87,10 +91,8 @@ impl Filters<'_> {
 
     /// Gets the info for a specific source filter.
     #[doc(alias = "GetSourceFilter")]
-    pub async fn get(&self, source: SourceId<'_>, filter: &str) -> Result<responses::SourceFilter> {
-        self.client
-            .send_message(Request::Get { source, filter })
-            .await
+    pub async fn get(&self, filter: Get<'_>) -> Result<responses::SourceFilter> {
+        self.client.send_message(Request::Get(filter)).await
     }
 
     /// Sets the index position of a filter on a source.
@@ -108,6 +110,7 @@ impl Filters<'_> {
         self.client
             .send_message(Request::SetSettings(SetSettingsInternal {
                 source: settings.source,
+                canvas: settings.canvas,
                 filter: settings.filter,
                 settings: serde_json::to_value(&settings.settings)
                     .map_err(crate::error::SerializeCustomDataError)?,

@@ -5,6 +5,8 @@ use std::fmt::{self, Display};
 use bitflags::bitflags;
 use derive_more::Debug;
 use serde::Serialize;
+use serde_with::skip_serializing_none;
+use uuid::Uuid;
 
 use super::{inputs::InputId, sources::SourceId};
 use crate::common::FlagsDebug;
@@ -75,6 +77,8 @@ pub(crate) struct OpenVideoMixProjectorInternal {
 /// Request information for [`crate::client::Ui::open_source_projector`].
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct OpenSourceProjector<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    pub canvas: Option<Uuid>,
     /// Identifier of the source to open a projector for.
     pub source: SourceId<'a>,
     /// Optional location for the new projector window.
@@ -82,11 +86,15 @@ pub struct OpenSourceProjector<'a> {
 }
 
 /// Request information for [`crate::client::Ui::open_source_projector`].
+#[skip_serializing_none]
 #[derive(Serialize)]
 pub(crate) struct OpenSourceProjectorInternal<'a> {
     /// Identifier of the source to open a projector for.
     #[serde(flatten)]
     pub source: SourceId<'a>,
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Optional location for the new projector window.
     #[serde(flatten)]
     pub location: Option<LocationInternal>,

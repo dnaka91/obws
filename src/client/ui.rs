@@ -87,6 +87,7 @@ impl<'a> Ui<'a> {
     pub async fn open_source_projector(&self, open: OpenSourceProjector<'a>) -> Result<()> {
         self.client
             .send_message(Request::OpenSourceProjector(OpenSourceProjectorInternal {
+                canvas: open.canvas,
                 source: open.source,
                 location: open.location.map(Into::into),
             }))

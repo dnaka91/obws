@@ -1,3 +1,5 @@
+use uuid::Uuid;
+
 use super::Client;
 use crate::{
     error::Result,
@@ -13,8 +15,14 @@ pub struct Sources<'a> {
 impl Sources<'_> {
     /// Gets the active and show state of a source.
     #[doc(alias = "GetSourceActive")]
-    pub async fn active(&self, source: SourceId<'_>) -> Result<responses::SourceActive> {
-        self.client.send_message(Request::Active { source }).await
+    pub async fn active(
+        &self,
+        canvas: Option<Uuid>,
+        source: SourceId<'_>,
+    ) -> Result<responses::SourceActive> {
+        self.client
+            .send_message(Request::Active { canvas, source })
+            .await
     }
 
     /// Gets a Base64-encoded screenshot of a source.

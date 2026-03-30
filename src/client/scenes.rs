@@ -3,7 +3,7 @@ use uuid::Uuid;
 use super::Client;
 use crate::{
     error::Result,
-    requests::scenes::{Request, SceneId, SetTransitionOverride},
+    requests::scenes::{Request, SceneId, SetName, SetTransitionOverride},
     responses::scenes as responses,
 };
 
@@ -32,6 +32,9 @@ impl Scenes<'_> {
     }
 
     /// Gets the current program scene.
+    ///
+    /// **Note:** Canvases do not have any concept of a program or preview scene, so this request
+    /// does not support canvases.
     #[doc(alias = "GetCurrentProgramScene")]
     pub async fn current_program_scene(&self) -> Result<responses::CurrentProgramScene> {
         self.client.send_message(Request::CurrentProgramScene).await
@@ -69,35 +72,36 @@ impl Scenes<'_> {
 
     /// Sets the name of a scene (rename).
     #[doc(alias = "SetSceneName")]
-    pub async fn set_name(&self, scene: SceneId<'_>, new_name: &str) -> Result<()> {
-        self.client
-            .send_message(Request::SetName { scene, new_name })
-            .await
+    pub async fn set_name(&self, name: SetName<'_>) -> Result<()> {
+        self.client.send_message(Request::SetName(name)).await
     }
 
     /// Creates a new scene in OBS.
     #[doc(alias = "CreateScene")]
-    pub async fn create(&self, name: &str) -> Result<Uuid> {
+    pub async fn create(&self, canvas: Option<Uuid>, name: &str) -> Result<Uuid> {
         self.client
-            .send_message::<_, responses::CreateScene>(Request::Create { name })
+            .send_message::<_, responses::CreateScene>(Request::Create { canvas, name })
             .await
             .map(|cs| cs.uuid)
     }
 
     /// Removes a scene from OBS.
     #[doc(alias = "RemoveScene")]
-    pub async fn remove(&self, scene: SceneId<'_>) -> Result<()> {
-        self.client.send_message(Request::Remove { scene }).await
+    pub async fn remove(&self, canvas: Option<Uuid>, scene: SceneId<'_>) -> Result<()> {
+        self.client
+            .send_message(Request::Remove { canvas, scene })
+            .await
     }
 
     /// Gets the scene transition overridden for a scene.
     #[doc(alias = "GetSceneSceneTransitionOverride")]
     pub async fn transition_override(
         &self,
+        canvas: Option<Uuid>,
         scene: SceneId<'_>,
     ) -> Result<responses::SceneTransitionOverride> {
         self.client
-            .send_message(Request::TransitionOverride { scene })
+            .send_message(Request::TransitionOverride { canvas, scene })
             .await
     }
 

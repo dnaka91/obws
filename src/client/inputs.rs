@@ -139,6 +139,7 @@ impl Inputs<'_> {
     {
         self.client
             .send_message(Request::Create(CreateInputInternal {
+                canvas: input.canvas,
                 scene: input.scene,
                 input: input.input,
                 kind: input.kind,

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use obws::requests::filters::{Create, SetEnabled, SetIndex, SetName, SetSettings};
+use obws::requests::filters::{Create, Get, Remove, SetEnabled, SetIndex, SetName, SetSettings};
 use serde_json::json;
 use test_log::test;
 
@@ -26,7 +26,7 @@ async fn filters() -> Result<()> {
         json!({"filters": []}),
     );
 
-    client.list(TEST_TEXT.as_source()).await?;
+    client.list(None, TEST_TEXT.as_source()).await?;
 
     server.expect(
         "GetSourceFilterDefaultSettings",
@@ -51,6 +51,7 @@ async fn filters() -> Result<()> {
 
     client
         .create(Create {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             filter: TEST_FILTER_2,
             kind: FILTER_COLOR,
@@ -67,7 +68,13 @@ async fn filters() -> Result<()> {
         json!(null),
     );
 
-    client.remove(TEST_TEXT.as_source(), TEST_FILTER_2).await?;
+    client
+        .remove(Remove {
+            canvas: None,
+            source: TEST_TEXT.as_source(),
+            filter: TEST_FILTER_2,
+        })
+        .await?;
 
     server.expect(
         "SetSourceFilterName",
@@ -81,6 +88,7 @@ async fn filters() -> Result<()> {
 
     client
         .set_name(SetName {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             filter: TEST_FILTER,
             new_name: TEST_FILTER_RENAME,
@@ -101,7 +109,13 @@ async fn filters() -> Result<()> {
         }),
     );
 
-    client.get(TEST_TEXT.as_source(), TEST_FILTER).await?;
+    client
+        .get(Get {
+            canvas: None,
+            source: TEST_TEXT.as_source(),
+            filter: TEST_FILTER,
+        })
+        .await?;
 
     server.expect(
         "SetSourceFilterIndex",
@@ -115,6 +129,7 @@ async fn filters() -> Result<()> {
 
     client
         .set_index(SetIndex {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             filter: TEST_FILTER,
             index: 0,
@@ -134,6 +149,7 @@ async fn filters() -> Result<()> {
 
     client
         .set_settings(SetSettings {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             filter: TEST_FILTER,
             settings: serde_json::Map::new(),
@@ -153,6 +169,7 @@ async fn filters() -> Result<()> {
 
     client
         .set_enabled(SetEnabled {
+            canvas: None,
             source: TEST_TEXT.as_source(),
             filter: TEST_FILTER,
             enabled: false,

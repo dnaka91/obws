@@ -2,9 +2,11 @@
 
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use uuid::Uuid;
 
 use super::sources::SourceId;
 
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
@@ -12,6 +14,9 @@ pub(crate) enum Request<'a> {
     KindList,
     #[serde(rename = "GetSourceFilterList")]
     List {
+        /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+        #[serde(rename = "canvasUuid")]
+        canvas: Option<Uuid>,
         /// Identifier of the source.
         #[serde(flatten)]
         source: SourceId<'a>,
@@ -25,25 +30,11 @@ pub(crate) enum Request<'a> {
     #[serde(rename = "CreateSourceFilter")]
     Create(CreateInternal<'a>),
     #[serde(rename = "RemoveSourceFilter")]
-    Remove {
-        /// Identifier of the source the filter is on.
-        #[serde(flatten)]
-        source: SourceId<'a>,
-        /// Name of the filter to remove.
-        #[serde(rename = "filterName")]
-        filter: &'a str,
-    },
+    Remove(Remove<'a>),
     #[serde(rename = "SetSourceFilterName")]
     SetName(SetName<'a>),
     #[serde(rename = "GetSourceFilter")]
-    Get {
-        /// Identifier of the source.
-        #[serde(flatten)]
-        source: SourceId<'a>,
-        /// Name of the filter.
-        #[serde(rename = "filterName")]
-        filter: &'a str,
-    },
+    Get(Get<'a>),
     #[serde(rename = "SetSourceFilterIndex")]
     SetIndex(SetIndex<'a>),
     #[serde(rename = "SetSourceFilterSettings")]
@@ -61,6 +52,8 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 /// Request information for [`crate::client::Filters::create`].
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Create<'a, T> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    pub canvas: Option<Uuid>,
     /// Identifier of the source to add the filter to.
     pub source: SourceId<'a>,
     /// Name of the new filter to be created.
@@ -75,6 +68,9 @@ pub struct Create<'a, T> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct CreateInternal<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source to add the filter to.
     #[serde(flatten)]
     pub source: SourceId<'a>,
@@ -89,10 +85,30 @@ pub(crate) struct CreateInternal<'a> {
     pub settings: Option<serde_json::Value>,
 }
 
+/// Request information for [`crate::client::Filters::remove`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Remove<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the source the filter is on.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
+    /// Name of the filter to remove.
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
+}
+
 /// Request information for [`crate::client::Filters::set_name`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetName<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
     pub source: SourceId<'a>,
@@ -104,10 +120,30 @@ pub struct SetName<'a> {
     pub new_name: &'a str,
 }
 
+/// Request information for [`crate::client::Filters::get`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Get<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the source.
+    #[serde(flatten)]
+    pub source: SourceId<'a>,
+    /// Name of the filter.
+    #[serde(rename = "filterName")]
+    pub filter: &'a str,
+}
+
 /// Request information for [`crate::client::Filters::set_index`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetIndex<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
     pub source: SourceId<'a>,
@@ -122,6 +158,8 @@ pub struct SetIndex<'a> {
 /// Request information for [`crate::client::Filters::set_settings`].
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetSettings<'a, T> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    pub canvas: Option<Uuid>,
     /// Identifier of the source the filter is on.
     pub source: SourceId<'a>,
     /// Name of the filter to set the settings of.
@@ -133,8 +171,12 @@ pub struct SetSettings<'a, T> {
 }
 
 /// Request information for [`crate::client::Filters::set_settings`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct SetSettingsInternal<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
     pub source: SourceId<'a>,
@@ -150,9 +192,13 @@ pub(crate) struct SetSettingsInternal<'a> {
 }
 
 /// Request information for [`crate::client::Filters::set_enabled`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetEnabled<'a> {
+    /// UUID of the canvas the source is in, if using the [`SourceId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the source the filter is on.
     #[serde(flatten)]
     pub source: SourceId<'a>,

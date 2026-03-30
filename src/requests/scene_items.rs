@@ -2,21 +2,29 @@
 
 use serde::Serialize;
 use serde_with::skip_serializing_none;
+use uuid::Uuid;
 
 use super::{ids::DestinationSceneId, scenes::SceneId, sources::SourceId};
-use crate::common::{Alignment, BlendMode, BoundsType};
+use crate::common::{self, Alignment, BoundsType};
 
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[serde(tag = "requestType", content = "requestData")]
 pub(crate) enum Request<'a> {
     #[serde(rename = "GetSceneItemList")]
     List {
+        /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+        #[serde(rename = "canvasUuid")]
+        canvas: Option<Uuid>,
         /// Identifier of the scene to get the items of.
         #[serde(flatten)]
         scene: SceneId<'a>,
     },
     #[serde(rename = "GetGroupSceneItemList")]
     ListGroup {
+        /// UUID of the canvas the group is in, if using the [`SceneId::Name`].
+        #[serde(rename = "canvasUuid")]
+        canvas: Option<Uuid>,
         /// Identifier of the group to get the items of.
         #[serde(flatten)]
         scene: SceneId<'a>,
@@ -28,69 +36,27 @@ pub(crate) enum Request<'a> {
     #[serde(rename = "CreateSceneItem")]
     Create(CreateSceneItem<'a>),
     #[serde(rename = "RemoveSceneItem")]
-    Remove {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    Remove(Remove<'a>),
     #[serde(rename = "DuplicateSceneItem")]
     Duplicate(Duplicate<'a>),
     #[serde(rename = "GetSceneItemTransform")]
-    Transform {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    Transform(Transform<'a>),
     #[serde(rename = "SetSceneItemTransform")]
     SetTransform(SetTransform<'a>),
     #[serde(rename = "GetSceneItemEnabled")]
-    Enabled {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    Enabled(Enabled<'a>),
     #[serde(rename = "SetSceneItemEnabled")]
     SetEnabled(SetEnabled<'a>),
     #[serde(rename = "GetSceneItemLocked")]
-    Locked {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    Locked(Locked<'a>),
     #[serde(rename = "SetSceneItemLocked")]
     SetLocked(SetLocked<'a>),
     #[serde(rename = "GetSceneItemIndex")]
-    Index {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    Index(Index<'a>),
     #[serde(rename = "SetSceneItemIndex")]
     SetIndex(SetIndex<'a>),
     #[serde(rename = "GetSceneItemBlendMode")]
-    BlendMode {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        ///  Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    BlendMode(BlendMode<'a>),
     #[serde(rename = "SetSceneItemBlendMode")]
     SetBlendMode(SetBlendMode<'a>),
     #[serde(rename = "GetSceneItemPrivateSettings")]
@@ -117,6 +83,9 @@ impl<'a> From<Request<'a>> for super::RequestType<'a> {
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Id<'a> {
+    /// UUID of the canvas the scene or group is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene or group to search in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -135,6 +104,9 @@ pub struct Id<'a> {
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Source<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -148,6 +120,9 @@ pub struct Source<'a> {
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct CreateSceneItem<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene to create the new item in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -159,11 +134,30 @@ pub struct CreateSceneItem<'a> {
     pub enabled: Option<bool>,
 }
 
+/// Request information for [`crate::client::SceneItems::remove`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Remove<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::duplicate`].
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct Duplicate<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -175,10 +169,30 @@ pub struct Duplicate<'a> {
     pub destination: Option<DestinationSceneId<'a>>,
 }
 
+/// Request information for [`crate::client::SceneItems::transform`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Transform<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_transform`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetTransform<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -313,10 +327,30 @@ pub struct Crop {
     pub bottom: Option<u32>,
 }
 
+/// Request information for [`crate::client::SceneItems::enabled`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Enabled<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_enabled`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetEnabled<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -328,10 +362,30 @@ pub struct SetEnabled<'a> {
     pub enabled: bool,
 }
 
+/// Request information for [`crate::client::SceneItems::locked`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Locked<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_locked`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetLocked<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -343,10 +397,30 @@ pub struct SetLocked<'a> {
     pub locked: bool,
 }
 
+/// Request information for [`crate::client::SceneItems::index`].
+#[skip_serializing_none]
+#[derive(Default, Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct Index<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_index`].
+#[skip_serializing_none]
 #[derive(Default, Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetIndex<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -358,10 +432,30 @@ pub struct SetIndex<'a> {
     pub index: u32,
 }
 
+/// Request information for [`crate::client::SceneItems::blend_mode`].
+#[skip_serializing_none]
+#[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct BlendMode<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    ///  Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_blend_mode`].
+#[skip_serializing_none]
 #[derive(Serialize)]
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetBlendMode<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
@@ -370,7 +464,7 @@ pub struct SetBlendMode<'a> {
     pub item_id: i64,
     /// New blend mode.
     #[serde(rename = "sceneItemBlendMode")]
-    pub mode: BlendMode,
+    pub mode: common::BlendMode,
 }
 
 /// Request information for [`crate::client::SceneItems::set_private_settings`].
