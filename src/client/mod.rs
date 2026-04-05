@@ -145,7 +145,8 @@ where
     /// events are listened to, with the exception of high volume events.
     pub event_subscriptions: Option<EventSubscription>,
     /// Whether to use TLS when connecting. Only useful when OBS runs on a remote machine.
-    #[cfg(feature = "tls")]
+    ///
+    /// **Note:** This flag will do nothing unless the `tls` crate features is enabled.
     #[cfg_attr(feature = "builder", builder(default))]
     pub tls: bool,
     /// Capacity of the broadcast channel for events. The default is [`DEFAULT_BROADCAST_CAPACITY`]
@@ -218,15 +219,12 @@ where
     H: AsRef<str>,
     P: AsRef<str>,
 {
-    #[cfg(feature = "tls")]
     fn tls(&self) -> bool {
-        self.tls
-    }
-
-    #[cfg(not(feature = "tls"))]
-    #[expect(clippy::unused_self)]
-    fn tls(&self) -> bool {
-        false
+        if cfg!(feature = "tls") {
+            self.tls
+        } else {
+            false
+        }
     }
 }
 
@@ -251,7 +249,6 @@ impl Client {
             } else {
                 Some(EventSubscription::NONE)
             },
-            #[cfg(feature = "tls")]
             tls: false,
             broadcast_capacity: DEFAULT_BROADCAST_CAPACITY,
             connect_timeout: DEFAULT_CONNECT_TIMEOUT,

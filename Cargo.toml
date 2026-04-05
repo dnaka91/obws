@@ -78,7 +78,7 @@ test-integration = []
 ##
 ## For example, have a look at [`ConnectConfig::builder`](crate::client::ConnectConfig::builder).
 builder = ["dep:bon"]
-doc = ["builder", "events", "tls", "dep:document-features"]
+doc = ["builder", "events", "dep:document-features"]
 ## The event feature enables receiving of user interaction events from `obs-websocket`.
 ##
 ## This is not enabled by default, as it has a large impact on the compilation time. Enabling it is
