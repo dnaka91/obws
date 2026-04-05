@@ -47,6 +47,7 @@ the equivalent function calls.
 | GetStreamServiceSettings  | [`Config::stream_service_settings`](crate::client::Config::stream_service_settings)         |
 | SetStreamServiceSettings  | [`Config::set_stream_service_settings`](crate::client::Config::set_stream_service_settings) |
 | GetRecordDirectory        | [`Config::record_directory`](crate::client::Config::record_directory)                       |
+| SetRecordDirectory        | [`Config::set_record_directory`](crate::client::Config::set_record_directory)               |
 
 ## Sources Requests
 
@@ -55,6 +56,12 @@ the equivalent function calls.
 | GetSourceActive      | [`Sources::active`](crate::client::Sources::active)                   |
 | GetSourceScreenshot  | [`Sources::take_screenshot`](crate::client::Sources::take_screenshot) |
 | SaveSourceScreenshot | [`Sources::save_screenshot`](crate::client::Sources::save_screenshot) |
+
+## Canvases Requests
+
+| obs-websocket | obws                                              |
+| ------------- | ------------------------------------------------- |
+| GetCanvasList | [`Canvases::list`](crate::client::Canvases::list) |
 
 ## Scenes Requests
 
@@ -98,6 +105,10 @@ the equivalent function calls.
 | SetInputAudioMonitorType            | [`Inputs::set_audio_monitor_type`](crate::client::Inputs::set_audio_monitor_type)                 |
 | GetInputAudioTracks                 | [`Inputs::audio_tracks`](crate::client::Inputs::audio_tracks)                                     |
 | SetInputAudioTracks                 | [`Inputs::set_audio_tracks`](crate::client::Inputs::set_audio_tracks)                             |
+| GetInputDeinterlaceMode             | [`Inputs::deinterlace_mode`](crate::client::Inputs::deinterlace_mode)                             |
+| SetInputDeinterlaceMode             | [`Inputs::set_deinterlace_mode`](crate::client::Inputs::set_deinterlace_mode)                     |
+| GetInputDeinterlaceFieldOrder       | [`Inputs::deinterlace_field_order`](crate::client::Inputs::deinterlace_field_order)               |
+| SetInputDeinterlaceFieldOrder       | [`Inputs::set_deinterlace_field_order`](crate::client::Inputs::set_deinterlace_field_order)       |
 | GetInputPropertiesListPropertyItems | [`Inputs::properties_list_property_items`](crate::client::Inputs::properties_list_property_items) |
 | PressInputPropertiesButton          | [`Inputs::press_properties_button`](crate::client::Inputs::press_properties_button)               |
 
@@ -119,6 +130,7 @@ the equivalent function calls.
 
 | obs-websocket                  | obws                                                                    |
 | ------------------------------ | ----------------------------------------------------------------------- |
+| GetSourceFilterKindList        | [`Filters::list_kinds`](crate::client::Filters::list_kinds)             |
 | GetSourceFilterList            | [`Filters::list`](crate::client::Filters::list)                         |
 | GetSourceFilterDefaultSettings | [`Filters::default_settings`](crate::client::Filters::default_settings) |
 | CreateSourceFilter             | [`Filters::create`](crate::client::Filters::create)                     |
@@ -136,6 +148,7 @@ the equivalent function calls.
 | GetSceneItemList                | [`SceneItems::list`](crate::client::SceneItems::list)                                 |
 | GetGroupSceneItemList           | [`SceneItems::list_group`](crate::client::SceneItems::list_group)                     |
 | GetSceneItemId                  | [`SceneItems::id`](crate::client::SceneItems::id)                                     |
+| GetSceneItemSource              | [`SceneItems::source`](crate::client::SceneItems::source)                             |
 | CreateSceneItem                 | [`SceneItems::create`](crate::client::SceneItems::create)                             |
 | RemoveSceneItem                 | [`SceneItems::remove`](crate::client::SceneItems::remove)                             |
 | DuplicateSceneItem              | [`SceneItems::duplicate`](crate::client::SceneItems::duplicate)                       |
