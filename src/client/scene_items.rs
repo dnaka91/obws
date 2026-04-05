@@ -7,8 +7,8 @@ use crate::{
     error::Result,
     requests::{
         scene_items::{
-            BlendMode, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, Remove, Request,
-            SetBlendMode, SetEnabled, SetIndex, SetLocked, SetPrivateSettings,
+            BlendMode, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, PrivateSettings,
+            Remove, Request, SetBlendMode, SetEnabled, SetIndex, SetLocked, SetPrivateSettings,
             SetPrivateSettingsInternal, SetTransform, Source, Transform,
         },
         scenes::SceneId,
@@ -173,15 +173,12 @@ impl<'a> SceneItems<'a> {
 
     /// Gets private scene item settings.
     #[doc(alias = "GetSceneItemPrivateSettings")]
-    pub async fn private_settings<T>(&self, scene: SceneId<'_>, item_id: i64) -> Result<T>
+    pub async fn private_settings<T>(&self, settings: PrivateSettings<'_>) -> Result<T>
     where
         T: DeserializeOwned,
     {
         self.client
-            .send_message::<_, responses::SceneItemSettings<T>>(Request::PrivateSettings {
-                scene,
-                item_id,
-            })
+            .send_message::<_, responses::SceneItemSettings<T>>(Request::PrivateSettings(settings))
             .await
             .map(|sis| sis.settings)
     }
@@ -194,6 +191,7 @@ impl<'a> SceneItems<'a> {
     {
         self.client
             .send_message(Request::SetPrivateSettings(SetPrivateSettingsInternal {
+                canvas: settings.canvas,
                 scene: settings.scene,
                 item_id: settings.item_id,
                 settings: serde_json::to_value(settings.settings)

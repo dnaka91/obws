@@ -2,9 +2,9 @@ use anyhow::Result;
 use obws::{
     common::{BlendMode, BoundsType},
     requests::scene_items::{
-        self, Bounds, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, Remove,
-        SceneItemTransform, SetBlendMode, SetEnabled, SetIndex, SetLocked, SetPrivateSettings,
-        SetTransform, Source, Transform,
+        self, Bounds, CreateSceneItem, Duplicate, Enabled, Id, Index, Locked, PrivateSettings,
+        Remove, SceneItemTransform, SetBlendMode, SetEnabled, SetIndex, SetLocked,
+        SetPrivateSettings, SetTransform, Source, Transform,
     },
 };
 use serde_json::json;
@@ -348,7 +348,11 @@ async fn scene_items() -> Result<()> {
     );
 
     let settings = client
-        .private_settings::<serde_json::Value>(TEST_SCENE, test_text_id)
+        .private_settings::<serde_json::Value>(PrivateSettings {
+            canvas: None,
+            scene: TEST_SCENE,
+            item_id: test_text_id,
+        })
         .await?;
 
     server.expect(
@@ -363,6 +367,7 @@ async fn scene_items() -> Result<()> {
 
     client
         .set_private_settings(SetPrivateSettings {
+            canvas: None,
             scene: TEST_SCENE,
             item_id: test_text_id,
             settings: &settings,

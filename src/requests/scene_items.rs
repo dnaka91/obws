@@ -60,14 +60,7 @@ pub(crate) enum Request<'a> {
     #[serde(rename = "SetSceneItemBlendMode")]
     SetBlendMode(SetBlendMode<'a>),
     #[serde(rename = "GetSceneItemPrivateSettings")]
-    PrivateSettings {
-        /// Identifier of the scene the item is in.
-        #[serde(flatten)]
-        scene: SceneId<'a>,
-        /// Numeric ID of the scene item.
-        #[serde(rename = "sceneItemId")]
-        item_id: i64,
-    },
+    PrivateSettings(PrivateSettings<'a>),
     #[serde(rename = "SetSceneItemPrivateSettings")]
     SetPrivateSettings(SetPrivateSettingsInternal<'a>),
 }
@@ -467,9 +460,27 @@ pub struct SetBlendMode<'a> {
     pub mode: common::BlendMode,
 }
 
+/// Request information for [`crate::client::SceneItems::private_settings`].
+#[skip_serializing_none]
+#[derive(Serialize)]
+#[cfg_attr(feature = "builder", derive(bon::Builder))]
+pub struct PrivateSettings<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
+    /// Identifier of the scene the item is in.
+    #[serde(flatten)]
+    pub scene: SceneId<'a>,
+    /// Numeric ID of the scene item.
+    #[serde(rename = "sceneItemId")]
+    pub item_id: i64,
+}
+
 /// Request information for [`crate::client::SceneItems::set_private_settings`].
 #[cfg_attr(feature = "builder", derive(bon::Builder))]
 pub struct SetPrivateSettings<'a, T> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     pub scene: SceneId<'a>,
     /// Numeric ID of the scene item.
@@ -482,6 +493,9 @@ pub struct SetPrivateSettings<'a, T> {
 #[skip_serializing_none]
 #[derive(Default, Serialize)]
 pub(crate) struct SetPrivateSettingsInternal<'a> {
+    /// UUID of the canvas the scene is in, if using the [`SceneId::Name`].
+    #[serde(rename = "canvasUuid")]
+    pub canvas: Option<Uuid>,
     /// Identifier of the scene the item is in.
     #[serde(flatten)]
     pub scene: SceneId<'a>,
